@@ -1,8 +1,12 @@
+using Draco.IO.Metadata;
+
 namespace Draco.IO;
 
 public class DracoDecoder
 {
     public DracoHeader? Header { get; private set; }
+    public MetadataElement[]? AttMetadata;
+    public MetadataElement? FileMetadata;
 
     public void Decode(string path)
     {
@@ -20,6 +24,13 @@ public class DracoDecoder
         using var buffer = new DecoderBuffer(binaryReader);
         Header = ParseHeader(buffer);
         buffer.BitStream_Version = Header.Version;
+        if (Header.Version >= Constants.BitStreamVersion(1, 3) && (Header.Flags & Constants.Metadata.FlagMask) == Constants.Metadata.FlagMask)
+        {
+            var metadataDecoder = new MetadataDecoder();
+            metadataDecoder.Decode(buffer);
+            AttMetadata = metadataDecoder.AttMetadata;
+            FileMetadata = metadataDecoder.FileMetadata;
+        }
     }
 
     private static DracoHeader ParseHeader(DecoderBuffer buffer)
