@@ -7,4 +7,9 @@ internal static class Constants
     public const byte MinorVersion = 2;
 
     public static ushort BitStreamVersion(byte majorVersion, byte minorVersion) => (ushort)((majorVersion << 8) | minorVersion);
+
+    public static class Metadata
+    {
+        public const ushort FlagMask = 32768;
+    }
 }
