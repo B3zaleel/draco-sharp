@@ -11,4 +11,8 @@
     <ProjectReference Include="..\Draco\Draco.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Content Include="./Samples/**" CopyToOutputDirectory="PreserveNewest" Link="Samples\%(RecursiveDir)\%(Filename)%(Extension)" />
+  </ItemGroup>
+
 </Project>
