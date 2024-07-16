@@ -32,8 +32,8 @@ public class DracoDecoder
             AttMetadata = metadataDecoder.AttMetadata;
             FileMetadata = metadataDecoder.FileMetadata;
         }
-        var connectivityDecoder = GetDecoder(buffer);
-        connectivityDecoder.DecodeConnectivity(buffer);
+        var connectivityDecoder = GetDecoder(decoderBuffer);
+        connectivityDecoder.DecodeConnectivity(decoderBuffer);
     }
 
     private static DracoHeader ParseHeader(DecoderBuffer decoderBuffer)
