@@ -1,3 +1,4 @@
+using Draco.IO.Mesh;
 using Draco.IO.Metadata;
 
 namespace Draco.IO;
@@ -31,6 +32,8 @@ public class DracoDecoder
             AttMetadata = metadataDecoder.AttMetadata;
             FileMetadata = metadataDecoder.FileMetadata;
         }
+        var connectivityDecoder = GetDecoder(buffer);
+        connectivityDecoder.DecodeConnectivity(buffer);
     }
 
     private static DracoHeader ParseHeader(DecoderBuffer decoderBuffer)
@@ -53,5 +56,40 @@ public class DracoDecoder
             encoderMethod: encoderMethod,
             flags: flags
         );
+    }
+
+    private IConnectivityDecoder GetDecoder(DecoderBuffer decoderBuffer)
+    {
+        if (Header!.EncoderType == Constants.EncodingType.PointCloud)
+        {
+            throw new NotImplementedException("Point cloud decoding is not implemented.");
+        }
+        else if (Header.EncoderType == Constants.EncodingType.TriangularMesh)
+        {
+            if (Header.EncoderMethod == Constants.EncodingMethod.SequentialEncoding)
+            {
+                return new MeshSequentialDecoder();
+            }
+            else if (Header.EncoderMethod == Constants.EncodingMethod.EdgeBreakerEncoding)
+            {
+                var traversalDecoderType = decoderBuffer.ReadByte();
+
+                return traversalDecoderType switch
+                {
+                    Constants.EdgeBreakerTraversalDecoderType.StandardEdgeBreaker => new MeshEdgeBreakerTraversalDecoder(),
+                    Constants.EdgeBreakerTraversalDecoderType.ValenceEdgeBreaker => new MeshEdgeBreakerTraversalValenceDecoder(),
+                    Constants.EdgeBreakerTraversalDecoderType.PredictiveEdgeBreaker => new MeshEdgeBreakerTraversalPredictiveDecoder(),
+                    _ => throw new InvalidDataException($"Unsupported edge breaker traversal decoder type {traversalDecoderType}"),
+                };
+            }
+            else
+            {
+                throw new InvalidDataException($"Unsupported encoder method {Header.EncoderMethod}.");
+            }
+        }
+        else
+        {
+            throw new InvalidDataException($"Unsupported encoder type {Header.EncoderType}.");
+        }
     }
 }
