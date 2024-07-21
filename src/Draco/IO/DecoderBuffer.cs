@@ -78,6 +78,12 @@ internal sealed class DecoderBuffer : IDisposable
         return _binaryReader.ReadSByte();
     }
 
+    public short ReadInt16()
+    {
+        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        return _binaryReader.ReadInt16();
+    }
+
     public int ReadInt32()
     {
         Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
