@@ -100,6 +100,18 @@ internal static class Constants
         public const byte Tagged = 0;
         public const byte Raw = 1;
     }
+
+    public static int DataTypeLength(DataType dataType)
+    {
+        return dataType switch
+        {
+            DataType.Int8 or DataType.UInt8 or DataType.Bool => 1,
+            DataType.Int16 or DataType.UInt16 => 2,
+            DataType.Int32 or DataType.UInt32 or DataType.Float32 => 4,
+            DataType.Int64 or DataType.UInt64 or DataType.Float64 => 8,
+            _ => -1
+        };
+    }
 }
 
 public enum GeometryAttributeType : sbyte
