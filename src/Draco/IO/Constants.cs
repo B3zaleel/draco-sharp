@@ -112,6 +112,15 @@ internal static class Constants
             _ => -1
         };
     }
+
+    public static bool IsDataTypeIntegral(DataType dataType)
+    {
+        return dataType switch
+        {
+            DataType.Int8 or DataType.UInt8 or DataType.Int16 or DataType.UInt16 or DataType.Int32 or DataType.UInt32 or DataType.Int64 or DataType.UInt64 or DataType.Bool => true,
+            _ => false
+        };
+    }
 }
 
 public enum GeometryAttributeType : sbyte
