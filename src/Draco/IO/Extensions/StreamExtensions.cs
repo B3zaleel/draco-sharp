@@ -89,4 +89,13 @@ internal static class StreamExtensions
         };
         stream.Write(convertedData!.ToArray());
     }
+
+    public static void Update(this Stream stream, Stream srcStream)
+    {
+        var position = stream.Position;
+        var srcPosition = srcStream.Position;
+        srcStream.CopyTo(stream);
+        stream.Seek(position, SeekOrigin.Begin);
+        srcStream.Seek(srcPosition, SeekOrigin.Begin);
+    }
 }
