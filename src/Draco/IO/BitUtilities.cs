@@ -50,4 +50,26 @@ internal class BitUtilities
         }
         return -(int)val - 1;
     }
+
+    public static uint[] ConvertSignedIntsToSymbols(int[] signedInts)
+    {
+        var symbols = new uint[signedInts.Length];
+
+        for (int i = 0; i < signedInts.Length; ++i)
+        {
+            symbols[i] = ConvertSignedIntToSymbol(signedInts[i]);
+        }
+        return symbols;
+    }
+
+    public static int[] ConvertSymbolsToSignedInts(uint[] symbols)
+    {
+        var signedInts = new int[symbols.Length];
+
+        for (int i = 0; i < symbols.Length; ++i)
+        {
+            signedInts[i] = ConvertSymbolToSignedInt(symbols[i]);
+        }
+        return signedInts;
+    }
 }
