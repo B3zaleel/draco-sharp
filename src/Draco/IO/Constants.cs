@@ -89,6 +89,12 @@ internal static class Constants
     public const ushort TaggedRAnsBase = 16384;
     public const ushort TaggedRAnsPrecision = 4096;
 
+    public enum NormalPredictionMode : byte
+    {
+        OneTriangle = 0,
+        TriangleArea = 1,
+    }
+
     public static class SymbolCoding
     {
         public const byte Tagged = 0;
@@ -103,7 +109,8 @@ public enum GeometryAttributeType : sbyte
     Normal = 1,
     Color = 2,
     TexCoord = 3,
-    NamedAttributesCount = 4
+    Generic,
+    NamedAttributesCount
 }
 
 /// <summary>
@@ -131,4 +138,60 @@ public enum AttributeTransformType : sbyte
     NoTransform = 0,
     QuantizationTransform = 1,
     OctahedronTransform = 2,
+}
+
+public enum SequentialAttributeEncoderType : byte
+{
+    Generic = 0,
+    Integer,
+    Quantization,
+    Normals
+}
+
+public enum PredictionSchemeMethod : sbyte
+{
+    None = -2,
+    Undefined = -1,
+    Difference = 0,
+    Parallelogram = 1,
+    MultiParallelogram = 2,
+    TexCoordsDeprecated = 3,
+    ConstrainedMultiParallelogram = 4,
+    TexCoordsPortable = 5,
+    GeometricNormal = 6,
+    Count
+}
+
+public enum PredictionSchemeTransformType : sbyte
+{
+    None = -1,
+    Delta = 0,
+    Wrap = 1,
+    NormalOctahedron = 2,
+    NormalOctahedronCanonicalized = 3,
+    Count,
+}
+
+public enum MeshTraversalMethod : byte
+{
+    DepthFirst = 0,
+    PredictionDegree,
+    Count
+}
+
+public enum DataType : byte
+{
+    Invalid = 0,
+    Int8,
+    UInt8,
+    Int16,
+    UInt16,
+    Int32,
+    UInt32,
+    Int64,
+    UInt64,
+    Float32,
+    Float64,
+    Bool,
+    Count
 }
