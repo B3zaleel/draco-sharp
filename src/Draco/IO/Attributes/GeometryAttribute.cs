@@ -4,7 +4,7 @@ namespace Draco.IO.Attributes;
 
 public class GeometryAttribute
 {
-    public Stream? Buffer { get; private set; }
+    public Stream? Buffer { get; set; }
     public GeometryAttributeType AttributeType { get; set; }
     public byte NumComponents { get; set; }
     public DataType DataType { get; set; }
