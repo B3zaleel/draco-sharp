@@ -7,7 +7,6 @@ public class PointAttribute : GeometryAttribute
     private uint _numUniqueEntries = 0;
     private readonly List<uint> _indicesMap = [];
 
-    public Stream? Buffer { get; private set; }
     public bool IsMappingIdentity { get; private set; } = false;
     public int IndicesMapSize { get => IsMappingIdentity ? 0 : _indicesMap.Count; }
 
@@ -34,7 +33,11 @@ public class PointAttribute : GeometryAttribute
 
     public void Reset(int numAttributeValues)
     {
-        // TODO: implement this
+        if (Buffer == null)
+        {
+            Buffer = new MemoryStream();
+        }
+        ResetBuffer(Buffer, Constants.DataTypeLength(DataType) * NumComponents, 0);
         _numUniqueEntries = (uint)numAttributeValues;
     }
 
