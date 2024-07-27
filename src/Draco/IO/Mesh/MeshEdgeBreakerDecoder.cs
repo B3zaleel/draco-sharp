@@ -1,12 +1,12 @@
 using Draco.IO.Attributes;
 using Draco.IO.Extensions;
+using Draco.IO.Mesh.Traverser;
 
 namespace Draco.IO.Mesh;
 
 internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
 {
     protected CornerTable? _cornerTable;
-    private readonly List<int> _cornerTraversalStack = [];
     private readonly List<int> _vertexTraversalLength = [];
     private readonly List<TopologySplitEventData> _topologySplitData = [];
     private readonly List<HoleEventData> _holeEventData = [];
@@ -19,6 +19,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
     private readonly List<int> _processedCornerIds = [];
     private readonly List<int> _processedConnectivityCorners = [];
     private MeshAttributeIndicesEncodingData? _posEncodingData;
+    private int _posDataDecoderId = -1;
     private readonly List<DecoderAttributeData> _attributeData = [];
 
     public override void DecodeConnectivity(DecoderBuffer decoderBuffer)
@@ -633,6 +634,128 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             Mesh.SetFace(f, face);
         }
         Mesh.PointsCount = pointToCornerMap.Count;
+    }
+
+    protected override void CreateAttributesDecoder(DecoderBuffer decoderBuffer, int attDecoderId)
+    {
+        var attDataId = decoderBuffer.ReadSByte();
+        var decoderType = decoderBuffer.ReadByte();
+
+        if (attDataId >= 0)
+        {
+            Assertions.ThrowIf(attDataId >= _attributeData.Count, "Unexpected attribute data.");
+            Assertions.ThrowIf(_attributeData[attDataId].DecoderId >= 0, "Ensure that the attribute data is not mapped to a different attributes decoder already.");
+            _attributeData[attDataId].DecoderId = attDecoderId;
+        }
+        else
+        {
+            Assertions.ThrowIf(_posDataDecoderId >= 0, "Some other routine is already using the data.");
+            _posDataDecoderId = attDecoderId;
+        }
+        var traversalMethod = MeshTraversalMethod.DepthFirst;
+        if (decoderBuffer.BitStream_Version >= Constants.BitStreamVersion(1, 2))
+        {
+            var traversalMethodEncoded = decoderBuffer.ReadByte();
+            Assertions.ThrowIf(traversalMethodEncoded >= (byte)MeshTraversalMethod.Count, "Traversal method is invalid.");
+            traversalMethod = (MeshTraversalMethod)traversalMethodEncoded;
+        }
+        PointsSequencer? sequencer = null;
+        if (decoderType == (byte)MeshAttributeElementType.VertexAttribute)
+        {
+            MeshAttributeIndicesEncodingData? encodingData;
+
+            if (attDataId < 0)
+            {
+                encodingData = _posEncodingData;
+            }
+            else
+            {
+                encodingData = _attributeData[attDataId].EncodingData;
+                _attributeData[attDataId].IsConnectivityUsed = false;
+            }
+            if (traversalMethod == MeshTraversalMethod.PredictionDegree)
+            {
+                var traversalSequencer = new MeshTraversalSequencer(Mesh, encodingData!);
+                var attributeObserver = new MeshAttributeIndicesEncodingObserver(_cornerTable!, Mesh, encodingData!, traversalSequencer);
+                var attributeTraverser = new MaxPredictionDegreeTraverser(_cornerTable!, attributeObserver);
+                traversalSequencer.Traverser = attributeTraverser;
+                sequencer = traversalSequencer;
+            }
+            else if (traversalMethod == MeshTraversalMethod.DepthFirst)
+            {
+                var traversalSequencer = new MeshTraversalSequencer(Mesh, encodingData!);
+                var attributeObserver = new MeshAttributeIndicesEncodingObserver(_cornerTable!, Mesh, encodingData!, traversalSequencer);
+                var attributeTraverser = new DepthFirstTraverser(_cornerTable!, attributeObserver);
+                traversalSequencer.Traverser = attributeTraverser;
+                sequencer = traversalSequencer;
+            }
+            else
+            {
+                Assertions.Throw("Unsupported attribute traversal method.");
+            }
+        }
+        else
+        {
+            Assertions.ThrowIf(traversalMethod != MeshTraversalMethod.DepthFirst, "Unsupported attribute traversal method.");
+            Assertions.ThrowIf(attDataId < 0, "Attribute data must be specified.");
+            var traversalSequencer = new MeshTraversalSequencer(Mesh, _attributeData[attDataId].EncodingData!);
+            var attributeObserver = new MeshAttributeIndicesEncodingObserver(_attributeData[attDataId].ConnectivityData!, Mesh, _attributeData[attDataId].EncodingData!, traversalSequencer);
+            var attributeTraverser = new DepthFirstTraverser(_attributeData[attDataId].ConnectivityData!, attributeObserver);
+            traversalSequencer.Traverser = attributeTraverser;
+            sequencer = traversalSequencer;
+        }
+        Assertions.ThrowIf(sequencer == null, "Sequencer must be set.");
+        SetAttributesDecoder(attDataId, new SequentialAttributeDecodersController(sequencer!, this, Mesh));
+    }
+
+    public override MeshAttributeCornerTable? GetAttributeCornerTable(int attId)
+    {
+        for (uint i = 0; i < _attributeData.Count; ++i)
+        {
+            var decoderId = _attributeData[(int)i].DecoderId;
+
+            if (decoderId < 0 || decoderId >= AttributesDecoders.Count)
+            {
+                continue;
+            }
+            var decoder = AttributesDecoders[decoderId];
+
+            for (int j = 0; j < decoder!.AttributesCount; ++j)
+            {
+                if (decoder.GetAttributeId(j) == attId)
+                {
+                    return _attributeData[(int)i].IsConnectivityUsed ? _attributeData[(int)i].ConnectivityData : null;
+                }
+            }
+        }
+        return null;
+    }
+
+    public override MeshAttributeIndicesEncodingData? GetAttributeEncodingData(int attId)
+    {
+        if (attId < 0 || attId >= _attributeData.Count)
+        {
+            return null;
+        }
+        for (uint i = 0; i < _attributeData.Count; ++i)
+        {
+            var decoderId = _attributeData[(int)i].DecoderId;
+
+            if (decoderId < 0 || decoderId >= AttributesDecoders.Count)
+            {
+                continue;
+            }
+            var decoder = AttributesDecoders[decoderId];
+
+            for (int j = 0; j < decoder!.AttributesCount; ++j)
+            {
+                if (decoder.GetAttributeId(j) == attId)
+                {
+                    return _attributeData[(int)i].EncodingData;
+                }
+            }
+        }
+        return _posEncodingData;
     }
 
     protected abstract void Traversal_Init(DecoderBuffer decoderBuffer);
