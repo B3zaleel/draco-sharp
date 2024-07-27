@@ -35,6 +35,7 @@ public class DracoDecoder
         var connectivityDecoder = GetDecoder(decoderBuffer);
         connectivityDecoder.BitStreamVersion = Header.Version;
         connectivityDecoder.DecodeConnectivity(decoderBuffer);
+        connectivityDecoder.DecodeAttributes(decoderBuffer);
     }
 
     private static DracoHeader ParseHeader(DecoderBuffer decoderBuffer)
