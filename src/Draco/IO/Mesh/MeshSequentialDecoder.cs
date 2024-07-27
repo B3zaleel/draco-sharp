@@ -1,3 +1,4 @@
+using Draco.IO.Attributes;
 using Draco.IO.Entropy;
 
 namespace Draco.IO.Mesh;
@@ -114,5 +115,10 @@ internal class MeshSequentialDecoder : MeshDecoder
             }
             Mesh!.AddFace(face);
         }
+    }
+
+    protected override void CreateAttributesDecoder(DecoderBuffer decoderBuffer, int attDecoderId)
+    {
+        SetAttributesDecoder(attDecoderId, new SequentialAttributeDecodersController(new LinearSequencer(Mesh!.PointsCount), this, PointCloud));
     }
 }
