@@ -24,6 +24,25 @@ internal static class MathUtilities
         return (T)Convert.ChangeType(squareRoot, typeof(T));
     }
 
+    public static decimal Abs<T>(T value)
+    {
+        return value switch
+        {
+            decimal dec => Math.Abs(dec),
+            float f => (decimal)Math.Abs(f),
+            double dbl => (decimal)Math.Abs(dbl),
+            sbyte b => Math.Abs(b),
+            short s => Math.Abs(s),
+            int i => Math.Abs(i),
+            long l => Math.Abs(l),
+            byte b => Math.Abs(b),
+            ushort s => Math.Abs(s),
+            uint i => Math.Abs(i),
+            ulong ul => Math.Abs((decimal)ul),
+            _ => throw new InvalidOperationException("Unsupported type.")
+        };
+    }
+
     public static T AddAsUnsigned<T>(T a, T b)
     {
         var unsignedResult = typeof(T).Name switch
