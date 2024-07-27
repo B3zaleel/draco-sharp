@@ -3,7 +3,7 @@ using Draco.IO.Extensions;
 
 namespace Draco.IO.Mesh;
 
-internal abstract class MeshEdgeBreakerDecoder : IMeshDecoder
+internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
 {
     protected CornerTable? _cornerTable;
     private readonly List<int> _cornerTraversalStack = [];
@@ -21,10 +21,7 @@ internal abstract class MeshEdgeBreakerDecoder : IMeshDecoder
     private MeshAttributeIndicesEncodingData? _posEncodingData;
     private readonly List<DecoderAttributeData> _attributeData = [];
 
-    public Mesh Mesh { get; private set; } = new();
-    public int GeometryType { get => Constants.EncodingType.TriangularMesh; }
-
-    public void DecodeConnectivity(DecoderBuffer decoderBuffer)
+    public override void DecodeConnectivity(DecoderBuffer decoderBuffer)
     {
         _numNewVertices = 0;
         _newToParentVertexMap.Clear();
@@ -648,9 +645,4 @@ internal abstract class MeshEdgeBreakerDecoder : IMeshDecoder
     protected virtual void MergeVertices(uint dest, uint source) { }
     protected virtual void NewActiveCornerReached(uint corner) { }
     protected abstract bool DecodeStartFaceConfiguration(DecoderBuffer decoderBuffer);
-
-    public void DecodeAttributes(DecoderBuffer decoderBuffer)
-    {
-        throw new NotImplementedException(/* TODO: Implement this */);
-    }
 }

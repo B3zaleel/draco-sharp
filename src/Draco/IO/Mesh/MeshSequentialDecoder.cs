@@ -2,12 +2,9 @@ using Draco.IO.Entropy;
 
 namespace Draco.IO.Mesh;
 
-internal class MeshSequentialDecoder : IMeshDecoder
+internal class MeshSequentialDecoder : MeshDecoder
 {
-    public Mesh? Mesh { get; private set; }
-    public int GeometryType { get => Constants.EncodingType.TriangularMesh; }
-
-    public void DecodeConnectivity(DecoderBuffer decoderBuffer)
+    public override void DecodeConnectivity(DecoderBuffer decoderBuffer)
     {
         uint numFaces, numPoints;
 
