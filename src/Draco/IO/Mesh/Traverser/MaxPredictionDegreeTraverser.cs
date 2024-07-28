@@ -15,7 +15,7 @@ internal class MaxPredictionDegreeTraverser(CornerTable cornerTable, TraversalOb
 
         for (int i = 0; i < _kMaxPriority; ++i)
         {
-            _traversalStacks[i] = new();
+            _traversalStacks[i] = [];
         }
     }
 
@@ -52,7 +52,7 @@ internal class MaxPredictionDegreeTraverser(CornerTable cornerTable, TraversalOb
         while (cornerId != Constants.kInvalidCornerIndex)
         {
             var faceId = cornerId / 3;
-        
+
             if (IsFaceVisited(faceId, true))
             {
                 cornerId = PopNextCornerToTraverse();
