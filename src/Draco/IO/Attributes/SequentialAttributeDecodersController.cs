@@ -71,7 +71,7 @@ internal class SequentialAttributeDecodersController : AttributesDecoder
         {
             (uint)SequentialAttributeEncoderType.Generic => new SequentialAttributeDecoder(),
             (uint)SequentialAttributeEncoderType.Integer => new SequentialIntegerAttributeDecoder(),
-            // (uint)SequentialAttributeEncoderType.Quantization => new SequentialQuantizationAttributeDecoder(),
+            (uint)SequentialAttributeEncoderType.Quantization => new SequentialQuantizationAttributeDecoder(),
             // (uint)SequentialAttributeEncoderType.Normals => new SequentialNormalAttributeDecoder(),
             _ => throw new NotImplementedException($"Cannot generate a sequential decoder for the decoder type {decoderType}"),
         };
