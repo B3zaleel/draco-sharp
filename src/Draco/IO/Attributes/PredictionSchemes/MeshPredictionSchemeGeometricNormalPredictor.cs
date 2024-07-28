@@ -5,8 +5,8 @@ namespace Draco.IO.Attributes.PredictionSchemes;
 
 internal abstract class MeshPredictionSchemeGeometricNormalPredictor(MeshPredictionSchemeData predictionSchemeData)
 {
-    protected PointAttribute? PositionAttribute { get; set; }
-    protected uint[]? EntryToPointIdMap { get; set; }
+    public PointAttribute? PositionAttribute { get; set; }
+    public uint[]? EntryToPointIdMap { get; set; }
     protected MeshPredictionSchemeData MeshData { get; set; } = predictionSchemeData;
     public NormalPredictionMode Mode { get; set; }
 
