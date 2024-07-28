@@ -78,6 +78,12 @@ internal sealed class DecoderBuffer : IDisposable
         return _binaryReader.ReadSByte();
     }
 
+    public short ReadInt16()
+    {
+        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        return _binaryReader.ReadInt16();
+    }
+
     public int ReadInt32()
     {
         Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
@@ -111,6 +117,22 @@ internal sealed class DecoderBuffer : IDisposable
             values[i] = _binaryReader.ReadSByte();
         }
         return values;
+    }
+
+    public T Read<T>() where T : struct
+    {
+        return typeof(T).Name switch
+        {
+            nameof(Byte) => (T)Convert.ChangeType(ReadByte(), typeof(T)),
+            nameof(UInt16) => (T)Convert.ChangeType(ReadUInt16(), typeof(T)),
+            nameof(UInt32) => (T)Convert.ChangeType(ReadUInt32(), typeof(T)),
+            nameof(UInt64) => (T)Convert.ChangeType(ReadUInt64(), typeof(T)),
+            nameof(SByte) => (T)Convert.ChangeType(ReadSByte(), typeof(T)),
+            nameof(Int16) => (T)Convert.ChangeType(ReadInt16(), typeof(T)),
+            nameof(Int32) => (T)Convert.ChangeType(ReadInt32(), typeof(T)),
+            nameof(Single) => (T)Convert.ChangeType(ReadSingle(), typeof(T)),
+            _ => throw new NotSupportedException($"Type {typeof(T).Name} is not supported")
+        };
     }
 
     public uint DecodeLeastSignificantBits32(byte count)

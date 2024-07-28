@@ -9,6 +9,7 @@ public class PointCloud
     private readonly List<List<int>> _namedAttributeIndex = [];
 
     public int PointsCount { get; set; } = 0;
+    public int AttributesCount { get => _attributes.Count; }
 
     public int NumNamedAttributes(GeometryAttributeType type)
     {
@@ -50,6 +51,11 @@ public class PointCloud
             }
         }
         return null;
+    }
+
+    public PointAttribute? GetAttributeById(int id)
+    {
+        return id < 0 || id > _attributes.Count ? null : _attributes[id];
     }
 
     public PointAttribute? GetAttributeByUniqueId(uint uniqueId)

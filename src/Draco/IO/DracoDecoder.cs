@@ -33,7 +33,9 @@ public class DracoDecoder
             FileMetadata = metadataDecoder.FileMetadata;
         }
         var connectivityDecoder = GetDecoder(decoderBuffer);
+        connectivityDecoder.BitStreamVersion = Header.Version;
         connectivityDecoder.DecodeConnectivity(decoderBuffer);
+        connectivityDecoder.DecodeAttributes(decoderBuffer);
     }
 
     private static DracoHeader ParseHeader(DecoderBuffer decoderBuffer)
@@ -58,7 +60,7 @@ public class DracoDecoder
         );
     }
 
-    private IConnectivityDecoder GetDecoder(DecoderBuffer decoderBuffer)
+    private ConnectivityDecoder GetDecoder(DecoderBuffer decoderBuffer)
     {
         if (Header!.EncoderType == Constants.EncodingType.PointCloud)
         {

@@ -32,6 +32,12 @@ public class Mesh : PointCloud.PointCloud
         _faces.AddRange(new int[numFaces][]);
     }
 
+    public int[] GetFace(uint faceId)
+    {
+        Assertions.ThrowIfNot(faceId >= 0 && faceId < _faces.Count);
+        return _faces[(int)faceId];
+    }
+
     public new void SetAttribute(int attId, PointAttribute pointAttribute)
     {
         base.SetAttribute(attId, pointAttribute);

@@ -89,10 +89,59 @@ internal static class Constants
     public const ushort TaggedRAnsBase = 16384;
     public const ushort TaggedRAnsPrecision = 4096;
 
+    public enum NormalPredictionMode : byte
+    {
+        OneTriangle = 0,
+        TriangleArea = 1,
+    }
+
     public static class SymbolCoding
     {
         public const byte Tagged = 0;
         public const byte Raw = 1;
+    }
+
+    public static int DataTypeLength(DataType dataType)
+    {
+        return dataType switch
+        {
+            DataType.Int8 or DataType.UInt8 or DataType.Bool => 1,
+            DataType.Int16 or DataType.UInt16 => 2,
+            DataType.Int32 or DataType.UInt32 or DataType.Float32 => 4,
+            DataType.Int64 or DataType.UInt64 or DataType.Float64 => 8,
+            _ => -1
+        };
+    }
+
+    public static bool IsDataTypeIntegral(DataType dataType)
+    {
+        return dataType switch
+        {
+            DataType.Int8 or DataType.UInt8 or DataType.Int16 or DataType.UInt16 or DataType.Int32 or DataType.UInt32 or DataType.Int64 or DataType.UInt64 or DataType.Bool => true,
+            _ => false
+        };
+    }
+
+    public static bool IsIntegral<T>()
+    {
+        return typeof(T) == typeof(sbyte) || typeof(T) == typeof(byte) || typeof(T) == typeof(short) || typeof(T) == typeof(ushort) || typeof(T) == typeof(int) || typeof(T) == typeof(uint) || typeof(T) == typeof(long) || typeof(T) == typeof(ulong) || typeof(T) == typeof(bool) || typeof(T) == typeof(char);
+    }
+
+    public static bool IsFloatingPoint<T>()
+    {
+        return typeof(T) == typeof(float) || typeof(T) == typeof(double) || typeof(T) == typeof(Half);
+    }
+
+    public static byte SizeOf<T>()
+    {
+        return typeof(T) switch
+        {
+            Type t when t == typeof(sbyte) || t == typeof(byte) => 1,
+            Type t when t == typeof(short) || t == typeof(ushort) || t == typeof(char) || t == typeof(Half) => 2,
+            Type t when t == typeof(int) || t == typeof(uint) || t == typeof(float) => 4,
+            Type t when t == typeof(long) || t == typeof(ulong) || t == typeof(double) => 8,
+            _ => throw new NotImplementedException()
+        };
     }
 }
 
@@ -103,7 +152,8 @@ public enum GeometryAttributeType : sbyte
     Normal = 1,
     Color = 2,
     TexCoord = 3,
-    NamedAttributesCount = 4
+    Generic,
+    NamedAttributesCount
 }
 
 /// <summary>
@@ -131,4 +181,60 @@ public enum AttributeTransformType : sbyte
     NoTransform = 0,
     QuantizationTransform = 1,
     OctahedronTransform = 2,
+}
+
+public enum SequentialAttributeEncoderType : byte
+{
+    Generic = 0,
+    Integer,
+    Quantization,
+    Normals
+}
+
+public enum PredictionSchemeMethod : sbyte
+{
+    None = -2,
+    Undefined = -1,
+    Difference = 0,
+    Parallelogram = 1,
+    MultiParallelogram = 2,
+    TexCoordsDeprecated = 3,
+    ConstrainedMultiParallelogram = 4,
+    TexCoordsPortable = 5,
+    GeometricNormal = 6,
+    Count
+}
+
+public enum PredictionSchemeTransformType : sbyte
+{
+    None = -1,
+    Delta = 0,
+    Wrap = 1,
+    NormalOctahedron = 2,
+    NormalOctahedronCanonicalized = 3,
+    Count,
+}
+
+public enum MeshTraversalMethod : byte
+{
+    DepthFirst = 0,
+    PredictionDegree,
+    Count
+}
+
+public enum DataType : byte
+{
+    Invalid = 0,
+    Int8,
+    UInt8,
+    Int16,
+    UInt16,
+    Int32,
+    UInt32,
+    Int64,
+    UInt64,
+    Float32,
+    Float64,
+    Bool,
+    Count
 }

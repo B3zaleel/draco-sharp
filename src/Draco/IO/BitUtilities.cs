@@ -11,6 +11,17 @@ internal class BitUtilities
         return (n >> 16) | (n << 16);
     }
 
+    public static int MostSignificantBit(uint num)
+    {
+        int msb = -1;
+        while (num != 0)
+        {
+            msb++;
+            num >>= 1;
+        }
+        return msb;
+    }
+
     public static ulong ConvertSignedIntToSymbol(long val)
     {
         if (val >= 0)
@@ -49,5 +60,27 @@ internal class BitUtilities
             return (int)val;
         }
         return -(int)val - 1;
+    }
+
+    public static uint[] ConvertSignedIntsToSymbols(int[] signedInts)
+    {
+        var symbols = new uint[signedInts.Length];
+
+        for (int i = 0; i < signedInts.Length; ++i)
+        {
+            symbols[i] = ConvertSignedIntToSymbol(signedInts[i]);
+        }
+        return symbols;
+    }
+
+    public static int[] ConvertSymbolsToSignedInts(uint[] symbols)
+    {
+        var signedInts = new int[symbols.Length];
+
+        for (int i = 0; i < symbols.Length; ++i)
+        {
+            signedInts[i] = ConvertSymbolToSignedInt(symbols[i]);
+        }
+        return signedInts;
     }
 }
