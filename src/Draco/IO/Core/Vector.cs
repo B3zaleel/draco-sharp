@@ -223,6 +223,24 @@ internal class Vector<TScalar>
         return result;
     }
 
+    public static Vector<TScalar> CrossProduct(Vector<TScalar> left, Vector<TScalar> right)
+    {
+        if (left.Dimension != 3 || right.Dimension != 3)
+        {
+            throw new InvalidOperationException("Cross product is only defined for 3D vectors.");
+        }
+        var result = new Vector<TScalar>(3)
+        {
+            Components =
+            [
+                (left.Components[1] * right.Components[2]) - (left.Components[2] * right.Components[1]),
+                (left.Components[2] * right.Components[0]) - (left.Components[0] * right.Components[2]),
+                (left.Components[0] * right.Components[1]) - (left.Components[1] * right.Components[0])
+            ]
+        };
+        return result;
+    }
+
     public override bool Equals(object? obj)
     {
         return obj is Vector<TScalar> vector ? IsEqual(this, vector) : false;
