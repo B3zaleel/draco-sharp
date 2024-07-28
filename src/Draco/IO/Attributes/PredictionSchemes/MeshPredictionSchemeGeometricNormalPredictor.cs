@@ -6,7 +6,7 @@ namespace Draco.IO.Attributes.PredictionSchemes;
 internal abstract class MeshPredictionSchemeGeometricNormalPredictor(MeshPredictionSchemeData predictionSchemeData)
 {
     public PointAttribute? PositionAttribute { get; set; }
-    public uint[]? EntryToPointIdMap { get; set; }
+    public List<uint>? EntryToPointIdMap { get; set; }
     protected MeshPredictionSchemeData MeshData { get; set; } = predictionSchemeData;
     public NormalPredictionMode Mode { get; set; }
 
@@ -18,7 +18,7 @@ internal abstract class MeshPredictionSchemeGeometricNormalPredictor(MeshPredict
     protected Vector3<long> GetPositionForDataId(uint dataId)
     {
         Assertions.ThrowIfNot(IsInitialized());
-        var pointId = EntryToPointIdMap![dataId];
+        var pointId = EntryToPointIdMap![(int)dataId];
         var posValueId = PositionAttribute!.MappedIndex(pointId);
         return (Vector3<long>)new Vector<long>(PositionAttribute.ConvertValue<long>(posValueId));
     }
