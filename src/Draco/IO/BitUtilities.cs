@@ -11,6 +11,17 @@ internal class BitUtilities
         return (n >> 16) | (n << 16);
     }
 
+    public static int MostSignificantBit(uint num)
+    {
+        int msb = -1;
+        while (num != 0)
+        {
+            msb++;
+            num >>= 1;
+        }
+        return msb;
+    }
+
     public static ulong ConvertSignedIntToSymbol(long val)
     {
         if (val >= 0)
