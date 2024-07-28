@@ -176,25 +176,31 @@ internal class Vector<TScalar>
         return result;
     }
 
-    public override bool Equals(object? obj)
+    private static bool IsEqual(Vector<TScalar> left, Vector<TScalar> right)
     {
-        if (obj is Vector<TScalar> vector)
+        if (left.Dimension != right.Dimension)
         {
-            if (vector.Dimension != Dimension)
+            return false;
+        }
+
+        for (int i = 0; i < left.Dimension; ++i)
+        {
+            if (left.Components[i] != right.Components[i])
             {
                 return false;
             }
-
-            for (int i = 0; i < Dimension; ++i)
-            {
-                if (!vector.Components[i].Equals(Components[i]))
-                {
-                    return false;
-                }
-            }
-            return true;
         }
-        return false;
+        return true;
+    }
+
+    public static bool operator ==(Vector<TScalar> left, Vector<TScalar> right)
+    {
+        return IsEqual(left, right);
+    }
+
+    public static bool operator !=(Vector<TScalar> left, Vector<TScalar> right)
+    {
+        return !IsEqual(left, right);
     }
 
     public TScalar SquaredNorm()
@@ -215,6 +221,16 @@ internal class Vector<TScalar>
             result += Components[i] * otherVector.Components[i];
         }
         return result;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return obj is Vector<TScalar> vector ? IsEqual(this, vector) : false;
+    }
+
+    public override int GetHashCode()
+    {
+        throw new NotImplementedException();
     }
 }
 
