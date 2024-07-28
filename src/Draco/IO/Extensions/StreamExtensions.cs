@@ -75,6 +75,23 @@ internal static class StreamExtensions
         };
     }
 
+    public static void WriteDatum<T>(this Stream stream, T datum)
+    {
+        var convertedData = datum switch
+        {
+            bool datumAsBool => [(byte)(datumAsBool ? 1 : 0)],
+            byte datumAsByte => [datumAsByte],
+            sbyte datumAsSByte => [(byte)datumAsSByte],
+            ushort datumAsUShort => BitConverter.GetBytes(datumAsUShort),
+            short datumAsShort => BitConverter.GetBytes(datumAsShort),
+            uint datumAsUInt => BitConverter.GetBytes(datumAsUInt),
+            int datumAsInt => BitConverter.GetBytes(datumAsInt),
+            float datumAsFloat => BitConverter.GetBytes(datumAsFloat),
+            _ => throw new NotImplementedException("")
+        };
+        stream.Write(convertedData!.ToArray());
+    }
+
     public static void WriteData<T>(this Stream stream, T[] data)
     {
         var convertedData = typeof(T).Name switch
