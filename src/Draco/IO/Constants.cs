@@ -121,6 +121,28 @@ internal static class Constants
             _ => false
         };
     }
+
+    public static bool IsIntegral<T>()
+    {
+        return typeof(T) == typeof(sbyte) || typeof(T) == typeof(byte) || typeof(T) == typeof(short) || typeof(T) == typeof(ushort) || typeof(T) == typeof(int) || typeof(T) == typeof(uint) || typeof(T) == typeof(long) || typeof(T) == typeof(ulong) || typeof(T) == typeof(bool) || typeof(T) == typeof(char);
+    }
+
+    public static bool IsFloatingPoint<T>()
+    {
+        return typeof(T) == typeof(float) || typeof(T) == typeof(double) || typeof(T) == typeof(Half);
+    }
+
+    public static byte SizeOf<T>()
+    {
+        return typeof(T) switch
+        {
+            Type t when t == typeof(sbyte) || t == typeof(byte) => 1,
+            Type t when t == typeof(short) || t == typeof(ushort) || t == typeof(char) || t == typeof(Half) => 2,
+            Type t when t == typeof(int) || t == typeof(uint) || t == typeof(float) => 4,
+            Type t when t == typeof(long) || t == typeof(ulong) || t == typeof(double) => 8,
+            _ => throw new NotImplementedException()
+        };
+    }
 }
 
 public enum GeometryAttributeType : sbyte
