@@ -7,20 +7,18 @@ public class AttributeTransformData
     public AttributeTransformType TransformType { get; set; } = AttributeTransformType.InvalidTransform;
     public Stream? Buffer { get; set; }
 
-    public TDataType GetParameterValue<TDataType>(int byteOffset)
+    public TDataType GetParameterValue<TDataType>()
     {
-        Buffer!.Seek(byteOffset, SeekOrigin.Begin);
-        return Buffer.ReadDatum<TDataType>();
+        return Buffer!.ReadDatum<TDataType>();
     }
 
-    public void SetParameterValue<TDataType>(int byteOffset, TDataType data)
+    public void SetParameterValue<TDataType>(TDataType data)
     {
-        Buffer!.Seek(byteOffset, SeekOrigin.Begin);
-        Buffer.WriteData([data]);
+        Buffer!.WriteData([data]);
     }
 
     public void AppendParameterValue<TDataType>(TDataType data)
     {
-        SetParameterValue((int)Buffer!.Length, data);
+        SetParameterValue(data);
     }
 }
