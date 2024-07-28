@@ -208,6 +208,23 @@ internal class Vector<TScalar>
         return Dot(this);
     }
 
+    public TScalar AbsSum()
+    {
+        TScalar result = default;
+
+        for (int i = 0; i < Dimension; ++i)
+        {
+            var nextValue = Components[i];
+
+            if (result > TScalar.MaxValue - nextValue)
+            {
+                return TScalar.MaxValue;
+            }
+            result += nextValue;
+        }
+        return result;
+    }
+
     public TScalar Dot(Vector<TScalar> otherVector)
     {
         if (Dimension != otherVector.Dimension)
