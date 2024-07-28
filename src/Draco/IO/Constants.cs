@@ -89,12 +89,6 @@ internal static class Constants
     public const ushort TaggedRAnsBase = 16384;
     public const ushort TaggedRAnsPrecision = 4096;
 
-    public enum NormalPredictionMode : byte
-    {
-        OneTriangle = 0,
-        TriangleArea = 1,
-    }
-
     public static class SymbolCoding
     {
         public const byte Tagged = 0;
@@ -237,4 +231,10 @@ public enum DataType : byte
     Float64,
     Bool,
     Count
+}
+
+public enum NormalPredictionMode : byte
+{
+    OneTriangle = 0,
+    TriangleArea = 1,
 }

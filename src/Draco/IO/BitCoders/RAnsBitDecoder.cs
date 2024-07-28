@@ -7,9 +7,11 @@ internal class RAnsBitDecoder
 {
     private byte _probZero = 0;
     private AnsDecoder _ansDecoder = new();
+    private DecoderBuffer? _decoderBuffer = null;
 
     public void StartDecoding(DecoderBuffer decoderBuffer)
     {
+        _decoderBuffer = decoderBuffer;
         _probZero = decoderBuffer.ReadByte();
         _ansDecoder = new();
         uint size_in_bytes = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2) ? decoderBuffer.ReadUInt32() : (uint)decoderBuffer.DecodeVarIntUnsigned();
@@ -32,6 +34,11 @@ internal class RAnsBitDecoder
             count--;
         }
         return value;
+    }
+
+    public void EndDecoding()
+    {
+        _decoderBuffer?.EndBitDecoding();
     }
 
     public void EndDecoding(DecoderBuffer decoderBuffer)

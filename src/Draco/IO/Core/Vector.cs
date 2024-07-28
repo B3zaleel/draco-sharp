@@ -208,6 +208,23 @@ internal class Vector<TScalar>
         return Dot(this);
     }
 
+    public TScalar AbsSum()
+    {
+        TScalar result = default;
+
+        for (int i = 0; i < Dimension; ++i)
+        {
+            var nextValue = Components[i];
+
+            if (result > TScalar.MaxValue - nextValue)
+            {
+                return TScalar.MaxValue;
+            }
+            result += nextValue;
+        }
+        return result;
+    }
+
     public TScalar Dot(Vector<TScalar> otherVector)
     {
         if (Dimension != otherVector.Dimension)
@@ -220,6 +237,24 @@ internal class Vector<TScalar>
         {
             result += Components[i] * otherVector.Components[i];
         }
+        return result;
+    }
+
+    public static Vector<TScalar> CrossProduct(Vector<TScalar> left, Vector<TScalar> right)
+    {
+        if (left.Dimension != 3 || right.Dimension != 3)
+        {
+            throw new InvalidOperationException("Cross product is only defined for 3D vectors.");
+        }
+        var result = new Vector<TScalar>(3)
+        {
+            Components =
+            [
+                (left.Components[1] * right.Components[2]) - (left.Components[2] * right.Components[1]),
+                (left.Components[2] * right.Components[0]) - (left.Components[0] * right.Components[2]),
+                (left.Components[0] * right.Components[1]) - (left.Components[1] * right.Components[0])
+            ]
+        };
         return result;
     }
 

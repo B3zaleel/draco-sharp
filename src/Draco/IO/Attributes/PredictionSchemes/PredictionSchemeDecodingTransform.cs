@@ -40,6 +40,7 @@ internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
         IMinMaxValue<TDataType>
 {
     protected int ComponentsCount { get; set; }
+    public virtual int QuantizationBits { get; } = -1;
 
     public virtual void Init(int componentsCount)
     {
