@@ -36,7 +36,7 @@ internal class MeshPredictionSchemeMultiParallelogramDecoder<TDataType, TTransfo
 
             while (cornerId != Constants.kInvalidCornerIndex)
             {
-                if (MeshPredictionSchemeParallelogramDecoder<TDataType, TTransform>.ComputeParallelogramPrediction(p, cornerId, MeshData.CornerTable!, MeshData.VertexToDataMap!, originalValues, numComponents, out TDataType[] parallelogramPredictedValues))
+                if (MeshPredictionSchemeParallelogramDecoder<TDataType, TTransform>.TryComputeParallelogramPrediction(p, cornerId, MeshData.CornerTable!, MeshData.VertexToDataMap!, originalValues, numComponents, out TDataType[] parallelogramPredictedValues))
                 {
                     for (int c = 0; c < numComponents; ++c)
                     {

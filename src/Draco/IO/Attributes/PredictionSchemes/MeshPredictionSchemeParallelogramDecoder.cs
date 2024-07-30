@@ -38,7 +38,7 @@ internal class MeshPredictionSchemeParallelogramDecoder<TDataType, TTransform>(P
             var cornerId = MeshData.DataToCornerMap[p];
             var dstOffset = p * numComponents;
 
-            if (ComputeParallelogramPrediction(p, cornerId, MeshData.CornerTable!, MeshData.VertexToDataMap!, originalValues, numComponents, out TDataType[] predictedData))
+            if (TryComputeParallelogramPrediction(p, cornerId, MeshData.CornerTable!, MeshData.VertexToDataMap!, originalValues, numComponents, out TDataType[] predictedData))
             {
                 originalValues.SetSubArray(Transform.ComputeOriginalValue(predictedData, correctedData.GetSubArray(dstOffset)), dstOffset);
             }
@@ -56,7 +56,7 @@ internal class MeshPredictionSchemeParallelogramDecoder<TDataType, TTransform>(P
         return (vertexToDataMap[(int)table.Vertex(cornerId)], vertexToDataMap[(int)table.Vertex(table.Next(cornerId))], vertexToDataMap[(int)table.Vertex(table.Previous(cornerId))]);
     }
 
-    internal static bool ComputeParallelogramPrediction<T>(int dataEntryId, uint cornerId, CornerTable table, List<int> vertexToDataMap, T[] data, int numComponents, out T[] predictedData)
+    internal static bool TryComputeParallelogramPrediction<T>(int dataEntryId, uint cornerId, CornerTable table, List<int> vertexToDataMap, T[] data, int numComponents, out T[] predictedData)
         where T : struct,
             IAdditionOperators<T, T, T>,
             ISubtractionOperators<T, T, T>
