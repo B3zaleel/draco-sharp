@@ -67,7 +67,7 @@ internal static class PredictionSchemeDecoderFactory
             PredictionSchemeMethod.MultiParallelogram => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeMultiParallelogramDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
             PredictionSchemeMethod.ConstrainedMultiParallelogram => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
             // PredictionSchemeMethod.TexCoordsDeprecated => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
-            // PredictionSchemeMethod.TexCoordsPortable => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
+            PredictionSchemeMethod.TexCoordsPortable => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
             PredictionSchemeMethod.GeometricNormal => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
             _ => null,
         };
