@@ -238,3 +238,8 @@ public enum NormalPredictionMode : byte
     OneTriangle = 0,
     TriangleArea = 1,
 }
+
+public enum MultiParallelogramMode : byte
+{
+    Optimal = 0
+}
