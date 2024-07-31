@@ -29,8 +29,8 @@ internal class SequentialAttributeDecodersController : AttributesDecoder
         _sequencer.GenerateSequence(_pointIds);
         for (int i = 0; i < AttributesCount; ++i)
         {
-            var pointAttribute = ConnectivityDecoder!.PointCloud?.GetAttributeById(GetAttributeId(i));
-            _sequencer.UpdatePointToAttributeIndexMapping(pointAttribute!);
+            var pointAttribute = ConnectivityDecoder!.PointCloud!.GetAttributeById(GetAttributeId(i));
+            _sequencer.UpdatePointToAttributeIndexMapping(pointAttribute);
         }
         base.DecodeAttributes(decoderBuffer);
     }

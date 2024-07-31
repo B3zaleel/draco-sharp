@@ -58,9 +58,10 @@ public class PointCloud
         return null;
     }
 
-    public PointAttribute? GetAttributeById(int id)
+    public PointAttribute GetAttributeById(int id)
     {
-        return id < 0 || id > _attributes.Count ? null : _attributes[id];
+        Assertions.ThrowIf(id < 0 || id >= _attributes.Count, "Invalid attribute id.");
+        return _attributes[id];
     }
 
     public PointAttribute? GetAttributeByUniqueId(uint uniqueId)
