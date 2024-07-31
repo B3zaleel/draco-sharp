@@ -705,7 +705,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             sequencer = traversalSequencer;
         }
         Assertions.ThrowIf(sequencer == null, "Sequencer must be set.");
-        SetAttributesDecoder(attDataId, new SequentialAttributeDecodersController(sequencer!, this, Mesh));
+        SetAttributesDecoder(attDecoderId, new SequentialAttributeDecodersController(sequencer!, this, Mesh));
     }
 
     public override MeshAttributeCornerTable? GetAttributeCornerTable(int attId)
