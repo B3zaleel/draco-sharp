@@ -11,6 +11,11 @@ public class PointCloud
     public int PointsCount { get; set; } = 0;
     public int AttributesCount { get => _attributes.Count; }
 
+    public PointCloud()
+    {
+        _namedAttributeIndex.Fill((int)GeometryAttributeType.NamedAttributesCount, () => new());
+    }
+
     public int NumNamedAttributes(GeometryAttributeType type)
     {
         if (type == GeometryAttributeType.Invalid || type >= GeometryAttributeType.NamedAttributesCount)
