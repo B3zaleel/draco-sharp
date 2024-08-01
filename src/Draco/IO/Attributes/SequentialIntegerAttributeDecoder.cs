@@ -7,7 +7,6 @@ namespace Draco.IO.Attributes;
 internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
 {
     private IPredictionSchemeDecoder<int>? _predictionScheme;
-    public int ValueComponentsCount { get => Attribute!.NumComponents; }
 
     public SequentialIntegerAttributeDecoder() { }
 
@@ -46,7 +45,7 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
     protected virtual IPredictionSchemeDecoder<int>? CreatePredictionScheme(PredictionSchemeMethod method, PredictionSchemeTransformType transformType)
     {
         return transformType == PredictionSchemeTransformType.Wrap
-            ? (IPredictionSchemeDecoder<int>?)PredictionSchemeDecoderFactory.CreatePredictionSchemeForDecoder<int, PredictionSchemeWrapDecodingTransform<int>>(method, AttributeId, ConnectivityDecoder!, new())
+            ? PredictionSchemeDecoderFactory.CreatePredictionSchemeForDecoder<int, PredictionSchemeWrapDecodingTransform<int>>(method, AttributeId, ConnectivityDecoder!, new())
             : null;
     }
 
@@ -142,7 +141,6 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
         var numComponents = Attribute!.NumComponents;
         var entrySize = sizeof(int) * numComponents;
         var attributeValue = new T[numComponents];
-        // int valId = 0;
 
         for (uint i = 0; i < numValues; ++i)
         {
