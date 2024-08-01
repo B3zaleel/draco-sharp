@@ -12,6 +12,7 @@ internal class MeshPredictionSchemeParallelogramDecoder<TDataType, TTransform>(P
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>

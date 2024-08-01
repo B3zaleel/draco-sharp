@@ -10,6 +10,7 @@ internal class PredictionSchemeDecodingTransform<TDataType> : PredictionSchemeDe
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
@@ -25,6 +26,7 @@ internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
@@ -35,6 +37,7 @@ internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
