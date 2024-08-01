@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 
-internal abstract class PredictionSchemeDecoder<TDataType, TTransform>(PointAttribute attribute, TTransform transform) : IPredictionSchemeDecoder<TDataType, TDataType>
+internal abstract class PredictionSchemeDecoder<TDataType, TTransform>(PointAttribute attribute, TTransform transform) : IPredictionSchemeDecoder<TDataType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
