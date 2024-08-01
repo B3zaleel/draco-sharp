@@ -32,7 +32,7 @@ internal abstract class AttributesDecoder(ConnectivityDecoder? connectivityDecod
             var attributeType = decoderBuffer.ReadByte();
             var dataType = decoderBuffer.ReadByte();
             var numComponents = decoderBuffer.ReadByte();
-            var normalized = decoderBuffer.ReadByte() > 0;
+            var normalized = decoderBuffer.ReadByte() != 0;
             Assertions.ThrowIf(attributeType >= (byte)GeometryAttributeType.NamedAttributesCount);
             Assertions.ThrowIf(dataType == (byte)DataType.Invalid || dataType >= (byte)DataType.Count);
             Assertions.ThrowIf(numComponents == 0);
