@@ -17,7 +17,7 @@ internal class SequentialAttributeDecoder
         Init(connectivityDecoder, attributeId);
     }
 
-    public void Init(ConnectivityDecoder connectivityDecoder, int attributeId)
+    public virtual void Init(ConnectivityDecoder connectivityDecoder, int attributeId)
     {
         ConnectivityDecoder = connectivityDecoder;
         Attribute = connectivityDecoder.PointCloud?.GetAttributeById(attributeId);

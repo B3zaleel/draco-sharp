@@ -32,7 +32,7 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
     {
         get => GeometryAttributeType.Position;
     }
-    public new PointAttribute? ParentAttribute
+    public override PointAttribute? ParentAttribute
     {
         get => _posAttribute;
         set

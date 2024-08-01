@@ -7,7 +7,7 @@ internal class SequentialNormalAttributeDecoder : SequentialIntegerAttributeDeco
 {
     private AttributeOctahedronTransform? _octahedronTransform;
 
-    public new void Init(ConnectivityDecoder connectivityDecoder, int attributeId)
+    public override void Init(ConnectivityDecoder connectivityDecoder, int attributeId)
     {
         base.Init(connectivityDecoder, attributeId);
         Assertions.ThrowIf(Attribute!.NumComponents != 3);
@@ -15,7 +15,7 @@ internal class SequentialNormalAttributeDecoder : SequentialIntegerAttributeDeco
         _octahedronTransform = new(Attribute);
     }
 
-    protected new IPredictionSchemeDecoder<int>? CreatePredictionScheme(PredictionSchemeMethod method, PredictionSchemeTransformType transformType)
+    protected override IPredictionSchemeDecoder<int>? CreatePredictionScheme(PredictionSchemeMethod method, PredictionSchemeTransformType transformType)
     {
         return transformType switch
         {
@@ -25,7 +25,7 @@ internal class SequentialNormalAttributeDecoder : SequentialIntegerAttributeDeco
         };
     }
 
-    public new void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
+    protected override void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
         if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
         {

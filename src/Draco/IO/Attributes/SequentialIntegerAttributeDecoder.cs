@@ -43,14 +43,14 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
         }
     }
 
-    protected IPredictionSchemeDecoder<int>? CreatePredictionScheme(PredictionSchemeMethod method, PredictionSchemeTransformType transformType)
+    protected virtual IPredictionSchemeDecoder<int>? CreatePredictionScheme(PredictionSchemeMethod method, PredictionSchemeTransformType transformType)
     {
         return transformType == PredictionSchemeTransformType.Wrap
             ? (IPredictionSchemeDecoder<int>?)PredictionSchemeDecoderFactory.CreatePredictionSchemeForDecoder<int, PredictionSchemeWrapDecodingTransform<int>>(method, AttributeId, ConnectivityDecoder!, new())
             : null;
     }
 
-    protected void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
+    protected virtual void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
         var numComponents = Attribute!.NumComponents;
         Assertions.ThrowIf(numComponents <= 0);
@@ -93,11 +93,12 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
             if (numValues > 0)
             {
                 var originalData = _predictionScheme.ComputeOriginalValues(portableAttributeDataAsInt, numValues, numComponents, pointIds);
+                PortableAttribute!.Buffer = StreamExtensions.Create(originalData);
             }
         }
     }
 
-    protected void StoreValues(uint numValues)
+    protected virtual void StoreValues(uint numValues)
     {
         switch (Attribute!.DataType)
         {

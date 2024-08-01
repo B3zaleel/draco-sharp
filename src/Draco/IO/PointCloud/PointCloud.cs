@@ -118,7 +118,7 @@ public class PointCloud
         return pointAttribute;
     }
 
-    public void SetAttribute(int attId, PointAttribute pointAttribute)
+    public virtual void SetAttribute(int attId, PointAttribute pointAttribute)
     {
         if (_attributes.Count <= attId)
         {

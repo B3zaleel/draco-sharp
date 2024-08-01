@@ -25,7 +25,7 @@ internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransfor
     {
         get => GeometryAttributeType.Position;
     }
-    public new PointAttribute? ParentAttribute
+    public override PointAttribute? ParentAttribute
     {
         get => base.ParentAttribute;
         set
@@ -58,7 +58,7 @@ internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransfor
         return originalValues;
     }
 
-    public new void DecodePredictionData(DecoderBuffer decoderBuffer)
+    public override void DecodePredictionData(DecoderBuffer decoderBuffer)
     {
         var numOrientations = decoderBuffer.ReadInt32();
         Assertions.ThrowIf(numOrientations < 0);

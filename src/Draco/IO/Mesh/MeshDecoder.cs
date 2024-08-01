@@ -8,8 +8,8 @@ namespace Draco.IO.Mesh;
 internal abstract class MeshDecoder : ConnectivityDecoder
 {
     public Mesh Mesh { get; protected set; } = new();
-    public new PointCloud.PointCloud? PointCloud { get => Mesh; }
-    public new int GeometryType { get => Constants.EncodingType.TriangularMesh; }
+    public override PointCloud.PointCloud? PointCloud { get => Mesh; }
+    public override int GeometryType { get => Constants.EncodingType.TriangularMesh; }
     public virtual CornerTable? CornerTable { get => null; }
 
     public virtual MeshAttributeCornerTable? GetAttributeCornerTable(int attId)

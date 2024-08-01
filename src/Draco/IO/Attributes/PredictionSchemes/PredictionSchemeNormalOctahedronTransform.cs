@@ -29,7 +29,7 @@ internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType> : P
         }
     }
     public int CenterValue { get => _octahedronToolBox.CenterValue; }
-    public new int QuantizationBits { get => _octahedronToolBox.QuantizationBits; }
+    public override int QuantizationBits { get => _octahedronToolBox.QuantizationBits; }
 
     protected bool IsInDiamond(int s, int t)
     {

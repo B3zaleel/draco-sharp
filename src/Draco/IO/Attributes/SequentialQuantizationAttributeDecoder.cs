@@ -6,14 +6,14 @@ internal class SequentialQuantizationAttributeDecoder : SequentialIntegerAttribu
 {
     private AttributeQuantizationTransform? _quantizationTransform;
 
-    public new void Init(ConnectivityDecoder connectivityDecoder, int attributeId)
+    public override void Init(ConnectivityDecoder connectivityDecoder, int attributeId)
     {
         base.Init(connectivityDecoder, attributeId);
         Assertions.ThrowIf(Attribute!.DataType != DataType.Float32);
         _quantizationTransform = new(connectivityDecoder.PointCloud!.GetAttributeById(attributeId)!);
     }
 
-    public new void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
+    protected override void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
         if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
         {
@@ -22,7 +22,7 @@ internal class SequentialQuantizationAttributeDecoder : SequentialIntegerAttribu
         base.DecodeIntegerValues(decoderBuffer, pointIds);
     }
 
-    public new void DecodeDataNeededByPortableTransform(DecoderBuffer decoderBuffer, List<uint> pointIds)
+    public override void DecodeDataNeededByPortableTransform(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
         if (decoderBuffer.BitStream_Version >= Constants.BitStreamVersion(2, 0))
         {
@@ -31,7 +31,7 @@ internal class SequentialQuantizationAttributeDecoder : SequentialIntegerAttribu
         _quantizationTransform!.TransferToAttribute(PortableAttribute!);
     }
 
-    protected new void StoreValues(uint numPoints)
+    protected override void StoreValues(uint numPoints)
     {
         DequantizeValues(numPoints);
     }

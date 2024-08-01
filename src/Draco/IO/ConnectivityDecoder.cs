@@ -6,8 +6,8 @@ namespace Draco.IO;
 internal abstract class ConnectivityDecoder
 {
     public int BitStreamVersion { get; set; }
-    public int GeometryType { get; }
-    public PointCloud.PointCloud? PointCloud { get; }
+    public virtual int GeometryType { get; }
+    public virtual PointCloud.PointCloud? PointCloud { get; }
     public List<AttributesDecoder?> AttributesDecoders { get; } = [];
     public List<int> AttributeToDecoderMap { get; } = [];
 
