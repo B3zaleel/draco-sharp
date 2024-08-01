@@ -55,7 +55,7 @@ public class PointAttribute : GeometryAttribute
 
     public void SetPointMapEntry(uint pointIndex, uint entryIndex)
     {
-        Assertions.ThrowIfNot(IsMappingIdentity);
+        Assertions.ThrowIf(IsMappingIdentity);
         _indicesMap[(int)pointIndex] = entryIndex;
     }
 }
