@@ -12,7 +12,7 @@ internal class SequentialNormalAttributeDecoder : SequentialIntegerAttributeDeco
         base.Init(connectivityDecoder, attributeId);
         Assertions.ThrowIf(Attribute!.NumComponents != 3);
         Assertions.ThrowIf(Attribute.DataType != DataType.Float32);
-        _octahedronTransform = new(Attribute);
+        _octahedronTransform = new();
     }
 
     protected override IPredictionSchemeDecoder<int>? CreatePredictionScheme(PredictionSchemeMethod method, PredictionSchemeTransformType transformType)

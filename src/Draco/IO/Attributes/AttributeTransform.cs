@@ -4,6 +4,8 @@ internal abstract class AttributeTransform
 {
     public abstract AttributeTransformType Type { get; }
 
+    public virtual void Init(PointAttribute attribute) { }
+
     public void TransferToAttribute(PointAttribute attribute)
     {
         var transformData = new AttributeTransformData();

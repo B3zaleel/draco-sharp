@@ -8,7 +8,7 @@ internal class AttributeOctahedronTransform : AttributeTransform
 
     public override AttributeTransformType Type { get => AttributeTransformType.OctahedronTransform; }
 
-    public AttributeOctahedronTransform(PointAttribute attribute)
+    public override void Init(PointAttribute attribute)
     {
         Assertions.ThrowIf(attribute.AttributeTransformData == null || attribute.AttributeTransformData.TransformType != AttributeTransformType.OctahedronTransform, "Wrong transform type.");
         _quantizationBits = attribute.AttributeTransformData!.GetParameterValue<int>();

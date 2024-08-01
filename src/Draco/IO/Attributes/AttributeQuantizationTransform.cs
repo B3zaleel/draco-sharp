@@ -6,12 +6,12 @@ namespace Draco.IO.Attributes;
 internal class AttributeQuantizationTransform : AttributeTransform
 {
     public int QuantizationBits { get; private set; } = -1;
-    public List<float> MinValues { get; private set; }
+    public List<float> MinValues { get; private set; } = [];
     public float Range { get; private set; } = 0.0f;
     public bool IsInitialized { get => QuantizationBits != -1; }
     public override AttributeTransformType Type { get => AttributeTransformType.QuantizationTransform; }
 
-    public AttributeQuantizationTransform(PointAttribute attribute)
+    public override void Init(PointAttribute attribute)
     {
         Assertions.ThrowIf(attribute.AttributeTransformData == null || attribute.AttributeTransformData.TransformType != AttributeTransformType.QuantizationTransform, "Wrong transform type.");
         QuantizationBits = attribute.AttributeTransformData!.GetParameterValue<int>();

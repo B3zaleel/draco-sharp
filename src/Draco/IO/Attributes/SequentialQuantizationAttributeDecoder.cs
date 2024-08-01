@@ -10,7 +10,7 @@ internal class SequentialQuantizationAttributeDecoder : SequentialIntegerAttribu
     {
         base.Init(connectivityDecoder, attributeId);
         Assertions.ThrowIf(Attribute!.DataType != DataType.Float32);
-        _quantizationTransform = new(connectivityDecoder.PointCloud!.GetAttributeById(attributeId)!);
+        _quantizationTransform = new();
     }
 
     protected override void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
