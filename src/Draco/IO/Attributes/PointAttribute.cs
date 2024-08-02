@@ -20,8 +20,12 @@ public class PointAttribute : GeometryAttribute
 
     public PointAttribute(GeometryAttribute att)
     {
+        Buffer = att.Buffer;
         AttributeType = att.AttributeType;
+        NumComponents = att.NumComponents;
+        DataType = att.DataType;
         Normalized = att.Normalized;
+        ByteStride = att.ByteStride;
         ByteOffset = att.ByteOffset;
         UniqueId = att.UniqueId;
     }
