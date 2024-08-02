@@ -85,7 +85,7 @@ internal class MeshAttributeCornerTable : CornerTable
             }
             _cornerToVertexMap[(int)firstC] = firstVertIndex;
             _vertexToLeftMostCornerMap.Add(firstC);
-            actC = SwingRight(firstC);
+            actC = CornerTable.SwingRight(firstC);
             while (actC != Constants.kInvalidCornerIndex && actC != firstC)
             {
                 if (IsCornerOppositeToSeamEdge(CornerTable.Next(actC)))
@@ -103,7 +103,7 @@ internal class MeshAttributeCornerTable : CornerTable
                     _vertexToLeftMostCornerMap.Add(firstC);
                 }
                 _cornerToVertexMap[(int)actC] = firstVertIndex;
-                actC = SwingRight(actC);
+                actC = CornerTable.SwingRight(actC);
             }
         }
     }
