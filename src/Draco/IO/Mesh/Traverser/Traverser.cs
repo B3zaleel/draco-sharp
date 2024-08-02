@@ -25,7 +25,7 @@ internal abstract class Traverser
         }
         else
         {
-            return id == Constants.kInvalidVertexIndex || _isFaceVisited[(int)id / 3];
+            return id == Constants.kInvalidCornerIndex || _isFaceVisited[(int)(id / 3)];
         }
     }
 
