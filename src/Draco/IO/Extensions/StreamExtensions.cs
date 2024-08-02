@@ -94,14 +94,14 @@ internal static class StreamExtensions
 
     public static void WriteData<T>(this Stream stream, T[] data)
     {
-        var convertedData = typeof(T).Name switch
+        var convertedData = data switch
         {
-            nameof(Byte) => data as byte[],
-            nameof(SByte) => (data as sbyte[])!.Select(datum => (byte)datum),
-            nameof(UInt16) => (data as ushort[])!.SelectMany(BitConverter.GetBytes),
-            nameof(Int16) => (data as short[])!.SelectMany(BitConverter.GetBytes),
-            nameof(UInt32) => (data as uint[])!.SelectMany(BitConverter.GetBytes),
-            nameof(Int32) => (data as int[])!.SelectMany(BitConverter.GetBytes),
+            byte[] dataAsBytes => dataAsBytes,
+            sbyte[] dataAsSBytes => dataAsSBytes.Select(datum => (byte)datum),
+            ushort[] dataAsUShorts => dataAsUShorts.SelectMany(BitConverter.GetBytes),
+            short[] dataAsShorts => dataAsShorts.SelectMany(BitConverter.GetBytes),
+            uint[] dataAsUInts => dataAsUInts.SelectMany(BitConverter.GetBytes),
+            int[] dataAsInts => dataAsInts.SelectMany(BitConverter.GetBytes),
             _ => throw new NotImplementedException("")
         };
         stream.Write(convertedData!.ToArray());
