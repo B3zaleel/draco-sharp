@@ -257,7 +257,7 @@ internal class CornerTable
     public void MakeVertexIsolated(uint vert)
     {
         Assertions.ThrowIfNot(ValenceCache.IsCacheEmpty());
-        _vertexCorners[(int)vert] = uint.MaxValue;
+        _vertexCorners[(int)vert] = Constants.kInvalidCornerIndex;
     }
 
     public bool IsVertexIsolated(uint v)
@@ -268,12 +268,12 @@ internal class CornerTable
     public void MakeFaceInvalid(uint face)
     {
         Assertions.ThrowIfNot(ValenceCache.IsCacheEmpty());
-        if (face != uint.MaxValue)
+        if (face != Constants.kInvalidFaceIndex)
         {
             var firstCorner = FirstCorner(face);
             for (byte i = 0; i < 3; ++i)
             {
-                _cornerToVertexMap[(int)firstCorner + i] = uint.MaxValue;
+                _cornerToVertexMap[(int)firstCorner + i] = Constants.kInvalidVertexIndex;
             }
         }
     }

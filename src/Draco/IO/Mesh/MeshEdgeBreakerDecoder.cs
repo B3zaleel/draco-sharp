@@ -250,7 +250,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 uint vertexX = CornerTable!.Vertex(CornerTable.Next(cornerA));
                 uint cornerB = CornerTable.Next(CornerTable.LeftMostCorner(vertexX));
                 Assertions.ThrowIf(cornerA == cornerB, "All matched corners must be different.");
-                Assertions.ThrowIf(CornerTable.Opposite(cornerA) != uint.MaxValue || CornerTable.Opposite(cornerB) != uint.MaxValue, "All matched corners must be different.");
+                Assertions.ThrowIf(CornerTable.Opposite(cornerA) != Constants.kInvalidCornerIndex || CornerTable.Opposite(cornerB) != Constants.kInvalidCornerIndex, "All matched corners must be different.");
                 uint corner = 3 * (uint)face;
                 SetOppositeCorners(cornerA, corner + 1);
                 SetOppositeCorners(cornerB, corner + 2);
@@ -268,7 +268,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             {
                 Assertions.ThrowIf(activeCornerStack.Count == 0);
                 uint cornerA = activeCornerStack.Last();
-                Assertions.ThrowIf(CornerTable!.Opposite(cornerA) != uint.MaxValue);
+                Assertions.ThrowIf(CornerTable!.Opposite(cornerA) != Constants.kInvalidCornerIndex);
                 uint corner = 3 * (uint)face;
                 uint oppCorner, cornerL, cornerR;
 
@@ -310,7 +310,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 Assertions.ThrowIf(activeCornerStack.Count == 0);
                 var cornerA = activeCornerStack.Last();
                 Assertions.ThrowIf(cornerA == cornerB, "All matched corners must be different.");
-                Assertions.ThrowIf(CornerTable!.Opposite(cornerA) != uint.MaxValue || CornerTable.Opposite(cornerB) != uint.MaxValue);
+                Assertions.ThrowIf(CornerTable!.Opposite(cornerA) != Constants.kInvalidCornerIndex || CornerTable.Opposite(cornerB) != Constants.kInvalidCornerIndex);
                 uint corner = 3 * (uint)face;
                 SetOppositeCorners(cornerA, corner + 2);
                 SetOppositeCorners(cornerB, corner + 1);
@@ -326,7 +326,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 CornerTable.SetLeftMostCorner(vertexP, CornerTable.LeftMostCorner(vertexN));
                 uint firstCorner = cornerN;
 
-                while (cornerN != uint.MaxValue)
+                while (cornerN != Constants.kInvalidCornerIndex)
                 {
                     CornerTable.MapCornerToVertex(cornerN, vertexP);
                     cornerN = CornerTable.SwingLeft(cornerN);
@@ -388,7 +388,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 var vertexX = CornerTable.Vertex(CornerTable.Next(cornerB));
                 var cornerC = CornerTable.Next(CornerTable.LeftMostCorner(vertexX));
                 Assertions.ThrowIf(corner == cornerB || corner == cornerC || cornerB == cornerC, "All matched corners must be different.");
-                Assertions.ThrowIf(CornerTable.Opposite(corner) != uint.MaxValue || CornerTable.Opposite(cornerB) != uint.MaxValue || CornerTable.Opposite(cornerC) != uint.MaxValue, "One of the corners is already opposite to an existing face, which should not happen unless the input was tampered with.");
+                Assertions.ThrowIf(CornerTable.Opposite(corner) != Constants.kInvalidCornerIndex || CornerTable.Opposite(cornerB) != Constants.kInvalidCornerIndex || CornerTable.Opposite(cornerC) != Constants.kInvalidCornerIndex, "One of the corners is already opposite to an existing face, which should not happen unless the input was tampered with.");
                 var vertexP = CornerTable.Vertex(CornerTable.Next(cornerC));
                 var face = numFaces++;
                 uint newCorner = 3 * (uint)face;
@@ -479,7 +479,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         for (byte c = 0; c < 3; ++c)
         {
             uint oppCorner = CornerTable.Opposite(corners[c]);
-            if (oppCorner == uint.MaxValue)
+            if (oppCorner == Constants.kInvalidCornerIndex)
             {
                 for (int i = 0; i < _attributeData.Count; ++i)
                 {
@@ -509,7 +509,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         for (byte c = 0; c < 3; ++c)
         {
             uint oppCorner = CornerTable.Opposite(corners[c]);
-            if (oppCorner == uint.MaxValue)
+            if (oppCorner == Constants.kInvalidCornerIndex)
             {
                 for (int i = 0; i < _attributeData.Count; ++i)
                 {
