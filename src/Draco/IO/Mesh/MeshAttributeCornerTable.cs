@@ -54,7 +54,7 @@ internal class MeshAttributeCornerTable : CornerTable
         _vertexToLeftMostCornerMap.Clear();
         int numNewVertices = 0;
 
-        for (uint v = 0; v < VerticesCount; ++v)
+        for (uint v = 0; v < CornerTable.VerticesCount; ++v)
         {
             var c = CornerTable.LeftMostCorner(v);
             if (c == Constants.kInvalidCornerIndex)
@@ -195,7 +195,7 @@ internal class MeshAttributeCornerTable : CornerTable
 
     public override bool IsOnBoundary(uint vert)
     {
-        var corner = base.LeftMostCorner(vert);
+        var corner = LeftMostCorner(vert);
         return corner == Constants.kInvalidCornerIndex || SwingLeft(corner) == Constants.kInvalidCornerIndex;
     }
 
