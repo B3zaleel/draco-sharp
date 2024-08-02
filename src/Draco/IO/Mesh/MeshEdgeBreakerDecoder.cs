@@ -515,6 +515,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 {
                     _attributeData[i].AttributeSeamCorners.Add((int)corners[c]);
                 }
+                continue;
             }
             uint oppFaceId = CornerTable.Face(oppCorner);
             if (oppFaceId < srcFaceId)
