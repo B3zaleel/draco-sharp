@@ -106,7 +106,7 @@ internal class AttributeQuantizationTransform : AttributeTransform
 
     public override void InverseTransformAttribute(PointAttribute attribute, PointAttribute targetAttribute)
     {
-        Assertions.ThrowIfNot(targetAttribute.DataType != DataType.Float32);
+        Assertions.ThrowIf(targetAttribute.DataType != DataType.Float32);
         var maxQuantizedValue = (int)((1U << QuantizationBits) - 1);
         var dequantizer = new Dequantizer(Range, maxQuantizedValue);
         var attributeValue = new float[targetAttribute.NumComponents];
