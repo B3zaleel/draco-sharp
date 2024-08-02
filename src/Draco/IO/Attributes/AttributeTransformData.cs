@@ -5,7 +5,7 @@ namespace Draco.IO.Attributes;
 public class AttributeTransformData
 {
     public AttributeTransformType TransformType { get; set; } = AttributeTransformType.InvalidTransform;
-    public Stream? Buffer { get; set; }
+    public Stream? Buffer { get; set; } = new MemoryStream();
 
     public TDataType GetParameterValue<TDataType>()
     {
