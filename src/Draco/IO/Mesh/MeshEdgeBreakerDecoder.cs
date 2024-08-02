@@ -662,6 +662,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         if (decoderType == (byte)MeshAttributeElementType.VertexAttribute)
         {
             MeshAttributeIndicesEncodingData? encodingData;
+            Traverser.Traverser? attributeTraverser = null;
 
             if (attDataId < 0)
             {
@@ -672,26 +673,23 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 encodingData = _attributeData[attDataId].EncodingData;
                 _attributeData[attDataId].IsConnectivityUsed = false;
             }
+            var traversalSequencer = new MeshTraversalSequencer(Mesh, encodingData!);
+            var attributeObserver = new MeshAttributeIndicesEncodingObserver(CornerTable!, Mesh, encodingData!, traversalSequencer);
+
             if (traversalMethod == MeshTraversalMethod.PredictionDegree)
             {
-                var traversalSequencer = new MeshTraversalSequencer(Mesh, encodingData!);
-                var attributeObserver = new MeshAttributeIndicesEncodingObserver(CornerTable!, Mesh, encodingData!, traversalSequencer);
-                var attributeTraverser = new MaxPredictionDegreeTraverser(CornerTable!, attributeObserver);
-                traversalSequencer.Traverser = attributeTraverser;
-                sequencer = traversalSequencer;
+                attributeTraverser = new MaxPredictionDegreeTraverser(CornerTable!, attributeObserver);
             }
             else if (traversalMethod == MeshTraversalMethod.DepthFirst)
             {
-                var traversalSequencer = new MeshTraversalSequencer(Mesh, encodingData!);
-                var attributeObserver = new MeshAttributeIndicesEncodingObserver(CornerTable!, Mesh, encodingData!, traversalSequencer);
-                var attributeTraverser = new DepthFirstTraverser(CornerTable!, attributeObserver);
-                traversalSequencer.Traverser = attributeTraverser;
-                sequencer = traversalSequencer;
+                attributeTraverser = new DepthFirstTraverser(CornerTable!, attributeObserver);
             }
             else
             {
                 Assertions.Throw("Unsupported attribute traversal method.");
             }
+            traversalSequencer.Traverser = attributeTraverser;
+            sequencer = traversalSequencer;
         }
         else
         {
