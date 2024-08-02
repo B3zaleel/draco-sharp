@@ -10,9 +10,9 @@ internal class CornerTable
     private readonly List<uint> _vertexCorners = [];
     private readonly List<uint> _nonManifoldVertexParents = [];
 
-    public int VerticesCount { get => _vertexCorners.Count; }
-    public int CornersCount { get => _cornerToVertexMap.Count; }
-    public int FacesCount { get => _cornerToVertexMap.Count / 3; }
+    public virtual int VerticesCount { get => _vertexCorners.Count; }
+    public virtual int CornersCount { get => _cornerToVertexMap.Count; }
+    public virtual int FacesCount { get => _cornerToVertexMap.Count / 3; }
     public int NewVerticesCount { get => VerticesCount - OriginalVerticesCount; }
     public int OriginalVerticesCount { get; private set; } = 0;
     public int DegeneratedFacesCount { get; private set; } = 0;

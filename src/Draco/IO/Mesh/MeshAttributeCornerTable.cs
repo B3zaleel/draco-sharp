@@ -5,27 +5,27 @@ namespace Draco.IO.Mesh;
 
 internal class MeshAttributeCornerTable : CornerTable
 {
-    private readonly ValenceCache? _valenceCache;
     private readonly List<bool> _isEdgeOnSeam = [];
     private readonly List<bool> _isVertexOnSeam = [];
     private readonly List<uint> _vertexToLeftMostCornerMap = [];
     private readonly List<uint> _vertexToAttributeEntryIdMap = [];
 
-    public new int VerticesCount { get => _vertexToAttributeEntryIdMap.Count; }
-    public new int CornersCount { get => CornerTable.CornersCount; }
-    public new int FacesCount { get => CornerTable.FacesCount; }
+    public override int VerticesCount { get => _vertexToAttributeEntryIdMap.Count; }
+    public override int CornersCount { get => CornerTable.CornersCount; }
+    public override int FacesCount { get => CornerTable.FacesCount; }
     public bool NoInteriorSeams { get; private set; }
     public CornerTable CornerTable { get; private set; }
 
     public MeshAttributeCornerTable(CornerTable cornerTable)
     {
         CornerTable = cornerTable;
-        _valenceCache = new(this);
         ValenceCache.ClearValenceCache();
         ValenceCache.ClearValenceCacheInaccurate();
         _isEdgeOnSeam.Fill(cornerTable.CornersCount, false);
         _isVertexOnSeam.Fill(cornerTable.VerticesCount, false);
         _cornerToVertexMap.Fill(cornerTable.CornersCount, Constants.kInvalidVertexIndex);
+        _vertexToLeftMostCornerMap = new List<uint>(cornerTable.VerticesCount);
+        _vertexToAttributeEntryIdMap = new List<uint>(cornerTable.VerticesCount);
         NoInteriorSeams = true;
     }
 
