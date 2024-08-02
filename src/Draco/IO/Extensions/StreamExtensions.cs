@@ -86,7 +86,10 @@ internal static class StreamExtensions
             short datumAsShort => BitConverter.GetBytes(datumAsShort),
             uint datumAsUInt => BitConverter.GetBytes(datumAsUInt),
             int datumAsInt => BitConverter.GetBytes(datumAsInt),
+            ulong datumAsLong => BitConverter.GetBytes(datumAsLong),
+            long datumAsLong => BitConverter.GetBytes(datumAsLong),
             float datumAsFloat => BitConverter.GetBytes(datumAsFloat),
+            double datumAsDouble => BitConverter.GetBytes(datumAsDouble),
             _ => throw new NotImplementedException("")
         };
         stream.Write(convertedData!.ToArray());
@@ -102,6 +105,10 @@ internal static class StreamExtensions
             short[] dataAsShorts => dataAsShorts.SelectMany(BitConverter.GetBytes),
             uint[] dataAsUInts => dataAsUInts.SelectMany(BitConverter.GetBytes),
             int[] dataAsInts => dataAsInts.SelectMany(BitConverter.GetBytes),
+            ulong[] dataAsULongs => dataAsULongs.SelectMany(BitConverter.GetBytes),
+            long[] dataAsLongs => dataAsLongs.SelectMany(BitConverter.GetBytes),
+            float[] dataAsFloats => dataAsFloats.SelectMany(BitConverter.GetBytes),
+            double[] dataAsDoubles => dataAsDoubles.SelectMany(BitConverter.GetBytes),
             _ => throw new NotImplementedException("")
         };
         stream.Write(convertedData!.ToArray());
