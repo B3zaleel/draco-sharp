@@ -20,9 +20,8 @@ internal abstract class PredictionSchemeDecoder<TDataType, TTransform>(PointAttr
     public TTransform Transform { get; set; } = transform;
     public PredictionSchemeTransformType TransformType { get; set; }
     public PointAttribute Attribute { get; set; } = attribute;
-    protected virtual int NumParentAttribute { get; set; } = 0;
+    public virtual int ParentAttributesCount { get; set; } = 0;
     public virtual PointAttribute? ParentAttribute { get; set; }
-    public int ParentAttributesCount { get; set; }
     public virtual GeometryAttributeType ParentAttributeType { get; set; } = GeometryAttributeType.Invalid;
 
     public virtual void DecodePredictionData(DecoderBuffer decoderBuffer)

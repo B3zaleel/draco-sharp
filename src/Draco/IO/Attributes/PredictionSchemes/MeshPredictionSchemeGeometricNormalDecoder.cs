@@ -23,7 +23,7 @@ internal class MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>
     private readonly OctahedronToolBox _octahedronToolBox = new();
     private readonly RAnsBitDecoder _flipNormalBitDecoder = new();
 
-    protected override int NumParentAttribute { get => 1; set {} }
+    public override int ParentAttributesCount { get => 1; set { } }
 
     public bool IsInitialized()
     {

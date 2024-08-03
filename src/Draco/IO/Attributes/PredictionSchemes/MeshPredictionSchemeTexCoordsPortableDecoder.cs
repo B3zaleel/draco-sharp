@@ -20,7 +20,7 @@ internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransfor
 {
     private readonly MeshPredictionSchemeTexCoordsPortablePredictor<TDataType> _predictor = new(meshData, false);
     public override PredictionSchemeMethod Method { get => PredictionSchemeMethod.TexCoordsPortable; }
-    protected override int NumParentAttribute { get => 1; set => base.NumParentAttribute = value; }
+    public override int ParentAttributesCount { get => 1; set { } }
     public override GeometryAttributeType ParentAttributeType
     {
         get => GeometryAttributeType.Position;

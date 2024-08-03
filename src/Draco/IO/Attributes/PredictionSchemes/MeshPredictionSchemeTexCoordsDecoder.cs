@@ -28,7 +28,7 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
     private ushort _version = 0;
 
     public override PredictionSchemeMethod Method { get => PredictionSchemeMethod.TexCoordsDeprecated; }
-    protected override int NumParentAttribute { get => 1; set => base.NumParentAttribute = value; }
+    public override int ParentAttributesCount { get => 1; set { } }
     public override GeometryAttributeType ParentAttributeType
     {
         get => GeometryAttributeType.Position;
