@@ -30,8 +30,8 @@ internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransfor
         get => base.ParentAttribute;
         set
         {
-            Assertions.ThrowIf(value!.AttributeType != GeometryAttributeType.Position);
-            Assertions.ThrowIf(value.NumComponents != 3);
+            Assertions.ThrowIf(value == null || value!.AttributeType != GeometryAttributeType.Position, "Invalid attribute type.");
+            Assertions.ThrowIf(value!.NumComponents != 3, "Currently works only for 3 component positions.");
             _predictor.PositionAttribute = value;
         }
     }
