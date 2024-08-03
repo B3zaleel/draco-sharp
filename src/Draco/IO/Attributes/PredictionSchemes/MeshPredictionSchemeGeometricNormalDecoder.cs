@@ -30,6 +30,11 @@ internal class MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>
         return _predictor.IsInitialized() && MeshData.IsInitialized() && _octahedronToolBox.IsInitialized();
     }
 
+    public override GeometryAttributeType GetParentAttributeType(int i)
+    {
+        return GeometryAttributeType.Position;
+    }
+
     public void SetParentAttribute(PointAttribute attribute)
     {
         Assertions.ThrowIf(attribute.AttributeType != GeometryAttributeType.Position);

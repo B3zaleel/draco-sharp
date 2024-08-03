@@ -50,6 +50,11 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
         return _posAttribute != null && MeshData.IsInitialized();
     }
 
+    public override GeometryAttributeType GetParentAttributeType(int i)
+    {
+        return GeometryAttributeType.Position;
+    }
+
     public override TDataType[] ComputeOriginalValues(TDataType[] correctedData, int size, int numComponents, List<uint> entryToPointMap)
     {
         Assertions.ThrowIf(numComponents != 2);

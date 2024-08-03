@@ -34,7 +34,7 @@ internal abstract class PredictionSchemeDecoder<TDataType, TTransform>(PointAttr
         return Transform.AreCorrectionsPositive();
     }
 
-    public GeometryAttributeType GetParentAttributeType(int i)
+    public virtual GeometryAttributeType GetParentAttributeType(int i)
     {
         return GeometryAttributeType.Invalid;
     }

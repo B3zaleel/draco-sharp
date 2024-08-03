@@ -41,6 +41,11 @@ internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransfor
         return _predictor.IsInitialized() && MeshData.IsInitialized();
     }
 
+    public override GeometryAttributeType GetParentAttributeType(int i)
+    {
+        return GeometryAttributeType.Position;
+    }
+
     public override TDataType[] ComputeOriginalValues(TDataType[] correctedData, int _, int numComponents, List<uint> entryToPointMap)
     {
         Assertions.ThrowIf(numComponents != MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>.kNumComponents);
