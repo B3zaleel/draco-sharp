@@ -35,13 +35,6 @@ internal class MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>
         return GeometryAttributeType.Position;
     }
 
-    public void SetParentAttribute(PointAttribute attribute)
-    {
-        Assertions.ThrowIf(attribute.AttributeType != GeometryAttributeType.Position);
-        Assertions.ThrowIf(attribute.NumComponents != 3);
-        _predictor.PositionAttribute = attribute;
-    }
-
     public void SetQuantizationBits(byte q)
     {
         _octahedronToolBox.SetQuantizationBits(q);
