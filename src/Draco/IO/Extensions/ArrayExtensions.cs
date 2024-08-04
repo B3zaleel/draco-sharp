@@ -2,11 +2,15 @@ namespace Draco.IO.Extensions;
 
 internal static class ArrayExtensions
 {
-    public static T[] GetSubArray<T>(this T[] array, int start)
+    public static T[] GetSubArray<T>(this T[] array, int offset)
     {
-        int length = array.Length - start;
+        if (offset < 0 || offset >= array.Length)
+        {
+            return [];
+        }
+        int length = array.Length - offset;
         var subArray = new T[length];
-        Array.Copy(array, start, subArray, 0, length);
+        Array.Copy(array, offset, subArray, 0, length);
         return subArray;
     }
 
