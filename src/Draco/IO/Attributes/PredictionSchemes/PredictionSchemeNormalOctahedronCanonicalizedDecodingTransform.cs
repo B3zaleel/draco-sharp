@@ -18,7 +18,7 @@ internal class PredictionSchemeNormalOctahedronCanonicalizedDecodingTransform<TD
         IMinMaxValue<TDataType>
 { }
 
-internal class PredictionSchemeNormalOctahedronCanonicalizedDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeNormalOctahedronCanonicalizedTransform<TDataType>
+internal class PredictionSchemeNormalOctahedronCanonicalizedDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeNormalOctahedronCanonicalizedTransform<TDataType, TCorrectedType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -42,7 +42,7 @@ internal class PredictionSchemeNormalOctahedronCanonicalizedDecodingTransform<TD
         IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
         IMinMaxValue<TCorrectedType>
 {
-    public override TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TDataType[] correctedValues)
+    public override TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
     {
         int[] predicted = [(int)Convert.ChangeType(predictedValues[0], typeof(int)), (int)Convert.ChangeType(predictedValues[1], typeof(int))];
         int[] corrected = [(int)Convert.ChangeType(correctedValues[0], typeof(int)), (int)Convert.ChangeType(correctedValues[1], typeof(int))];

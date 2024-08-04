@@ -16,7 +16,7 @@ internal class MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType>
+    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
 {
     public override PredictionSchemeMethod Method { get => PredictionSchemeMethod.GeometricNormal; }
     private readonly MeshPredictionSchemeGeometricNormalPredictorArea _predictor = new(meshData);

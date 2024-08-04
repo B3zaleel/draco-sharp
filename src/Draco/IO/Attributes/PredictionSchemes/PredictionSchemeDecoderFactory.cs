@@ -17,7 +17,7 @@ internal static class PredictionSchemeDecoderFactory
             IDecrementOperators<TDataType>,
             IBitwiseOperators<TDataType, TDataType, TDataType>,
             IMinMaxValue<TDataType>
-        where TTransform : PredictionSchemeDecodingTransform<TDataType>
+        where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
     {
         if (method == PredictionSchemeMethod.None)
         {
@@ -47,7 +47,7 @@ internal static class PredictionSchemeDecoderFactory
             IDecrementOperators<TDataType>,
             IBitwiseOperators<TDataType, TDataType, TDataType>,
             IMinMaxValue<TDataType>
-        where TTransform : PredictionSchemeDecodingTransform<TDataType>
+        where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
     {
         var attribute = meshDecoder.PointCloud!.GetAttributeById(attributeId)!;
         var cornerTable = meshDecoder.CornerTable;

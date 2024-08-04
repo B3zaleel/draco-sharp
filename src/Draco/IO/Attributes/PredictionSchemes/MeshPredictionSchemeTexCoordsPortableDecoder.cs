@@ -16,7 +16,7 @@ internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransfor
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType>
+    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
 {
     private readonly MeshPredictionSchemeTexCoordsPortablePredictor<TDataType> _predictor = new(meshData, false);
     public override PredictionSchemeMethod Method { get => PredictionSchemeMethod.TexCoordsPortable; }

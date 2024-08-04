@@ -14,9 +14,7 @@ internal class PredictionSchemeDecodingTransform<TDataType> : PredictionSchemeDe
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-{
-
-}
+{ }
 
 internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
     where TDataType : struct,

@@ -18,7 +18,7 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType>
+    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
 {
     private PointAttribute? _posAttribute;
     private List<uint> _entryToPointMap = [];
