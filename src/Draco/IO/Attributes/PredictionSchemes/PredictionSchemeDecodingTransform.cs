@@ -50,7 +50,7 @@ internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
         ComponentsCount = componentsCount;
     }
 
-    public TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
+    public virtual TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
     {
         var originalValues = new TDataType[ComponentsCount];
 

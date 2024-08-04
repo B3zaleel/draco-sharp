@@ -41,7 +41,7 @@ internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> 
         IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
         IMinMaxValue<TCorrectedType>
 {
-    public TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
+    public override TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TDataType[] correctedValues)
     {
         var originalValues = new TDataType[ComponentsCount];
         predictedValues = ClampPredictedValue(predictedValues);
