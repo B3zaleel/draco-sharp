@@ -20,4 +20,22 @@ public class ArrayExtensionsTests
         // Assert
         result.Should().BeEquivalentTo(expectedArray);
     }
+
+    [Theory]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, new int[] { 7 }, -1, new int[] { 1, 2, 3, 4, 5 })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, new int[] { 7 }, 5, new int[] { 1, 2, 3, 4, 5 })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, new int[] { 7 }, 10, new int[] { 1, 2, 3, 4, 5 })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, new int[] { 7, 8, 9, 10 }, 3, new int[] { 1, 2, 3, 4, 5 })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, new int[] { 7 }, 4, new int[] { 1, 2, 3, 4, 7 })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, new int[] { 7 }, 1, new int[] { 1, 7, 3, 4, 5 })]
+    public void SetSubArray_GivenArrayAndSubArrayAndOffset_OverwritesExpectedArraySection(int[] array, int[] subArray, int offset, int[] expectedArray)
+    {
+        // Arrange
+
+        // Act
+        ArrayExtensions.SetSubArray(array, subArray, offset);
+
+        // Assert
+        array.Should().BeEquivalentTo(expectedArray);
+    }
 }

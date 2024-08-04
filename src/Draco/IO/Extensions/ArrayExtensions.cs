@@ -16,6 +16,10 @@ internal static class ArrayExtensions
 
     public static void SetSubArray<T>(this T[] array, T[] subArray, int offset)
     {
+        if (offset < 0 || offset >= array.Length || subArray.Length + offset > array.Length)
+        {
+            return;
+        }
         for (int i = 0; i < subArray.Length; ++i)
         {
             array[offset + i] = subArray[i];
