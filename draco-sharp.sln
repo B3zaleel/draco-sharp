@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Draco", "src\Draco\Draco.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Draco.Examples", "src\Draco.Examples\Draco.Examples.csproj", "{E2DB44FA-4161-48B0-A422-0EE47197FDD5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{05D26680-52D1-4717-8C9E-1586A5D3688A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Draco.UnitTests", "tests\Draco.UnitTests\Draco.UnitTests.csproj", "{60DAFA76-DFBF-4F7A-92AD-66B917761E5F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +30,14 @@ Global
 		{E2DB44FA-4161-48B0-A422-0EE47197FDD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E2DB44FA-4161-48B0-A422-0EE47197FDD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2DB44FA-4161-48B0-A422-0EE47197FDD5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60DAFA76-DFBF-4F7A-92AD-66B917761E5F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60DAFA76-DFBF-4F7A-92AD-66B917761E5F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60DAFA76-DFBF-4F7A-92AD-66B917761E5F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60DAFA76-DFBF-4F7A-92AD-66B917761E5F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{A3CAE5F2-C72A-4935-AFF2-0B6FD8DBD702} = {EF76C146-970B-484E-8B81-8DAFC6D340C6}
 		{E2DB44FA-4161-48B0-A422-0EE47197FDD5} = {EF76C146-970B-484E-8B81-8DAFC6D340C6}
+		{60DAFA76-DFBF-4F7A-92AD-66B917761E5F} = {05D26680-52D1-4717-8C9E-1586A5D3688A}
 	EndGlobalSection
 EndGlobal
