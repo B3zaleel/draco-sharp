@@ -137,6 +137,46 @@ internal static class Constants
             _ => throw new NotImplementedException()
         };
     }
+
+    public static TOut[] ReinterpretCast<TIn, TOut>(TIn[] values)
+    {
+        var result = new TOut[values.Length];
+
+        for (int i = 0; i < values.Length; i++)
+        {
+            var value = values[i];
+            var valueBytes = value switch
+            {
+                sbyte v => [v < 0 ? (byte)(v + 256) : (byte)v],
+                byte v => [v],
+                short v => BitConverter.GetBytes(v),
+                ushort v => BitConverter.GetBytes(v),
+                int v => BitConverter.GetBytes(v),
+                uint v => BitConverter.GetBytes(v),
+                long v => BitConverter.GetBytes(v),
+                ulong v => BitConverter.GetBytes(v),
+                float v => BitConverter.GetBytes(v),
+                double v => BitConverter.GetBytes(v),
+                _ => throw new NotImplementedException()
+            };
+            var interpretedValue = typeof(TOut).Name switch
+            {
+                nameof(SByte) => (TOut)(object)(sbyte)(valueBytes[0] > 127 ? valueBytes[0] - 256 : valueBytes[0]),
+                nameof(Byte) => (TOut)(object)valueBytes[0],
+                nameof(Int16) => (TOut)(object)BitConverter.ToInt16(valueBytes, 0),
+                nameof(UInt16) => (TOut)(object)BitConverter.ToUInt16(valueBytes, 0),
+                nameof(Int32) => (TOut)(object)BitConverter.ToInt32(valueBytes, 0),
+                nameof(UInt32) => (TOut)(object)BitConverter.ToUInt32(valueBytes, 0),
+                nameof(Int64) => (TOut)(object)BitConverter.ToInt64(valueBytes, 0),
+                nameof(UInt64) => (TOut)(object)BitConverter.ToUInt64(valueBytes, 0),
+                nameof(Single) => (TOut)(object)BitConverter.ToSingle(valueBytes, 0),
+                nameof(Double) => (TOut)(object)BitConverter.ToDouble(valueBytes, 0),
+                _ => throw new NotImplementedException()
+            };
+            result[i] = interpretedValue;
+        }
+        return result;
+    }
 }
 
 public enum GeometryAttributeType : sbyte
