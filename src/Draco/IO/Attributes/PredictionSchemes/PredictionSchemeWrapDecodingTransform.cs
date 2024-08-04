@@ -46,9 +46,11 @@ internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> 
         var originalValues = new TDataType[ComponentsCount];
         predictedValues = ClampPredictedValue(predictedValues);
 
+        var predictedValuesAsUint = predictedValues.Select(value => (uint)Convert.ChangeType(value, typeof(uint))!).ToArray();
+        var correctedValuesAsUint = correctedValues.Select(value => (uint)Convert.ChangeType(value, typeof(uint))!).ToArray();
         for (int i = 0; i < ComponentsCount; ++i)
         {
-            originalValues[i] = predictedValues[i] + (TDataType)Convert.ChangeType(correctedValues[i], typeof(TDataType))!;
+            originalValues[i] = (TDataType)Convert.ChangeType(predictedValuesAsUint[i] + correctedValuesAsUint[i], typeof(TDataType))!;
 
             if (originalValues[i] > MaxValue)
             {
