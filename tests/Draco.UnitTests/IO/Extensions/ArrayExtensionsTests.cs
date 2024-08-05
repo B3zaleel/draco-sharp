@@ -22,6 +22,25 @@ public class ArrayExtensionsTests
     }
 
     [Theory]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, -1, 1, new int[] { })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, 0, -1, new int[] { })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, 0, 6, new int[] { })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, 5, 1, new int[] { })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, 10, 1, new int[] { })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, 0, 5, new int[] { 1, 2, 3, 4, 5 })]
+    [InlineData(new int[] { 1, 2, 3, 4, 5 }, 1, 3, new int[] { 2, 3, 4 })]
+    public void GetSubArray_GivenArrayAndOffsetAndCount_ReturnsExpectedSubArray(int[] array, int offset, int count, int[] expectedArray)
+    {
+        // Arrange
+
+        // Act
+        var result = ArrayExtensions.GetSubArray(array, offset, count);
+
+        // Assert
+        result.Should().BeEquivalentTo(expectedArray);
+    }
+
+    [Theory]
     [InlineData(new int[] { 1, 2, 3, 4, 5 }, new int[] { 7 }, -1, new int[] { 1, 2, 3, 4, 5 })]
     [InlineData(new int[] { 1, 2, 3, 4, 5 }, new int[] { 7 }, 5, new int[] { 1, 2, 3, 4, 5 })]
     [InlineData(new int[] { 1, 2, 3, 4, 5 }, new int[] { 7 }, 10, new int[] { 1, 2, 3, 4, 5 })]
