@@ -50,7 +50,7 @@ internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> 
 
         for (int i = 0; i < ComponentsCount; ++i)
         {
-            originalValues[i] = (TDataType)Convert.ChangeType(predictedValuesAsUint[i] + correctedValuesAsUint[i], typeof(TDataType))!;
+            originalValues[i] = Constants.StaticCast<uint, TDataType>(predictedValuesAsUint[i] + correctedValuesAsUint[i]);
 
             if (originalValues[i] > MaxValue)
             {
