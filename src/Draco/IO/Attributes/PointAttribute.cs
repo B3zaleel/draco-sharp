@@ -37,11 +37,10 @@ public class PointAttribute : GeometryAttribute
 
     public void Reset(int numAttributeValues)
     {
-        if (Buffer == null)
-        {
-            Buffer = new MemoryStream();
-        }
-        ResetBuffer(Buffer, Constants.DataTypeLength(DataType) * NumComponents, 0);
+        Buffer ??= new();
+        var entrySize = Constants.DataTypeLength(DataType) * NumComponents;
+        Buffer.Update(Enumerable.Repeat(0, numAttributeValues + entrySize).ToArray());
+        ResetBuffer(Buffer, entrySize, 0);
         Size = (uint)numAttributeValues;
     }
 

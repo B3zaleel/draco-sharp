@@ -1,24 +1,28 @@
-using Draco.IO.Extensions;
+using Draco.IO.Core;
 
 namespace Draco.IO.Attributes;
 
 public class AttributeTransformData
 {
     public AttributeTransformType TransformType { get; set; } = AttributeTransformType.InvalidTransform;
-    public Stream? Buffer { get; set; } = new MemoryStream();
+    public DataBuffer? Buffer { get; set; } = new();
 
-    public TDataType GetParameterValue<TDataType>()
+    public TDataType GetParameterValue<TDataType>(int byteOffset)
     {
-        return Buffer!.ReadDatum<TDataType>();
+        return Buffer!.Read<TDataType>(byteOffset);
     }
 
-    public void SetParameterValue<TDataType>(TDataType data)
+    public void SetParameterValue<TDataType>(TDataType data, int byteOffset)
     {
-        Buffer!.WriteData([data]);
+        if (byteOffset + Constants.SizeOf<TDataType>() > Buffer!.DataSize)
+        {
+            Buffer.Resize(byteOffset + Constants.SizeOf<TDataType>());
+        }
+        Buffer.Write([data], byteOffset);
     }
 
     public void AppendParameterValue<TDataType>(TDataType data)
     {
-        SetParameterValue(data);
+        SetParameterValue(data, (int)Buffer!.DataSize);
     }
 }

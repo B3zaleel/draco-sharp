@@ -11,7 +11,7 @@ internal class AttributeOctahedronTransform : AttributeTransform
     public override void Init(PointAttribute attribute)
     {
         Assertions.ThrowIf(attribute.AttributeTransformData == null || attribute.AttributeTransformData.TransformType != AttributeTransformType.OctahedronTransform, "Wrong transform type.");
-        _quantizationBits = attribute.AttributeTransformData!.GetParameterValue<int>();
+        _quantizationBits = attribute.AttributeTransformData!.GetParameterValue<int>(0);
     }
 
     public override DataType GetTransformedDataType(PointAttribute attribute)
@@ -42,6 +42,7 @@ internal class AttributeOctahedronTransform : AttributeTransform
 
     public override void TransformAttribute(PointAttribute attribute, List<uint> pointIds, PointAttribute targetAttribute)
     {
+        var portableAttributeDataPosition = targetAttribute.GetAddress(0);
         double[] attributeValue;
         var converter = new OctahedronToolBox();
         converter.SetQuantizationBits((byte)_quantizationBits);
@@ -52,8 +53,10 @@ internal class AttributeOctahedronTransform : AttributeTransform
             {
                 attributeValue = attribute.GetValue<float>(attribute.MappedIndex(i), 3).Select(value => (double)value).ToArray();
                 var (s, t) = converter.FloatVectorToQuantizedOctahedralCoords(attributeValue);
-                targetAttribute.Buffer!.WriteDatum(s);
-                targetAttribute.Buffer!.WriteDatum(t);
+                targetAttribute.Buffer!.Write(s, portableAttributeDataPosition);
+                portableAttributeDataPosition += Constants.SizeOf<int>();
+                targetAttribute.Buffer!.Write(t, portableAttributeDataPosition);
+                portableAttributeDataPosition += Constants.SizeOf<int>();
             }
         }
         else
@@ -62,8 +65,10 @@ internal class AttributeOctahedronTransform : AttributeTransform
             {
                 attributeValue = attribute.GetValue<float>(attribute.MappedIndex(pointIds[(int)i]), 3).Select(value => (double)value).ToArray();
                 var (s, t) = converter.FloatVectorToQuantizedOctahedralCoords(attributeValue);
-                targetAttribute.Buffer!.WriteDatum(s);
-                targetAttribute.Buffer!.WriteDatum(t);
+                targetAttribute.Buffer!.Write(s, portableAttributeDataPosition);
+                portableAttributeDataPosition += Constants.SizeOf<int>();
+                targetAttribute.Buffer.Write(t, portableAttributeDataPosition);
+                portableAttributeDataPosition += Constants.SizeOf<int>();
             }
         }
     }
@@ -72,15 +77,21 @@ internal class AttributeOctahedronTransform : AttributeTransform
     {
         Assertions.ThrowIfNot(targetAttribute.DataType != DataType.Float32);
         Assertions.ThrowIf(targetAttribute.NumComponents != 3);
+        var entrySize = sizeof(float) * 3;
         var octahedronToolBox = new OctahedronToolBox();
         octahedronToolBox.SetQuantizationBits((byte)_quantizationBits);
+        var sourceAttributeDataPosition = attribute.GetAddress(0);
+        var targetAttributeDataPosition = targetAttribute.GetAddress(0);
 
         for (uint i = 0; i < targetAttribute.Size; ++i)
         {
-            var s = attribute.Buffer!.ReadDatum<int>();
-            var t = attribute.Buffer!.ReadDatum<int>();
+            var s = attribute.Buffer!.Read<int>(sourceAttributeDataPosition);
+            sourceAttributeDataPosition += Constants.SizeOf<int>();
+            var t = attribute.Buffer!.Read<int>(sourceAttributeDataPosition);
+            sourceAttributeDataPosition += Constants.SizeOf<int>();
             var attributeValue = octahedronToolBox.QuantizedOctahedralCoordsToUnitVector(s, t);
-            targetAttribute.Buffer!.WriteData(attributeValue);
+            targetAttribute.Buffer!.Write(attributeValue, targetAttributeDataPosition);
+            targetAttributeDataPosition += entrySize;
         }
     }
 }

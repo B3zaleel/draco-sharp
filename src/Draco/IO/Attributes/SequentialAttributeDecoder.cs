@@ -68,10 +68,14 @@ internal class SequentialAttributeDecoder
 
     protected virtual void DecodeValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
+        var bytePosition = 0;
+        var entrySize = (int)Attribute!.ByteStride;
+
         for (int i = 0; i < pointIds.Count; ++i)
         {
-            var valueData = decoderBuffer.ReadBytes((int)Attribute!.ByteStride);
-            Attribute.Buffer!.Write(valueData);
+            var valueData = decoderBuffer.ReadBytes(entrySize);
+            Attribute.Buffer!.Write(valueData, bytePosition);
+            bytePosition += entrySize;
         }
     }
 }

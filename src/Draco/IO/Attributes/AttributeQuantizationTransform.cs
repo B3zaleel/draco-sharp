@@ -14,14 +14,17 @@ internal class AttributeQuantizationTransform : AttributeTransform
     public override void Init(PointAttribute attribute)
     {
         Assertions.ThrowIf(attribute.AttributeTransformData == null || attribute.AttributeTransformData.TransformType != AttributeTransformType.QuantizationTransform, "Wrong transform type.");
-        QuantizationBits = attribute.AttributeTransformData!.GetParameterValue<int>();
+        var byteOffset = 0;
+        QuantizationBits = attribute.AttributeTransformData!.GetParameterValue<int>(byteOffset);
         MinValues = [];
+        byteOffset += 4;
 
         for (int i = 0; i < attribute.NumComponents; ++i)
         {
-            MinValues.Add(attribute.AttributeTransformData.GetParameterValue<float>());
+            MinValues.Add(attribute.AttributeTransformData.GetParameterValue<float>(byteOffset));
+            byteOffset += 4;
         }
-        Range = attribute.AttributeTransformData.GetParameterValue<float>();
+        Range = attribute.AttributeTransformData.GetParameterValue<float>(byteOffset);
     }
 
     private static bool IsQuantizationValid(int quantizationBits)
@@ -70,6 +73,7 @@ internal class AttributeQuantizationTransform : AttributeTransform
         var numComponents = attribute.NumComponents;
         var maxQuantizedValue = (1 << QuantizationBits) - 1;
         var quantizer = new Quantizer(Range, maxQuantizedValue);
+        int dstIndex = 0;
         float[] attValue;
 
         if (pointIds.Count == 0)
@@ -83,7 +87,8 @@ internal class AttributeQuantizationTransform : AttributeTransform
                 {
                     var value = attValue[c] - MinValues[c];
                     var qVal = quantizer.QuantizeFloat(value);
-                    targetAttribute.Buffer!.WriteDatum(qVal);
+                    targetAttribute.Buffer!.Write(qVal, dstIndex);
+                    dstIndex += Constants.SizeOf<int>();
                 }
             }
         }
@@ -98,7 +103,8 @@ internal class AttributeQuantizationTransform : AttributeTransform
                 {
                     var value = attValue[c] - MinValues[c];
                     var qVal = quantizer.QuantizeFloat(value);
-                    targetAttribute.Buffer!.WriteDatum(qVal);
+                    targetAttribute.Buffer!.Write(qVal, dstIndex);
+                    dstIndex += Constants.SizeOf<int>();
                 }
             }
         }
@@ -108,16 +114,21 @@ internal class AttributeQuantizationTransform : AttributeTransform
     {
         Assertions.ThrowIf(targetAttribute.DataType != DataType.Float32);
         var maxQuantizedValue = (int)((1U << QuantizationBits) - 1);
+        int entrySize = sizeof(float) * targetAttribute.NumComponents;
+        int bytePosition = 0;
         var dequantizer = new Dequantizer(Range, maxQuantizedValue);
         var attributeValue = new float[targetAttribute.NumComponents];
+        var sourceAttributeDataPosition = attribute.GetAddress(0);
 
         for (uint i = 0; i < targetAttribute.Size; ++i)
         {
             for (int c = 0; c < targetAttribute.NumComponents; ++c)
             {
-                attributeValue[c] = dequantizer.DequantizeFloat(attribute.GetValue<int>()) + MinValues[c];
+                attributeValue[c] = dequantizer.DequantizeFloat(attribute.Buffer!.Read<int>(sourceAttributeDataPosition)) + MinValues[c];
+                sourceAttributeDataPosition += Constants.SizeOf<int>();
             }
-            targetAttribute.Buffer!.WriteData(attributeValue);
+            targetAttribute.Buffer!.Write(attributeValue, bytePosition);
+            bytePosition += entrySize;
         }
     }
 }
