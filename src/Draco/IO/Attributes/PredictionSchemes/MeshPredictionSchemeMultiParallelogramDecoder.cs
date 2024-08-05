@@ -27,7 +27,7 @@ internal class MeshPredictionSchemeMultiParallelogramDecoder<TDataType, TTransfo
         var predictedValues = new TDataType[numComponents];
         var zero = (TDataType)Convert.ChangeType(0, typeof(TDataType));
         Array.Fill(predictedValues, zero);
-        originalValues.SetSubArray(Transform.ComputeOriginalValue(originalValues.GetSubArray(0), correctedData.GetSubArray(0)), 0);
+        originalValues.SetSubArray(Transform.ComputeOriginalValue(predictedValues.GetSubArray(0), correctedData.GetSubArray(0, numComponents)), 0);
 
         for (int p = 1; p < MeshData.DataToCornerMap!.Count; ++p)
         {
@@ -57,7 +57,7 @@ internal class MeshPredictionSchemeMultiParallelogramDecoder<TDataType, TTransfo
             if (numParallelograms == 0)
             {
                 var srcOffset = (p - 1) * numComponents;
-                originalValues.SetSubArray(Transform.ComputeOriginalValue(originalValues.GetSubArray(srcOffset), correctedData.GetSubArray(dstOffset)), dstOffset);
+                originalValues.SetSubArray(Transform.ComputeOriginalValue(originalValues.GetSubArray(srcOffset), correctedData.GetSubArray(dstOffset, numComponents)), dstOffset);
             }
             else
             {
@@ -65,7 +65,7 @@ internal class MeshPredictionSchemeMultiParallelogramDecoder<TDataType, TTransfo
                 {
                     predictedValues[c] /= (TDataType)Convert.ChangeType(numParallelograms, typeof(TDataType));
                 }
-                originalValues.SetSubArray(Transform.ComputeOriginalValue(predictedValues, correctedData.GetSubArray(dstOffset)), dstOffset);
+                originalValues.SetSubArray(Transform.ComputeOriginalValue(predictedValues, correctedData.GetSubArray(dstOffset, numComponents)), dstOffset);
             }
         }
         return originalValues;

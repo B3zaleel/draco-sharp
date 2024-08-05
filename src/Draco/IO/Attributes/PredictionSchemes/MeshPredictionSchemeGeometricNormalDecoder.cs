@@ -61,7 +61,7 @@ internal class MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>
             var (s, t) = _octahedronToolBox.IntegerVectorToQuantizedOctahedralCoords(predictedNormal3D.Components);
             TDataType[] predictedNormalOctahedral = [(TDataType)Convert.ChangeType(s, typeof(TDataType)), (TDataType)Convert.ChangeType(t, typeof(TDataType))];
             var dataOffset = dataId * 2;
-            data.SetSubArray(Transform.ComputeOriginalValue(predictedNormalOctahedral, correctedData.GetSubArray(dataOffset)), dataOffset);
+            data.SetSubArray(Transform.ComputeOriginalValue(predictedNormalOctahedral, correctedData.GetSubArray(dataOffset, numComponents)), dataOffset);
         }
         _flipNormalBitDecoder.EndDecoding();
         return data;

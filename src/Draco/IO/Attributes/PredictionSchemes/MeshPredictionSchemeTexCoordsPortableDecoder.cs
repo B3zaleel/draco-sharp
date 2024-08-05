@@ -58,7 +58,7 @@ internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransfor
             var cornerId = MeshData.DataToCornerMap[p];
             _predictor.ComputePredictedValue(cornerId, originalValues, p);
             var dstOffset = p * numComponents;
-            originalValues.SetSubArray(Transform.ComputeOriginalValue(_predictor.PredictedValue, correctedData.GetSubArray(dstOffset)), dstOffset);
+            originalValues.SetSubArray(Transform.ComputeOriginalValue(_predictor.PredictedValue, correctedData.GetSubArray(dstOffset, numComponents)), dstOffset);
         }
         return originalValues;
     }

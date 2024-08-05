@@ -68,7 +68,7 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
         {
             ComputePredictedValue(MeshData.DataToCornerMap[p], originalValues, p);
             var dstOffset = p * numComponents;
-            originalValues.SetSubArray(Transform.ComputeOriginalValue(_predictedValues, correctedData.GetSubArray(dstOffset)), dstOffset);
+            originalValues.SetSubArray(Transform.ComputeOriginalValue(_predictedValues, correctedData.GetSubArray(dstOffset, numComponents)), dstOffset);
         }
         return originalValues;
     }
