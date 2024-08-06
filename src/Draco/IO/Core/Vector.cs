@@ -283,6 +283,8 @@ internal class Vector2<TScalar> : Vector<TScalar>
         IMinMaxValue<TScalar>
 {
     public Vector2(TScalar c0, TScalar c1) : base(c0, c1) { }
+    public Vector2(params TScalar[] c) : this(c[0], c[1]) { }
+    public Vector2(Vector<TScalar> vector) : this(vector.Components[0], vector.Components[1]) { }
 }
 
 internal class Vector3<TScalar> : Vector<TScalar>
@@ -299,4 +301,6 @@ internal class Vector3<TScalar> : Vector<TScalar>
         IMinMaxValue<TScalar>
 {
     public Vector3(TScalar c0, TScalar c1, TScalar c2) : base(c0, c1, c2) { }
+    public Vector3(params TScalar[] c) : this(c[0], c[1], c[2]) { }
+    public Vector3(Vector<TScalar> vector) : this(vector.Components[0], vector.Components[1], vector.Components[2]) { }
 }

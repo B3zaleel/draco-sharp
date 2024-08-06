@@ -20,7 +20,7 @@ internal abstract class MeshPredictionSchemeGeometricNormalPredictor(MeshPredict
         Assertions.ThrowIfNot(IsInitialized());
         var pointId = EntryToPointIdMap![(int)dataId];
         var posValueId = PositionAttribute!.MappedIndex(pointId);
-        return (Vector3<long>)new Vector<long>(PositionAttribute.ConvertValue<long>(posValueId));
+        return new Vector3<long>(PositionAttribute.ConvertValue<long>(posValueId));
     }
 
     protected Vector3<long> GetPositionForCorner(uint cornerId)
