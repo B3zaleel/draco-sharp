@@ -43,7 +43,7 @@ internal class SequentialNormalAttributeDecoder : SequentialIntegerAttributeDeco
         _octahedronTransform!.TransferToAttribute(PortableAttribute!);
     }
 
-    protected new void StoreValues(uint numPoints)
+    protected override void StoreValues(uint numPoints)
     {
         _octahedronTransform!.InverseTransformAttribute(PortableAttribute!, Attribute!);
     }

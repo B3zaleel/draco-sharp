@@ -73,7 +73,7 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
         return originalValues;
     }
 
-    public new void DecodePredictionData(DecoderBuffer decoderBuffer)
+    public override void DecodePredictionData(DecoderBuffer decoderBuffer)
     {
         var numOrientations = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2) ? decoderBuffer.ReadUInt32() : (uint)decoderBuffer.DecodeVarIntUnsigned();
         Assertions.ThrowIf(numOrientations < 0);
