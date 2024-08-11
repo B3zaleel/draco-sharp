@@ -39,7 +39,7 @@ public class PointAttribute : GeometryAttribute
     {
         Buffer ??= new();
         var entrySize = Constants.DataTypeLength(DataType) * NumComponents;
-        Buffer.Update(Enumerable.Repeat(0, numAttributeValues + entrySize).ToArray());
+        Buffer.Update(Enumerable.Repeat((byte)0, numAttributeValues * entrySize).ToArray());
         ResetBuffer(Buffer, entrySize, 0);
         UniqueEntriesCount = (uint)numAttributeValues;
     }
