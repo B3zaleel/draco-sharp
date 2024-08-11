@@ -14,10 +14,11 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType>
+    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
 {
     private PointAttribute? _posAttribute;
     private List<uint> _entryToPointMap = [];
@@ -27,18 +28,18 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
     private ushort _version = 0;
 
     public override PredictionSchemeMethod Method { get => PredictionSchemeMethod.TexCoordsDeprecated; }
-    protected override int NumParentAttribute { get => 1; set => base.NumParentAttribute = value; }
+    public override int ParentAttributesCount { get => 1; set { } }
     public override GeometryAttributeType ParentAttributeType
     {
         get => GeometryAttributeType.Position;
     }
-    public new PointAttribute? ParentAttribute
+    public override PointAttribute? ParentAttribute
     {
         get => _posAttribute;
         set
         {
-            Assertions.ThrowIf(value!.AttributeType != GeometryAttributeType.Position);
-            Assertions.ThrowIf(value.NumComponents != 3);
+            Assertions.ThrowIf(value == null || value!.AttributeType != GeometryAttributeType.Position, "Invalid attribute type");
+            Assertions.ThrowIf(value!.NumComponents != 3, "Currently works only for 3 component positions.");
             base.ParentAttribute = value;
             _posAttribute = value;
         }
@@ -47,6 +48,11 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
     public bool IsInitialized()
     {
         return _posAttribute != null && MeshData.IsInitialized();
+    }
+
+    public override GeometryAttributeType GetParentAttributeType(int i)
+    {
+        return GeometryAttributeType.Position;
     }
 
     public override TDataType[] ComputeOriginalValues(TDataType[] correctedData, int size, int numComponents, List<uint> entryToPointMap)
@@ -62,12 +68,12 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
         {
             ComputePredictedValue(MeshData.DataToCornerMap[p], originalValues, p);
             var dstOffset = p * numComponents;
-            originalValues.SetSubArray(Transform.ComputeOriginalValue(_predictedValues, correctedData.GetSubArray(dstOffset)), dstOffset);
+            originalValues.SetSubArray(Transform.ComputeOriginalValue(_predictedValues, correctedData.GetSubArray(dstOffset, numComponents)), dstOffset);
         }
         return originalValues;
     }
 
-    public new void DecodePredictionData(DecoderBuffer decoderBuffer)
+    public override void DecodePredictionData(DecoderBuffer decoderBuffer)
     {
         var numOrientations = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2) ? decoderBuffer.ReadUInt32() : (uint)decoderBuffer.DecodeVarIntUnsigned();
         Assertions.ThrowIf(numOrientations < 0);

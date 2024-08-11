@@ -2,7 +2,7 @@ using System.Numerics;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 
-internal class PredictionSchemeNormalOctahedronCanonicalizedTransform<TDataType> : PredictionSchemeNormalOctahedronTransform<TDataType>
+internal class PredictionSchemeNormalOctahedronCanonicalizedTransform<TDataType> : PredictionSchemeNormalOctahedronCanonicalizedTransform<TDataType, TDataType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -10,9 +10,35 @@ internal class PredictionSchemeNormalOctahedronCanonicalizedTransform<TDataType>
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
+{ }
+
+internal class PredictionSchemeNormalOctahedronCanonicalizedTransform<TDataType, TCorrectedType> : PredictionSchemeNormalOctahedronTransform<TDataType, TCorrectedType>
+    where TDataType : struct,
+        IComparisonOperators<TDataType, TDataType, bool>,
+        IComparable,
+        IEqualityOperators<TDataType, TDataType, bool>,
+        IAdditionOperators<TDataType, TDataType, TDataType>,
+        ISubtractionOperators<TDataType, TDataType, TDataType>,
+        IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
+        IDecrementOperators<TDataType>,
+        IBitwiseOperators<TDataType, TDataType, TDataType>,
+        IMinMaxValue<TDataType>
+    where TCorrectedType : struct,
+        IComparisonOperators<TCorrectedType, TCorrectedType, bool>,
+        IComparable,
+        IEqualityOperators<TCorrectedType, TCorrectedType, bool>,
+        IAdditionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        ISubtractionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IDivisionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IMultiplyOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IDecrementOperators<TCorrectedType>,
+        IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IMinMaxValue<TCorrectedType>
 {
     public int GetRotationCount(int[] p)
     {

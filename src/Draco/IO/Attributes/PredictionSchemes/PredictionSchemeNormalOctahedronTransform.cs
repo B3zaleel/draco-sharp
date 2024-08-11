@@ -3,7 +3,7 @@ using Draco.IO.Extensions;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 
-internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType> : PredictionSchemeDecodingTransform<TDataType>
+internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType> : PredictionSchemeNormalOctahedronTransform<TDataType, TDataType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -11,9 +11,35 @@ internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType> : P
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
+{ }
+
+internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType, TCorrectedType> : PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
+    where TDataType : struct,
+        IComparisonOperators<TDataType, TDataType, bool>,
+        IComparable,
+        IEqualityOperators<TDataType, TDataType, bool>,
+        IAdditionOperators<TDataType, TDataType, TDataType>,
+        ISubtractionOperators<TDataType, TDataType, TDataType>,
+        IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
+        IDecrementOperators<TDataType>,
+        IBitwiseOperators<TDataType, TDataType, TDataType>,
+        IMinMaxValue<TDataType>
+    where TCorrectedType : struct,
+        IComparisonOperators<TCorrectedType, TCorrectedType, bool>,
+        IComparable,
+        IEqualityOperators<TCorrectedType, TCorrectedType, bool>,
+        IAdditionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        ISubtractionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IDivisionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IMultiplyOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IDecrementOperators<TCorrectedType>,
+        IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IMinMaxValue<TCorrectedType>
 {
     private int _maxQuantizedValue;
     private readonly OctahedronToolBox _octahedronToolBox = new();
@@ -29,7 +55,7 @@ internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType> : P
         }
     }
     public int CenterValue { get => _octahedronToolBox.CenterValue; }
-    public new int QuantizationBits { get => _octahedronToolBox.QuantizationBits; }
+    public override int QuantizationBits { get => _octahedronToolBox.QuantizationBits; }
 
     protected bool IsInDiamond(int s, int t)
     {

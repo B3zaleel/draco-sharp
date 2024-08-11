@@ -4,7 +4,7 @@ namespace Draco.IO.Attributes;
 
 public class PointAttribute : GeometryAttribute
 {
-    public uint Size { get; private set; } = 0;
+    public uint UniqueEntriesCount { get; private set; } = 0;
     private readonly List<uint> _indicesMap = [];
 
     public bool IsMappingIdentity { get; private set; } = false;
@@ -20,8 +20,12 @@ public class PointAttribute : GeometryAttribute
 
     public PointAttribute(GeometryAttribute att)
     {
+        Buffer = att.Buffer;
         AttributeType = att.AttributeType;
+        NumComponents = att.NumComponents;
+        DataType = att.DataType;
         Normalized = att.Normalized;
+        ByteStride = att.ByteStride;
         ByteOffset = att.ByteOffset;
         UniqueId = att.UniqueId;
     }
@@ -33,12 +37,11 @@ public class PointAttribute : GeometryAttribute
 
     public void Reset(int numAttributeValues)
     {
-        if (Buffer == null)
-        {
-            Buffer = new MemoryStream();
-        }
-        ResetBuffer(Buffer, Constants.DataTypeLength(DataType) * NumComponents, 0);
-        Size = (uint)numAttributeValues;
+        Buffer ??= new();
+        var entrySize = Constants.DataTypeLength(DataType) * NumComponents;
+        Buffer.Update(Enumerable.Repeat((byte)0, numAttributeValues * entrySize).ToArray());
+        ResetBuffer(Buffer, entrySize, 0);
+        UniqueEntriesCount = (uint)numAttributeValues;
     }
 
     public void SetIdentityMapping()
@@ -55,7 +58,7 @@ public class PointAttribute : GeometryAttribute
 
     public void SetPointMapEntry(uint pointIndex, uint entryIndex)
     {
-        Assertions.ThrowIfNot(IsMappingIdentity);
+        Assertions.ThrowIf(IsMappingIdentity);
         _indicesMap[(int)pointIndex] = entryIndex;
     }
 }

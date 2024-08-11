@@ -12,28 +12,27 @@ internal class MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType>
+    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
 {
     public override PredictionSchemeMethod Method { get => PredictionSchemeMethod.GeometricNormal; }
     private readonly MeshPredictionSchemeGeometricNormalPredictorArea _predictor = new(meshData);
     private readonly OctahedronToolBox _octahedronToolBox = new();
     private readonly RAnsBitDecoder _flipNormalBitDecoder = new();
 
-    public new int NumParentAttribute { get => 1; }
+    public override int ParentAttributesCount { get => 1; set { } }
 
     public bool IsInitialized()
     {
         return _predictor.IsInitialized() && MeshData.IsInitialized() && _octahedronToolBox.IsInitialized();
     }
 
-    public void SetParentAttribute(PointAttribute attribute)
+    public override GeometryAttributeType GetParentAttributeType(int i)
     {
-        Assertions.ThrowIf(attribute.AttributeType != GeometryAttributeType.Position);
-        Assertions.ThrowIf(attribute.NumComponents != 3);
-        _predictor.PositionAttribute = attribute;
+        return GeometryAttributeType.Position;
     }
 
     public void SetQuantizationBits(byte q)
@@ -62,13 +61,13 @@ internal class MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>
             var (s, t) = _octahedronToolBox.IntegerVectorToQuantizedOctahedralCoords(predictedNormal3D.Components);
             TDataType[] predictedNormalOctahedral = [(TDataType)Convert.ChangeType(s, typeof(TDataType)), (TDataType)Convert.ChangeType(t, typeof(TDataType))];
             var dataOffset = dataId * 2;
-            data.SetSubArray(Transform.ComputeOriginalValue(predictedNormalOctahedral, correctedData.GetSubArray(dataOffset)), dataOffset);
+            data.SetSubArray(Transform.ComputeOriginalValue(predictedNormalOctahedral, correctedData.GetSubArray(dataOffset, numComponents)), dataOffset);
         }
         _flipNormalBitDecoder.EndDecoding();
         return data;
     }
 
-    public new void DecodePredictionData(DecoderBuffer decoderBuffer)
+    public override void DecodePredictionData(DecoderBuffer decoderBuffer)
     {
         Transform.DecodeTransformData(decoderBuffer);
 

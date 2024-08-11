@@ -5,7 +5,7 @@ namespace Draco.IO.Attributes.PredictionSchemes;
 
 internal static class PredictionSchemeDecoderFactory
 {
-    public static IPredictionSchemeDecoder<TDataType, TTransform>? CreatePredictionSchemeForDecoder<TDataType, TTransform>(PredictionSchemeMethod method, int attributeId, ConnectivityDecoder connectivityDecoder, TTransform transform)
+    public static IPredictionSchemeDecoder<TDataType>? CreatePredictionSchemeForDecoder<TDataType, TTransform>(PredictionSchemeMethod method, int attributeId, ConnectivityDecoder connectivityDecoder, TTransform transform)
         where TDataType : struct,
             IComparisonOperators<TDataType, TDataType, bool>,
             IComparable,
@@ -17,7 +17,7 @@ internal static class PredictionSchemeDecoderFactory
             IDecrementOperators<TDataType>,
             IBitwiseOperators<TDataType, TDataType, TDataType>,
             IMinMaxValue<TDataType>
-        where TTransform : PredictionSchemeDecodingTransform<TDataType>
+        where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
     {
         if (method == PredictionSchemeMethod.None)
         {
@@ -32,10 +32,10 @@ internal static class PredictionSchemeDecoderFactory
                 return meshPredictionScheme;
             }
         }
-        return (IPredictionSchemeDecoder<TDataType, TTransform>)new PredictionSchemeDeltaDecoder<TDataType, TTransform>(connectivityDecoder.PointCloud!.GetAttributeById(attributeId)!, transform);
+        return new PredictionSchemeDeltaDecoder<TDataType, TTransform>(connectivityDecoder.PointCloud!.GetAttributeById(attributeId)!, transform);
     }
 
-    public static IPredictionSchemeDecoder<TDataType, TTransform>? CreateMeshPredictionScheme<TDataType, TTransform>(MeshDecoder meshDecoder, PredictionSchemeMethod method, int attributeId, TTransform transform)
+    public static IPredictionSchemeDecoder<TDataType>? CreateMeshPredictionScheme<TDataType, TTransform>(MeshDecoder meshDecoder, PredictionSchemeMethod method, int attributeId, TTransform transform)
         where TDataType : struct,
             IComparisonOperators<TDataType, TDataType, bool>,
             IComparable,
@@ -47,7 +47,7 @@ internal static class PredictionSchemeDecoderFactory
             IDecrementOperators<TDataType>,
             IBitwiseOperators<TDataType, TDataType, TDataType>,
             IMinMaxValue<TDataType>
-        where TTransform : PredictionSchemeDecodingTransform<TDataType>
+        where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
     {
         var attribute = meshDecoder.PointCloud!.GetAttributeById(attributeId)!;
         var cornerTable = meshDecoder.CornerTable;
@@ -63,12 +63,12 @@ internal static class PredictionSchemeDecoderFactory
             : new(meshDecoder.Mesh, attributeCornerTable, encodingData.EncodedAttributeValueIndexToCornerMap, encodingData.VertexToEncodedAttributeValueIndexMap);
         return method switch
         {
-            PredictionSchemeMethod.Parallelogram => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeParallelogramDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
-            PredictionSchemeMethod.MultiParallelogram => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeMultiParallelogramDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
-            PredictionSchemeMethod.ConstrainedMultiParallelogram => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
-            PredictionSchemeMethod.TexCoordsDeprecated => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
-            PredictionSchemeMethod.TexCoordsPortable => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
-            PredictionSchemeMethod.GeometricNormal => (IPredictionSchemeDecoder<TDataType, TTransform>)new MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
+            PredictionSchemeMethod.Parallelogram => new MeshPredictionSchemeParallelogramDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
+            PredictionSchemeMethod.MultiParallelogram => new MeshPredictionSchemeMultiParallelogramDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
+            PredictionSchemeMethod.ConstrainedMultiParallelogram => new MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
+            PredictionSchemeMethod.TexCoordsDeprecated => new MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
+            PredictionSchemeMethod.TexCoordsPortable => new MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
+            PredictionSchemeMethod.GeometricNormal => new MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>(attribute, transform, meshPredictionSchemeData),
             _ => null,
         };
     }

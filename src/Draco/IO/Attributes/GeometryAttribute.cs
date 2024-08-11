@@ -1,11 +1,12 @@
 using System.Numerics;
+using Draco.IO.Core;
 using Draco.IO.Extensions;
 
 namespace Draco.IO.Attributes;
 
 public class GeometryAttribute
 {
-    public Stream? Buffer { get; set; }
+    public DataBuffer? Buffer { get; set; } = new();
     public GeometryAttributeType AttributeType { get; set; }
     public byte NumComponents { get; set; }
     public DataType DataType { get; set; }
@@ -16,7 +17,7 @@ public class GeometryAttribute
 
     internal GeometryAttribute() : this(GeometryAttributeType.Invalid, null, 1, DataType.Float32, false, 0, 0) { }
 
-    internal GeometryAttribute(GeometryAttributeType attributeType, Stream? buffer, byte numComponents, DataType dataType, bool normalized, long byteStride, long byteOffset)
+    internal GeometryAttribute(GeometryAttributeType attributeType, DataBuffer? buffer, byte numComponents, DataType dataType, bool normalized, long byteStride, long byteOffset)
     {
         Buffer = buffer;
         AttributeType = attributeType;
@@ -43,27 +44,26 @@ public class GeometryAttribute
         }
         else
         {
-            Buffer = new MemoryStream();
-            Buffer.Update(srcAttribute.Buffer);
+            Buffer = new();
+            Buffer.Update(srcAttribute.Buffer._data);
         }
     }
 
-    public void ResetBuffer(Stream buffer, long byteStride, long byteOffset)
+    public void ResetBuffer(DataBuffer buffer, long byteStride, long byteOffset)
     {
         Buffer = buffer;
         ByteStride = byteStride;
         ByteOffset = byteOffset;
     }
 
-    public T GetValue<T>()
-    {
-        return Buffer!.ReadDatum<T>();
-    }
-
     public T[] GetValue<T>(uint attributeId, int numComponents)
     {
-        Buffer!.Seek(ByteOffset + ByteStride * attributeId, SeekOrigin.Begin);
-        return Buffer!.ReadData<T>(numComponents);
+        return Buffer!.Read<T>(ByteOffset + ByteStride * attributeId, numComponents);
+    }
+
+    public int GetAddress(uint attributeIndex)
+    {
+        return (int)(ByteOffset + ByteStride * attributeIndex);
     }
 
     public TOut[] ConvertValue<TOut>(uint attributeId)
@@ -136,13 +136,15 @@ public class GeometryAttribute
             IBitwiseOperators<TOut, TOut, TOut>,
             IMinMaxValue<TOut>
     {
+        var srcPosition = GetAddress(attributeId);
         var size = Math.Min(numComponents, NumComponents);
         var result = new TOut[size];
 
         for (int i = 0; i < size; ++i)
         {
-            var value = Buffer!.ReadDatum<T>();
+            var value = Buffer!.Read<T>(srcPosition);
             result[i] = ConvertComponentValue<T, TOut>(value, Normalized);
+            srcPosition += Constants.SizeOf<TOut>();
         }
         return result;
     }

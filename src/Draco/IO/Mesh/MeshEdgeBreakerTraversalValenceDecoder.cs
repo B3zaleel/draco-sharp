@@ -57,7 +57,7 @@ internal class MeshEdgeBreakerTraversalValenceDecoder : MeshEdgeBreakerTraversal
         for (int i = 0; i < numUniqueValences; ++i)
         {
             uint numSymbols = (uint)decoderBuffer.DecodeVarIntUnsigned();
-            Assertions.ThrowIf(numSymbols > _cornerTable!.FacesCount);
+            Assertions.ThrowIf(numSymbols > CornerTable!.FacesCount);
             if (numSymbols > 0)
             {
                 SymbolDecoding.DecodeSymbols(decoderBuffer, numSymbols, 1, out uint[] contextSymbolsData);
@@ -99,34 +99,34 @@ internal class MeshEdgeBreakerTraversalValenceDecoder : MeshEdgeBreakerTraversal
 
     protected override void NewActiveCornerReached(uint corner)
     {
-        uint next = _cornerTable!.Next(corner);
-        uint prev = _cornerTable.Previous(corner);
+        uint next = CornerTable!.Next(corner);
+        uint prev = CornerTable.Previous(corner);
         switch (_lastSymbol)
         {
             case Constants.EdgeBreakerTopologyBitPattern.C:
             case Constants.EdgeBreakerTopologyBitPattern.S:
-                _vertexValences[(int)_cornerTable.Vertex(next)] += 1;
-                _vertexValences[(int)_cornerTable.Vertex(prev)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(next)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(prev)] += 1;
                 break;
             case Constants.EdgeBreakerTopologyBitPattern.R:
-                _vertexValences[(int)_cornerTable.Vertex(corner)] += 1;
-                _vertexValences[(int)_cornerTable.Vertex(next)] += 1;
-                _vertexValences[(int)_cornerTable.Vertex(prev)] += 2;
+                _vertexValences[(int)CornerTable.Vertex(corner)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(next)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(prev)] += 2;
                 break;
             case Constants.EdgeBreakerTopologyBitPattern.L:
-                _vertexValences[(int)_cornerTable.Vertex(corner)] += 1;
-                _vertexValences[(int)_cornerTable.Vertex(next)] += 2;
-                _vertexValences[(int)_cornerTable.Vertex(prev)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(corner)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(next)] += 2;
+                _vertexValences[(int)CornerTable.Vertex(prev)] += 1;
                 break;
             case Constants.EdgeBreakerTopologyBitPattern.E:
-                _vertexValences[(int)_cornerTable.Vertex(corner)] += 2;
-                _vertexValences[(int)_cornerTable.Vertex(next)] += 2;
-                _vertexValences[(int)_cornerTable.Vertex(prev)] += 2;
+                _vertexValences[(int)CornerTable.Vertex(corner)] += 2;
+                _vertexValences[(int)CornerTable.Vertex(next)] += 2;
+                _vertexValences[(int)CornerTable.Vertex(prev)] += 2;
                 break;
             default:
                 break;
         }
-        int activeValence = (int)_vertexValences[(int)_cornerTable.Vertex(next)];
+        int activeValence = (int)_vertexValences[(int)CornerTable.Vertex(next)];
         int clampedValence;
         if (activeValence < _minValence)
         {

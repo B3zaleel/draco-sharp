@@ -11,12 +11,13 @@ internal class PredictionSchemeWrapDecodingTransform<TDataType> : PredictionSche
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
 { }
 
-internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeWrapTransform<TDataType>
+internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeWrapTransform<TDataType, TCorrectedType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -24,28 +25,32 @@ internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> 
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
     where TCorrectedType : struct,
-        IComparisonOperators<TDataType, TDataType, bool>,
+        IComparisonOperators<TCorrectedType, TCorrectedType, bool>,
         IComparable,
-        IEqualityOperators<TDataType, TDataType, bool>,
-        IAdditionOperators<TDataType, TDataType, TDataType>,
-        ISubtractionOperators<TDataType, TDataType, TDataType>,
-        IDivisionOperators<TDataType, TDataType, TDataType>,
-        IDecrementOperators<TDataType>,
-        IBitwiseOperators<TDataType, TDataType, TDataType>,
-        IMinMaxValue<TDataType>
+        IEqualityOperators<TCorrectedType, TCorrectedType, bool>,
+        IAdditionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        ISubtractionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IDivisionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IMultiplyOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IDecrementOperators<TCorrectedType>,
+        IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IMinMaxValue<TCorrectedType>
 {
-    public TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
+    public override TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
     {
         var originalValues = new TDataType[ComponentsCount];
         predictedValues = ClampPredictedValue(predictedValues);
+        var predictedValuesAsUint = Constants.ReinterpretCast<TDataType, uint>(predictedValues);
+        var correctedValuesAsUint = Constants.ReinterpretCast<TCorrectedType, uint>(correctedValues);
 
         for (int i = 0; i < ComponentsCount; ++i)
         {
-            originalValues[i] = predictedValues[i] + (TDataType)Convert.ChangeType(correctedValues[i], typeof(TDataType))!;
+            originalValues[i] = Constants.StaticCast<uint, TDataType>(predictedValuesAsUint[i] + correctedValuesAsUint[i]);
 
             if (originalValues[i] > MaxValue)
             {

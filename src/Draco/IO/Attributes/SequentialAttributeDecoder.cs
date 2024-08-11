@@ -17,7 +17,7 @@ internal class SequentialAttributeDecoder
         Init(connectivityDecoder, attributeId);
     }
 
-    public void Init(ConnectivityDecoder connectivityDecoder, int attributeId)
+    public virtual void Init(ConnectivityDecoder connectivityDecoder, int attributeId)
     {
         ConnectivityDecoder = connectivityDecoder;
         Attribute = connectivityDecoder.PointCloud?.GetAttributeById(attributeId);
@@ -68,10 +68,14 @@ internal class SequentialAttributeDecoder
 
     protected virtual void DecodeValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
+        var bytePosition = 0;
+        var entrySize = (int)Attribute!.ByteStride;
+
         for (int i = 0; i < pointIds.Count; ++i)
         {
-            var valueData = decoderBuffer.ReadBytes((int)Attribute!.ByteStride);
-            Attribute.Buffer!.Write(valueData);
+            var valueData = decoderBuffer.ReadBytes(entrySize);
+            Attribute.Buffer!.Write(valueData, bytePosition);
+            bytePosition += entrySize;
         }
     }
 }

@@ -30,7 +30,7 @@ internal static class ListExtensions
         }
         else if (list.Count > count)
         {
-            list.RemoveRange(count, list.Count - count);
+            list.RemoveRange(list.Count, list.Count - count);
         }
     }
 
@@ -38,14 +38,14 @@ internal static class ListExtensions
     {
         if (list.Count < count)
         {
-            for (var i = 0; i < count; i++)
+            for (var i = list.Count; i < count; i++)
             {
                 list.Add(elementCreator());
             }
         }
         else if (list.Count > count)
         {
-            list.RemoveRange(count, list.Count - count);
+            list.RemoveRange(list.Count, list.Count - count);
         }
     }
 }

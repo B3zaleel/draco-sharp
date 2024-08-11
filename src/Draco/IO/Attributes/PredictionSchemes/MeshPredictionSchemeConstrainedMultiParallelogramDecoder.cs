@@ -13,10 +13,11 @@ internal class MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataTyp
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType>
+    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
 {
     private const int kMaxNumParallelograms = 4;
     private MultiParallelogramMode _selectedMode = MultiParallelogramMode.Optimal;
@@ -39,7 +40,7 @@ internal class MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataTyp
         Array.Fill(isCreaseEdgePos, 0);
         var multiPredValues = new TDataType[numComponents];
         Array.Fill(multiPredValues, default);
-        originalValues.SetSubArray(Transform.ComputeOriginalValue(originalValues.GetSubArray(0), correctedData.GetSubArray(0)), 0);
+        originalValues.SetSubArray(Transform.ComputeOriginalValue(originalValues.GetSubArray(0), correctedData.GetSubArray(0, numComponents)), 0);
 
         for (int p = 1; p < MeshData.DataToCornerMap!.Count; ++p)
         {
@@ -95,7 +96,7 @@ internal class MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataTyp
             if (numUsedParallelograms == 0)
             {
                 var srcOffset = (p - 1) * numComponents;
-                originalValues.SetSubArray(Transform.ComputeOriginalValue(originalValues.GetSubArray(srcOffset), correctedData.GetSubArray(dstOffset)), dstOffset);
+                originalValues.SetSubArray(Transform.ComputeOriginalValue(originalValues.GetSubArray(srcOffset), correctedData.GetSubArray(dstOffset, numComponents)), dstOffset);
             }
             else
             {
@@ -103,7 +104,7 @@ internal class MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataTyp
                 {
                     multiPredValues[c] /= (TDataType)Convert.ChangeType(numUsedParallelograms, typeof(TDataType));
                 }
-                originalValues.SetSubArray(Transform.ComputeOriginalValue(multiPredValues, correctedData.GetSubArray(dstOffset)), dstOffset);
+                originalValues.SetSubArray(Transform.ComputeOriginalValue(multiPredValues, correctedData.GetSubArray(dstOffset, numComponents)), dstOffset);
             }
         }
         return originalValues;

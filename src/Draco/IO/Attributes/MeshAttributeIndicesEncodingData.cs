@@ -13,7 +13,7 @@ public class MeshAttributeIndicesEncodingData
 
     public MeshAttributeIndicesEncodingData(int numVertices)
     {
-        EncodedAttributeValueIndexToCornerMap.Resize(numVertices, 0U);
+        EncodedAttributeValueIndexToCornerMap = new List<uint>(numVertices);
         VertexToEncodedAttributeValueIndexMap.Resize(numVertices, 0);
     }
 }

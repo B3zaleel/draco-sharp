@@ -33,8 +33,8 @@ internal class MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>(MeshPre
     public Vector3<TDataType> GetPositionForEntryId(int entryId)
     {
         var pointIndex = EntryToPointMap[entryId];
-        var pos = new Core.Vector<TDataType>(PositionAttribute!.ConvertValue<TDataType>(PositionAttribute.MappedIndex(pointIndex), 3));
-        return (Vector3<TDataType>)pos;
+        var pos = new Vector3<TDataType>(PositionAttribute!.ConvertValue<TDataType>(PositionAttribute.MappedIndex(pointIndex), 3));
+        return pos;
     }
 
     public Vector2<TDataType> GetTexCoordForEntryId(int entryId, TDataType[] data)
@@ -97,12 +97,12 @@ internal class MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>(MeshPre
 
                     if ((cUV - predictedUV0).SquaredNorm() < (cUV - predictedUV1).SquaredNorm())
                     {
-                        predictedUV = (Vector2<TDataType>)predictedUV0;
+                        predictedUV = new Vector2<TDataType>(predictedUV0);
                         Orientations.Add(true);
                     }
                     else
                     {
-                        predictedUV = (Vector2<TDataType>)predictedUV1;
+                        predictedUV = new Vector2<TDataType>(predictedUV1);
                         Orientations.Add(false);
                     }
                 }
@@ -111,7 +111,7 @@ internal class MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>(MeshPre
                     Assertions.ThrowIf(Orientations.Count == 0);
                     var orientation = Orientations.Last();
                     Orientations.PopBack();
-                    predictedUV = (Vector2<TDataType>)(orientation ? (xUV + cxUV) / pnNorm2Squared : (xUV - cxUV) / pnNorm2Squared);
+                    predictedUV = new Vector2<TDataType>(orientation ? (xUV + cxUV) / pnNorm2Squared : (xUV - cxUV) / pnNorm2Squared);
                 }
                 PredictedValue[0] = predictedUV[0];
                 PredictedValue[1] = predictedUV[1];

@@ -10,9 +10,9 @@ internal class CornerTable
     private readonly List<uint> _vertexCorners = [];
     private readonly List<uint> _nonManifoldVertexParents = [];
 
-    public int VerticesCount { get => _vertexCorners.Count; }
-    public int CornersCount { get => _cornerToVertexMap.Count; }
-    public int FacesCount { get => _cornerToVertexMap.Count / 3; }
+    public virtual int VerticesCount { get => _vertexCorners.Count; }
+    public virtual int CornersCount { get => _cornerToVertexMap.Count; }
+    public virtual int FacesCount { get => _cornerToVertexMap.Count / 3; }
     public int NewVerticesCount { get => VerticesCount - OriginalVerticesCount; }
     public int OriginalVerticesCount { get; private set; } = 0;
     public int DegeneratedFacesCount { get; private set; } = 0;
@@ -38,43 +38,43 @@ internal class CornerTable
         ValenceCache.ClearValenceCacheInaccurate();
     }
 
-    public uint Opposite(uint corner)
+    public virtual uint Opposite(uint corner)
     {
         return corner == Constants.kInvalidCornerIndex ? corner : _oppositeCorners[(int)corner];
     }
 
-    public uint Next(uint corner)
+    public virtual uint Next(uint corner)
     {
         return corner == Constants.kInvalidCornerIndex ? corner : LocalIndex(++corner) != 0 ? corner : corner - 3;
     }
 
-    public uint Previous(uint corner)
+    public virtual uint Previous(uint corner)
     {
         return corner == Constants.kInvalidCornerIndex ? corner : LocalIndex(corner) != 0 ? corner - 1 : corner + 2;
     }
 
-    public uint Vertex(uint corner)
+    public virtual uint Vertex(uint corner)
     {
         return corner == Constants.kInvalidCornerIndex || corner >= CornersCount ? corner : ConfidentVertex(corner);
     }
 
-    public uint ConfidentVertex(uint corner)
+    public virtual uint ConfidentVertex(uint corner)
     {
         Assertions.ThrowIfNot(corner >= 0 && corner < CornersCount);
         return _cornerToVertexMap[(int)corner];
     }
 
-    public uint Face(uint corner)
+    public virtual uint Face(uint corner)
     {
         return corner == Constants.kInvalidCornerIndex ? corner : corner / 3;
     }
 
-    public uint FirstCorner(uint face)
+    public virtual uint FirstCorner(uint face)
     {
         return face == Constants.kInvalidFaceIndex ? face : face * 3;
     }
 
-    public uint[] AllCorners(uint face)
+    public virtual uint[] AllCorners(uint face)
     {
         var ci = face * 3;
         return [ci, ci + 1, ci + 2];
@@ -106,17 +106,17 @@ internal class CornerTable
         }
     }
 
-    public uint LeftMostCorner(uint v)
+    public virtual uint LeftMostCorner(uint v)
     {
         return _vertexCorners[(int)v];
     }
 
-    public uint VertexParent(uint vertex)
+    public virtual uint VertexParent(uint vertex)
     {
         return vertex < OriginalVerticesCount ? vertex : _nonManifoldVertexParents[(int)vertex - OriginalVerticesCount];
     }
 
-    public int VertexValence(uint v)
+    public virtual int VertexValence(uint v)
     {
         if (v == Constants.kInvalidVertexIndex)
         {
@@ -125,7 +125,7 @@ internal class CornerTable
         return ConfidentVertexValence(v);
     }
 
-    public int ConfidentVertexValence(uint v)
+    public virtual int ConfidentVertexValence(uint v)
     {
         Assertions.ThrowIfNot(v >= 0 || v < VerticesCount);
         int valence = 0;
@@ -136,39 +136,39 @@ internal class CornerTable
         return valence;
     }
 
-    public int CornerValence(uint c)
+    public virtual int CornerValence(uint c)
     {
         return c == Constants.kInvalidCornerIndex ? (int)c : ConfidentCornerValence(c);
     }
 
-    public int ConfidentCornerValence(uint c)
+    public virtual int ConfidentCornerValence(uint c)
     {
         Assertions.ThrowIfNot(c < CornersCount);
         return ConfidentVertexValence(ConfidentVertex(c));
     }
 
-    public bool IsOnBoundary(uint vert)
+    public virtual bool IsOnBoundary(uint vert)
     {
         var corner = LeftMostCorner(vert);
         return SwingLeft(corner) == Constants.kInvalidCornerIndex;
     }
 
-    public uint SwingRight(uint corner)
+    public virtual uint SwingRight(uint corner)
     {
         return Previous(Opposite(Previous(corner)));
     }
 
-    public uint SwingLeft(uint corner)
+    public virtual uint SwingLeft(uint corner)
     {
         return Next(Opposite(Next(corner)));
     }
 
-    public uint GetLeftCorner(uint cornerId)
+    public virtual uint GetLeftCorner(uint cornerId)
     {
         return cornerId == Constants.kInvalidCornerIndex ? Constants.kInvalidCornerIndex : Opposite(Previous(cornerId));
     }
 
-    public uint GetRightCorner(uint cornerId)
+    public virtual uint GetRightCorner(uint cornerId)
     {
         return cornerId == Constants.kInvalidCornerIndex ? Constants.kInvalidCornerIndex : Opposite(Next(cornerId));
     }
@@ -257,7 +257,7 @@ internal class CornerTable
     public void MakeVertexIsolated(uint vert)
     {
         Assertions.ThrowIfNot(ValenceCache.IsCacheEmpty());
-        _vertexCorners[(int)vert] = uint.MaxValue;
+        _vertexCorners[(int)vert] = Constants.kInvalidCornerIndex;
     }
 
     public bool IsVertexIsolated(uint v)
@@ -268,12 +268,12 @@ internal class CornerTable
     public void MakeFaceInvalid(uint face)
     {
         Assertions.ThrowIfNot(ValenceCache.IsCacheEmpty());
-        if (face != uint.MaxValue)
+        if (face != Constants.kInvalidFaceIndex)
         {
             var firstCorner = FirstCorner(face);
             for (byte i = 0; i < 3; ++i)
             {
-                _cornerToVertexMap[(int)firstCorner + i] = uint.MaxValue;
+                _cornerToVertexMap[(int)firstCorner + i] = Constants.kInvalidVertexIndex;
             }
         }
     }
@@ -529,7 +529,7 @@ internal class CornerTable
         }
     }
 
-    public bool IsDegenerated(uint face)
+    public virtual bool IsDegenerated(uint face)
     {
         if (face == Constants.kInvalidFaceIndex)
         {

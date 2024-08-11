@@ -38,7 +38,7 @@ public class Mesh : PointCloud.PointCloud
         return _faces[(int)faceId];
     }
 
-    public new void SetAttribute(int attId, PointAttribute pointAttribute)
+    public override void SetAttribute(int attId, PointAttribute pointAttribute)
     {
         base.SetAttribute(attId, pointAttribute);
         if (_attributeData.Count <= attId)

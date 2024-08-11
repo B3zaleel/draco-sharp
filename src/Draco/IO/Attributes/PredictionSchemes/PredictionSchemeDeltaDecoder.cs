@@ -11,10 +11,11 @@ internal class PredictionSchemeDeltaDecoder<TDataType, TTransform>(PointAttribut
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType>
+    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
 {
     public override PredictionSchemeMethod Method { get => PredictionSchemeMethod.Difference; }
 

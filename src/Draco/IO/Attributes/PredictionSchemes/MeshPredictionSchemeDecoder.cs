@@ -10,10 +10,11 @@ internal abstract class MeshPredictionSchemeDecoder<TDataType, TTransform>(Point
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType>
+    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
 {
     protected MeshPredictionSchemeData MeshData { get; set; } = meshData;
 }

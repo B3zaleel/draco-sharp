@@ -5,27 +5,27 @@ namespace Draco.IO.Mesh;
 
 internal class MeshAttributeCornerTable : CornerTable
 {
-    private readonly ValenceCache? _valenceCache;
     private readonly List<bool> _isEdgeOnSeam = [];
     private readonly List<bool> _isVertexOnSeam = [];
     private readonly List<uint> _vertexToLeftMostCornerMap = [];
     private readonly List<uint> _vertexToAttributeEntryIdMap = [];
 
-    public new int VerticesCount { get => _vertexToAttributeEntryIdMap.Count; }
-    public new int CornersCount { get => CornerTable.CornersCount; }
-    public new int FacesCount { get => CornerTable.FacesCount; }
+    public override int VerticesCount { get => _vertexToAttributeEntryIdMap.Count; }
+    public override int CornersCount { get => CornerTable.CornersCount; }
+    public override int FacesCount { get => CornerTable.FacesCount; }
     public bool NoInteriorSeams { get; private set; }
     public CornerTable CornerTable { get; private set; }
 
     public MeshAttributeCornerTable(CornerTable cornerTable)
     {
         CornerTable = cornerTable;
-        _valenceCache = new(this);
         ValenceCache.ClearValenceCache();
         ValenceCache.ClearValenceCacheInaccurate();
         _isEdgeOnSeam.Fill(cornerTable.CornersCount, false);
         _isVertexOnSeam.Fill(cornerTable.VerticesCount, false);
         _cornerToVertexMap.Fill(cornerTable.CornersCount, Constants.kInvalidVertexIndex);
+        _vertexToLeftMostCornerMap = new List<uint>(cornerTable.VerticesCount);
+        _vertexToAttributeEntryIdMap = new List<uint>(cornerTable.VerticesCount);
         NoInteriorSeams = true;
     }
 
@@ -54,7 +54,7 @@ internal class MeshAttributeCornerTable : CornerTable
         _vertexToLeftMostCornerMap.Clear();
         int numNewVertices = 0;
 
-        for (uint v = 0; v < VerticesCount; ++v)
+        for (uint v = 0; v < CornerTable.VerticesCount; ++v)
         {
             var c = CornerTable.LeftMostCorner(v);
             if (c == Constants.kInvalidCornerIndex)
@@ -85,7 +85,7 @@ internal class MeshAttributeCornerTable : CornerTable
             }
             _cornerToVertexMap[(int)firstC] = firstVertIndex;
             _vertexToLeftMostCornerMap.Add(firstC);
-            actC = SwingRight(firstC);
+            actC = CornerTable.SwingRight(firstC);
             while (actC != Constants.kInvalidCornerIndex && actC != firstC)
             {
                 if (IsCornerOppositeToSeamEdge(CornerTable.Next(actC)))
@@ -103,7 +103,7 @@ internal class MeshAttributeCornerTable : CornerTable
                     _vertexToLeftMostCornerMap.Add(firstC);
                 }
                 _cornerToVertexMap[(int)actC] = firstVertIndex;
-                actC = SwingRight(actC);
+                actC = CornerTable.SwingRight(actC);
             }
         }
     }
@@ -113,7 +113,7 @@ internal class MeshAttributeCornerTable : CornerTable
         return _isEdgeOnSeam[(int)corner];
     }
 
-    public new uint Opposite(uint corner)
+    public override uint Opposite(uint corner)
     {
         if (corner == Constants.kInvalidCornerIndex || IsCornerOppositeToSeamEdge(corner))
         {
@@ -122,12 +122,12 @@ internal class MeshAttributeCornerTable : CornerTable
         return CornerTable.Opposite(corner);
     }
 
-    public new uint Next(uint corner)
+    public override uint Next(uint corner)
     {
         return CornerTable.Next(corner);
     }
 
-    public new uint Previous(uint corner)
+    public override uint Previous(uint corner)
     {
         return CornerTable.Previous(corner);
     }
@@ -137,79 +137,79 @@ internal class MeshAttributeCornerTable : CornerTable
         return _isVertexOnSeam[(int)CornerTable.Vertex(corner)];
     }
 
-    public new uint GetLeftCorner(uint corner)
+    public override uint GetLeftCorner(uint corner)
     {
         return Opposite(Previous(corner));
     }
 
-    public new uint GetRightCorner(uint corner)
+    public override uint GetRightCorner(uint corner)
     {
         return Opposite(Next(corner));
     }
 
-    public new uint SwingRight(uint corner)
+    public override uint SwingRight(uint corner)
     {
         return Previous(Opposite(Previous(corner)));
     }
 
-    public new uint SwingLeft(uint corner)
+    public override uint SwingLeft(uint corner)
     {
         return Next(Opposite(Next(corner)));
     }
 
-    public new uint Vertex(uint corner)
+    public override uint Vertex(uint corner)
     {
         Assertions.ThrowIfNot(corner < _cornerToVertexMap.Count);
         return ConfidentVertex(corner);
     }
 
-    public new uint ConfidentVertex(uint corner)
+    public override uint ConfidentVertex(uint corner)
     {
         return _cornerToVertexMap[(int)corner];
     }
 
-    public new uint VertexParent(uint corner)
+    public override uint VertexParent(uint corner)
     {
         return _vertexToAttributeEntryIdMap[(int)corner];
     }
 
-    public new uint LeftMostCorner(uint corner)
+    public override uint LeftMostCorner(uint corner)
     {
         return _vertexToLeftMostCornerMap[(int)corner];
     }
 
-    public new uint Face(uint corner)
+    public override uint Face(uint corner)
     {
         return CornerTable.Face(corner);
     }
 
-    public new uint FirstCorner(uint face)
+    public override uint FirstCorner(uint face)
     {
         return CornerTable.FirstCorner(face);
     }
 
-    public new uint[] AllCorners(uint face)
+    public override uint[] AllCorners(uint face)
     {
         return CornerTable.AllCorners(face);
     }
 
-    public new bool IsOnBoundary(uint vert)
+    public override bool IsOnBoundary(uint vert)
     {
-        var corner = base.LeftMostCorner(vert);
+        var corner = LeftMostCorner(vert);
         return corner == Constants.kInvalidCornerIndex || SwingLeft(corner) == Constants.kInvalidCornerIndex;
     }
 
-    public new bool IsDegenerated(uint face)
+    public override bool IsDegenerated(uint face)
     {
         return CornerTable.IsDegenerated(face);
     }
 
-    public new int VertexValence(uint v)
+    public override int VertexValence(uint v)
     {
         return v == Constants.kInvalidVertexIndex ? -1 : ConfidentVertexValence(v);
     }
 
-    public new int ConfidentVertexValence(uint v)
+    public override int ConfidentVertexValence(uint v)
     {
         Assertions.ThrowIfNot(v < VerticesCount);
         int valence = 0;
@@ -220,13 +220,13 @@ internal class MeshAttributeCornerTable : CornerTable
         return valence;
     }
 
-    public new int CornerValence(uint c)
+    public override int CornerValence(uint c)
     {
         Assertions.ThrowIfNot(c < CornersCount);
         return c == Constants.kInvalidVertexIndex ? -1 : ConfidentCornerValence(c);
     }
 
-    public new int ConfidentCornerValence(uint c)
+    public override int ConfidentCornerValence(uint c)
     {
         Assertions.ThrowIfNot(c < CornersCount);
         return ConfidentVertexValence(Vertex(c));

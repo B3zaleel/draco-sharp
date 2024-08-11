@@ -11,6 +11,11 @@ public class PointCloud
     public int PointsCount { get; set; } = 0;
     public int AttributesCount { get => _attributes.Count; }
 
+    public PointCloud()
+    {
+        _namedAttributeIndex.Fill((int)GeometryAttributeType.NamedAttributesCount, () => new());
+    }
+
     public int NumNamedAttributes(GeometryAttributeType type)
     {
         if (type == GeometryAttributeType.Invalid || type >= GeometryAttributeType.NamedAttributesCount)
@@ -53,9 +58,10 @@ public class PointCloud
         return null;
     }
 
-    public PointAttribute? GetAttributeById(int id)
+    public PointAttribute GetAttributeById(int id)
     {
-        return id < 0 || id > _attributes.Count ? null : _attributes[id];
+        Assertions.ThrowIf(id < 0 || id >= _attributes.Count, "Invalid attribute id.");
+        return _attributes[id];
     }
 
     public PointAttribute? GetAttributeByUniqueId(uint uniqueId)
@@ -112,7 +118,7 @@ public class PointCloud
         return pointAttribute;
     }
 
-    public void SetAttribute(int attId, PointAttribute pointAttribute)
+    public virtual void SetAttribute(int attId, PointAttribute pointAttribute)
     {
         if (_attributes.Count <= attId)
         {

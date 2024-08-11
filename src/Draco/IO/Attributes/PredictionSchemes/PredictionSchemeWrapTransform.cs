@@ -3,17 +3,43 @@ using Draco.IO.Extensions;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 
-internal class PredictionSchemeWrapTransform<TDataType> : PredictionSchemeDecodingTransform<TDataType>
+internal class PredictionSchemeWrapTransform<TDataType> : PredictionSchemeWrapTransform<TDataType, TDataType>
     where TDataType : struct,
-    IComparisonOperators<TDataType, TDataType, bool>,
-    IComparable,
-    IEqualityOperators<TDataType, TDataType, bool>,
-    IAdditionOperators<TDataType, TDataType, TDataType>,
-    ISubtractionOperators<TDataType, TDataType, TDataType>,
-    IDivisionOperators<TDataType, TDataType, TDataType>,
-    IDecrementOperators<TDataType>,
-    IBitwiseOperators<TDataType, TDataType, TDataType>,
-    IMinMaxValue<TDataType>
+        IComparisonOperators<TDataType, TDataType, bool>,
+        IComparable,
+        IEqualityOperators<TDataType, TDataType, bool>,
+        IAdditionOperators<TDataType, TDataType, TDataType>,
+        ISubtractionOperators<TDataType, TDataType, TDataType>,
+        IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
+        IDecrementOperators<TDataType>,
+        IBitwiseOperators<TDataType, TDataType, TDataType>,
+        IMinMaxValue<TDataType>
+{ }
+
+internal class PredictionSchemeWrapTransform<TDataType, TCorrectedType> : PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
+    where TDataType : struct,
+        IComparisonOperators<TDataType, TDataType, bool>,
+        IComparable,
+        IEqualityOperators<TDataType, TDataType, bool>,
+        IAdditionOperators<TDataType, TDataType, TDataType>,
+        ISubtractionOperators<TDataType, TDataType, TDataType>,
+        IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
+        IDecrementOperators<TDataType>,
+        IBitwiseOperators<TDataType, TDataType, TDataType>,
+        IMinMaxValue<TDataType>
+    where TCorrectedType : struct,
+        IComparisonOperators<TCorrectedType, TCorrectedType, bool>,
+        IComparable,
+        IEqualityOperators<TCorrectedType, TCorrectedType, bool>,
+        IAdditionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        ISubtractionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IDivisionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IMultiplyOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IDecrementOperators<TCorrectedType>,
+        IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IMinMaxValue<TCorrectedType>
 {
     private readonly List<TDataType> _clampedValue = [];
     private TDataType One { get => (TDataType)Convert.ChangeType(1, typeof(TDataType)); }

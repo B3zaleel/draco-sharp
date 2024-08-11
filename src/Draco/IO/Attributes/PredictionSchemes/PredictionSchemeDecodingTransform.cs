@@ -10,12 +10,11 @@ internal class PredictionSchemeDecodingTransform<TDataType> : PredictionSchemeDe
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-{
-
-}
+{ }
 
 internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
     where TDataType : struct,
@@ -25,19 +24,21 @@ internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
         IAdditionOperators<TDataType, TDataType, TDataType>,
         ISubtractionOperators<TDataType, TDataType, TDataType>,
         IDivisionOperators<TDataType, TDataType, TDataType>,
+        IMultiplyOperators<TDataType, TDataType, TDataType>,
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
     where TCorrectedType : struct,
-        IComparisonOperators<TDataType, TDataType, bool>,
+        IComparisonOperators<TCorrectedType, TCorrectedType, bool>,
         IComparable,
-        IEqualityOperators<TDataType, TDataType, bool>,
-        IAdditionOperators<TDataType, TDataType, TDataType>,
-        ISubtractionOperators<TDataType, TDataType, TDataType>,
-        IDivisionOperators<TDataType, TDataType, TDataType>,
-        IDecrementOperators<TDataType>,
-        IBitwiseOperators<TDataType, TDataType, TDataType>,
-        IMinMaxValue<TDataType>
+        IEqualityOperators<TCorrectedType, TCorrectedType, bool>,
+        IAdditionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        ISubtractionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IDivisionOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IMultiplyOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IDecrementOperators<TCorrectedType>,
+        IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
+        IMinMaxValue<TCorrectedType>
 {
     protected int ComponentsCount { get; set; }
     public virtual int QuantizationBits { get; } = -1;
@@ -47,7 +48,7 @@ internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
         ComponentsCount = componentsCount;
     }
 
-    public TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
+    public virtual TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
     {
         var originalValues = new TDataType[ComponentsCount];
 

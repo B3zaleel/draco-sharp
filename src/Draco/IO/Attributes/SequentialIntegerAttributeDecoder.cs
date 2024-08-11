@@ -7,7 +7,6 @@ namespace Draco.IO.Attributes;
 internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
 {
     private IPredictionSchemeDecoder<int>? _predictionScheme;
-    public int ValueComponentsCount { get => Attribute!.NumComponents; }
 
     public SequentialIntegerAttributeDecoder() { }
 
@@ -43,14 +42,14 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
         }
     }
 
-    protected IPredictionSchemeDecoder<int>? CreatePredictionScheme(PredictionSchemeMethod method, PredictionSchemeTransformType transformType)
+    protected virtual IPredictionSchemeDecoder<int>? CreatePredictionScheme(PredictionSchemeMethod method, PredictionSchemeTransformType transformType)
     {
         return transformType == PredictionSchemeTransformType.Wrap
-            ? (IPredictionSchemeDecoder<int>?)PredictionSchemeDecoderFactory.CreatePredictionSchemeForDecoder<int, PredictionSchemeWrapDecodingTransform<int>>(method, AttributeId, ConnectivityDecoder!, new())
+            ? PredictionSchemeDecoderFactory.CreatePredictionSchemeForDecoder<int, PredictionSchemeDecodingTransform<int, int>>(method, AttributeId, ConnectivityDecoder!, new PredictionSchemeWrapDecodingTransform<int>())
             : null;
     }
 
-    protected void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
+    protected virtual void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
         var numComponents = Attribute!.NumComponents;
         Assertions.ThrowIf(numComponents <= 0);
@@ -63,7 +62,7 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
         if (compressed > 0)
         {
             SymbolDecoding.DecodeSymbols(decoderBuffer, (uint)numValues, numComponents, out portableAttributeData);
-            PortableAttribute!.Buffer = StreamExtensions.Create(portableAttributeData);
+            PortableAttribute!.Buffer!.Update(portableAttributeData);
         }
         else
         {
@@ -71,13 +70,14 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
 
             if (numBytes == Constants.DataTypeLength(DataType.Int32))
             {
-                PortableAttribute!.Buffer = StreamExtensions.Create(decoderBuffer.ReadBytes(sizeof(int) * numValues));
+                PortableAttribute!.Buffer!.Update(decoderBuffer.ReadBytes(sizeof(int) * numValues));
             }
             else
             {
                 for (int i = 0; i < numValues; ++i)
                 {
                     decoderBuffer.ReadBytes(numBytes);
+                    PortableAttribute!.Buffer!.Write(decoderBuffer.ReadBytes(numBytes), numBytes * i);
                 }
             }
         }
@@ -85,6 +85,7 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
         if (numValues > 0 && (_predictionScheme == null || _predictionScheme.AreCorrectionsPositive()))
         {
             portableAttributeDataAsInt = BitUtilities.ConvertSymbolsToSignedInts(portableAttributeData);
+            PortableAttribute!.Buffer!.Update(portableAttributeDataAsInt);
         }
         if (_predictionScheme != null)
         {
@@ -93,11 +94,12 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
             if (numValues > 0)
             {
                 var originalData = _predictionScheme.ComputeOriginalValues(portableAttributeDataAsInt, numValues, numComponents, pointIds);
+                PortableAttribute!.Buffer!.Update(originalData);
             }
         }
     }
 
-    protected void StoreValues(uint numValues)
+    protected virtual void StoreValues(uint numValues)
     {
         switch (Attribute!.DataType)
         {
@@ -141,16 +143,18 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
         var numComponents = Attribute!.NumComponents;
         var entrySize = sizeof(int) * numComponents;
         var attributeValue = new T[numComponents];
-        // int valId = 0;
+        var valuePosition = 0;
+        var bytePosition = 0;
 
         for (uint i = 0; i < numValues; ++i)
         {
             for (int c = 0; c < numComponents; ++c)
             {
-                attributeValue[c] = PortableAttribute!.Buffer!.ReadDatum<T>();
+                attributeValue[c] = PortableAttribute!.Buffer!.Read<T>(valuePosition);
+                valuePosition += Constants.SizeOf<int>();
             }
-            var ms = new MemoryStream();
-            Attribute.Buffer!.WriteData(attributeValue);
+            Attribute.Buffer!.Write(attributeValue, bytePosition);
+            bytePosition += entrySize;
         }
     }
 

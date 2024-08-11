@@ -6,7 +6,6 @@ namespace Draco.IO.Mesh;
 
 internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
 {
-    protected CornerTable? _cornerTable;
     private readonly List<int> _vertexTraversalLength = [];
     private readonly List<TopologySplitEventData> _topologySplitData = [];
     private readonly List<HoleEventData> _holeEventData = [];
@@ -55,7 +54,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             : (uint)decoderBuffer.DecodeVarIntUnsigned();
         Assertions.ThrowIf(numEncodedSplitSymbols > numEncodedSymbols, "Split symbols are a sub-set of all symbols.");
         _vertexTraversalLength.Clear();
-        _cornerTable = new CornerTable();
+        CornerTable = new CornerTable();
         _processedCornerIds.Clear();
         _processedConnectivityCorners.Clear();
         _topologySplitData.Clear();
@@ -64,7 +63,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         _initCorners.Clear();
         _attributeData.Clear();
         _attributeData.Resize(numAttributeData, () => new());
-        _cornerTable.Reset((int)numFaces, (int)(_numEncodedVertices + numEncodedSplitSymbols));
+        CornerTable.Reset((int)numFaces, (int)(_numEncodedVertices + numEncodedSplitSymbols));
         _isVertHole.Fill((int)(_numEncodedVertices + numEncodedSplitSymbols), true);
         int topologySplitDecodedBytes = -1;
 
@@ -94,14 +93,14 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             // Decode connectivity of non-position attributes.
             if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 1))
             {
-                for (uint ci = 0; ci < _cornerTable.CornersCount; ci += 3)
+                for (uint ci = 0; ci < CornerTable.CornersCount; ci += 3)
                 {
                     DecodeAttributeConnectivitiesOnFaceLegacy(ci);
                 }
             }
             else
             {
-                for (uint ci = 0; ci < _cornerTable.CornersCount; ci += 3)
+                for (uint ci = 0; ci < CornerTable.CornersCount; ci += 3)
                 {
                     DecodeAttributeConnectivitiesOnFace(ci);
                 }
@@ -112,21 +111,21 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         // Decode attribute connectivity
         for (int i = 0; i < _attributeData.Count; ++i)
         {
-            _attributeData[i].ConnectivityData = new(_cornerTable);
+            _attributeData[i].ConnectivityData = new(CornerTable);
             foreach (var c in _attributeData[i].AttributeSeamCorners)
             {
                 _attributeData[i].ConnectivityData!.AddSeamEdge((uint)c);
             }
             _attributeData[i].ConnectivityData!.RecomputeVertices(null, null);
         }
-        _posEncodingData = new(_cornerTable.VerticesCount);
+        _posEncodingData = new(CornerTable.VerticesCount);
         for (int i = 0; i < _attributeData.Count; ++i)
         {
             int attConnectivityVertices = _attributeData[i].ConnectivityData!.VerticesCount;
 
-            if (attConnectivityVertices < _cornerTable.VerticesCount)
+            if (attConnectivityVertices < CornerTable.VerticesCount)
             {
-                attConnectivityVertices = _cornerTable.VerticesCount;
+                attConnectivityVertices = CornerTable.VerticesCount;
             }
             _attributeData[i].EncodingData = new(attConnectivityVertices);
         }
@@ -146,7 +145,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         }
         if (numTopologySplits > 0)
         {
-            Assertions.ThrowIf(numTopologySplits > _cornerTable!.FacesCount);
+            Assertions.ThrowIf(numTopologySplits > CornerTable!.FacesCount);
             if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(1, 2))
             {
                 for (uint i = 0; i < numTopologySplits; ++i)
@@ -248,20 +247,20 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             {
                 Assertions.ThrowIf(activeCornerStack.Count == 0);
                 uint cornerA = activeCornerStack.Last();
-                uint vertexX = _cornerTable!.Vertex(_cornerTable.Next(cornerA));
-                uint cornerB = _cornerTable.Next(_cornerTable.LeftMostCorner(vertexX));
+                uint vertexX = CornerTable!.Vertex(CornerTable.Next(cornerA));
+                uint cornerB = CornerTable.Next(CornerTable.LeftMostCorner(vertexX));
                 Assertions.ThrowIf(cornerA == cornerB, "All matched corners must be different.");
-                Assertions.ThrowIf(_cornerTable.Opposite(cornerA) != uint.MaxValue || _cornerTable.Opposite(cornerB) != uint.MaxValue, "All matched corners must be different.");
+                Assertions.ThrowIf(CornerTable.Opposite(cornerA) != Constants.kInvalidCornerIndex || CornerTable.Opposite(cornerB) != Constants.kInvalidCornerIndex, "All matched corners must be different.");
                 uint corner = 3 * (uint)face;
                 SetOppositeCorners(cornerA, corner + 1);
                 SetOppositeCorners(cornerB, corner + 2);
-                uint vertAPrev = _cornerTable.Vertex(_cornerTable.Previous(cornerA));
-                uint vertBNext = _cornerTable.Vertex(_cornerTable.Next(cornerB));
+                uint vertAPrev = CornerTable.Vertex(CornerTable.Previous(cornerA));
+                uint vertBNext = CornerTable.Vertex(CornerTable.Next(cornerB));
                 Assertions.ThrowIf(vertexX == vertAPrev || vertexX == vertBNext, "Encoding is invalid, because face vertices are degenerate.");
-                _cornerTable.MapCornerToVertex(corner, vertexX);
-                _cornerTable.MapCornerToVertex(corner + 1, vertBNext);
-                _cornerTable.MapCornerToVertex(corner + 2, vertAPrev);
-                _cornerTable.SetLeftMostCorner(vertAPrev, corner + 2);
+                CornerTable.MapCornerToVertex(corner, vertexX);
+                CornerTable.MapCornerToVertex(corner + 1, vertBNext);
+                CornerTable.MapCornerToVertex(corner + 2, vertAPrev);
+                CornerTable.SetLeftMostCorner(vertAPrev, corner + 2);
                 _isVertHole[(int)vertexX] = false;
                 activeCornerStack[activeCornerStack.Count - 1] = corner;
             }
@@ -269,7 +268,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             {
                 Assertions.ThrowIf(activeCornerStack.Count == 0);
                 uint cornerA = activeCornerStack.Last();
-                Assertions.ThrowIf(_cornerTable!.Opposite(cornerA) != uint.MaxValue);
+                Assertions.ThrowIf(CornerTable!.Opposite(cornerA) != Constants.kInvalidCornerIndex);
                 uint corner = 3 * (uint)face;
                 uint oppCorner, cornerL, cornerR;
 
@@ -286,14 +285,14 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                     cornerR = corner + 2;
                 }
                 SetOppositeCorners(oppCorner, cornerA);
-                uint newVertIndex = _cornerTable.AddNewVertex();
-                Assertions.ThrowIf(_cornerTable.VerticesCount > maxNumVertices, "Unexpected number of decoded vertices.");
-                _cornerTable.MapCornerToVertex(oppCorner, newVertIndex);
-                _cornerTable.SetLeftMostCorner(newVertIndex, oppCorner);
-                uint vertexR = _cornerTable.Vertex(_cornerTable.Previous(cornerA));
-                _cornerTable.MapCornerToVertex(cornerR, vertexR);
-                _cornerTable.SetLeftMostCorner(vertexR, cornerR);
-                _cornerTable.MapCornerToVertex(cornerL, _cornerTable.Vertex(_cornerTable.Next(cornerA)));
+                uint newVertIndex = CornerTable.AddNewVertex();
+                Assertions.ThrowIf(CornerTable.VerticesCount > maxNumVertices, "Unexpected number of decoded vertices.");
+                CornerTable.MapCornerToVertex(oppCorner, newVertIndex);
+                CornerTable.SetLeftMostCorner(newVertIndex, oppCorner);
+                uint vertexR = CornerTable.Vertex(CornerTable.Previous(cornerA));
+                CornerTable.MapCornerToVertex(cornerR, vertexR);
+                CornerTable.SetLeftMostCorner(vertexR, cornerR);
+                CornerTable.MapCornerToVertex(cornerL, CornerTable.Vertex(CornerTable.Next(cornerA)));
                 activeCornerStack[activeCornerStack.Count - 1] = corner;
                 checkTopologySplit = true;
             }
@@ -311,29 +310,29 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 Assertions.ThrowIf(activeCornerStack.Count == 0);
                 var cornerA = activeCornerStack.Last();
                 Assertions.ThrowIf(cornerA == cornerB, "All matched corners must be different.");
-                Assertions.ThrowIf(_cornerTable!.Opposite(cornerA) != uint.MaxValue || _cornerTable.Opposite(cornerB) != uint.MaxValue);
+                Assertions.ThrowIf(CornerTable!.Opposite(cornerA) != Constants.kInvalidCornerIndex || CornerTable.Opposite(cornerB) != Constants.kInvalidCornerIndex);
                 uint corner = 3 * (uint)face;
                 SetOppositeCorners(cornerA, corner + 2);
                 SetOppositeCorners(cornerB, corner + 1);
-                var vertexP = _cornerTable.Vertex(_cornerTable.Previous(cornerA));
-                _cornerTable.MapCornerToVertex(corner, vertexP);
-                _cornerTable.MapCornerToVertex(corner + 1, _cornerTable.Vertex(_cornerTable.Next(cornerA)));
-                var vertBPrev = _cornerTable.Vertex(_cornerTable.Previous(cornerB));
-                _cornerTable.MapCornerToVertex(corner + 2, vertBPrev);
-                _cornerTable.SetLeftMostCorner(vertBPrev, corner + 2);
-                uint cornerN = _cornerTable.Next(cornerB);
-                uint vertexN = _cornerTable.Vertex(cornerN);
+                var vertexP = CornerTable.Vertex(CornerTable.Previous(cornerA));
+                CornerTable.MapCornerToVertex(corner, vertexP);
+                CornerTable.MapCornerToVertex(corner + 1, CornerTable.Vertex(CornerTable.Next(cornerA)));
+                var vertBPrev = CornerTable.Vertex(CornerTable.Previous(cornerB));
+                CornerTable.MapCornerToVertex(corner + 2, vertBPrev);
+                CornerTable.SetLeftMostCorner(vertBPrev, corner + 2);
+                uint cornerN = CornerTable.Next(cornerB);
+                uint vertexN = CornerTable.Vertex(cornerN);
                 MergeVertices(vertexP, vertexN);
-                _cornerTable.SetLeftMostCorner(vertexP, _cornerTable.LeftMostCorner(vertexN));
+                CornerTable.SetLeftMostCorner(vertexP, CornerTable.LeftMostCorner(vertexN));
                 uint firstCorner = cornerN;
 
-                while (cornerN != uint.MaxValue)
+                while (cornerN != Constants.kInvalidCornerIndex)
                 {
-                    _cornerTable.MapCornerToVertex(cornerN, vertexP);
-                    cornerN = _cornerTable.SwingLeft(cornerN);
+                    CornerTable.MapCornerToVertex(cornerN, vertexP);
+                    cornerN = CornerTable.SwingLeft(cornerN);
                     Assertions.ThrowIf(cornerN == firstCorner, "We reached the start again which should not happen for split symbols.");
                 }
-                _cornerTable.MakeVertexIsolated(vertexN);
+                CornerTable.MakeVertexIsolated(vertexN);
 
                 if (removeInvalidVertices)
                 {
@@ -344,14 +343,14 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             else if (symbol == Constants.EdgeBreakerTopologyBitPattern.E)
             {
                 uint corner = 3 * (uint)face;
-                uint firstVertIndex = _cornerTable!.AddNewVertex();
-                _cornerTable.MapCornerToVertex(corner, firstVertIndex);
-                _cornerTable.MapCornerToVertex(corner + 1, _cornerTable.AddNewVertex());
-                _cornerTable.MapCornerToVertex(corner + 2, _cornerTable.AddNewVertex());
-                Assertions.ThrowIf(_cornerTable.VerticesCount > maxNumVertices, "Unexpected number of decoded vertices.");
-                _cornerTable.SetLeftMostCorner(firstVertIndex, corner);
-                _cornerTable.SetLeftMostCorner(firstVertIndex + 1, corner + 1);
-                _cornerTable.SetLeftMostCorner(firstVertIndex + 2, corner + 2);
+                uint firstVertIndex = CornerTable!.AddNewVertex();
+                CornerTable.MapCornerToVertex(corner, firstVertIndex);
+                CornerTable.MapCornerToVertex(corner + 1, CornerTable.AddNewVertex());
+                CornerTable.MapCornerToVertex(corner + 2, CornerTable.AddNewVertex());
+                Assertions.ThrowIf(CornerTable.VerticesCount > maxNumVertices, "Unexpected number of decoded vertices.");
+                CornerTable.SetLeftMostCorner(firstVertIndex, corner);
+                CornerTable.SetLeftMostCorner(firstVertIndex + 1, corner + 1);
+                CornerTable.SetLeftMostCorner(firstVertIndex + 2, corner + 2);
                 activeCornerStack.Add(corner);
                 checkTopologySplit = true;
             }
@@ -368,13 +367,13 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 {
                     Assertions.ThrowIf(encoderSplitSymbolId < 0, "Wrong split symbol id.");
                     uint actTopCorner = activeCornerStack.Last();
-                    uint newActiveCorner = split_edge == Constants.EdgeFaceName.RightFaceEdge ? _cornerTable!.Next(actTopCorner) : _cornerTable!.Previous(actTopCorner);
+                    uint newActiveCorner = split_edge == Constants.EdgeFaceName.RightFaceEdge ? CornerTable!.Next(actTopCorner) : CornerTable!.Previous(actTopCorner);
                     int decoderSplitSymbolId = numSymbols - encoderSplitSymbolId - 1;
                     topologySplitActiveCorners[decoderSplitSymbolId] = newActiveCorner;
                 }
             }
         }
-        Assertions.ThrowIf(_cornerTable!.VerticesCount > maxNumVertices, "Unexpected number of decoded vertices.");
+        Assertions.ThrowIf(CornerTable!.VerticesCount > maxNumVertices, "Unexpected number of decoded vertices.");
         while (activeCornerStack.Count > 0)
         {
             var corner = activeCornerStack.Last();
@@ -382,27 +381,27 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             var interiorFace = DecodeStartFaceConfiguration(decoderBuffer);
             if (interiorFace)
             {
-                Assertions.ThrowIf(numFaces >= _cornerTable.FacesCount, "More faces than expected added to the mesh.");
+                Assertions.ThrowIf(numFaces >= CornerTable.FacesCount, "More faces than expected added to the mesh.");
                 var cornerA = corner;
-                var vertexN = _cornerTable.Vertex(_cornerTable.Next(cornerA));
-                var cornerB = _cornerTable.Next(_cornerTable.LeftMostCorner(vertexN));
-                var vertexX = _cornerTable.Vertex(_cornerTable.Next(cornerB));
-                var cornerC = _cornerTable.Next(_cornerTable.LeftMostCorner(vertexX));
+                var vertexN = CornerTable.Vertex(CornerTable.Next(cornerA));
+                var cornerB = CornerTable.Next(CornerTable.LeftMostCorner(vertexN));
+                var vertexX = CornerTable.Vertex(CornerTable.Next(cornerB));
+                var cornerC = CornerTable.Next(CornerTable.LeftMostCorner(vertexX));
                 Assertions.ThrowIf(corner == cornerB || corner == cornerC || cornerB == cornerC, "All matched corners must be different.");
-                Assertions.ThrowIf(_cornerTable.Opposite(corner) != uint.MaxValue || _cornerTable.Opposite(cornerB) != uint.MaxValue || _cornerTable.Opposite(cornerC) != uint.MaxValue, "One of the corners is already opposite to an existing face, which should not happen unless the input was tampered with.");
-                var vertexP = _cornerTable.Vertex(_cornerTable.Next(cornerC));
+                Assertions.ThrowIf(CornerTable.Opposite(corner) != Constants.kInvalidCornerIndex || CornerTable.Opposite(cornerB) != Constants.kInvalidCornerIndex || CornerTable.Opposite(cornerC) != Constants.kInvalidCornerIndex, "One of the corners is already opposite to an existing face, which should not happen unless the input was tampered with.");
+                var vertexP = CornerTable.Vertex(CornerTable.Next(cornerC));
                 var face = numFaces++;
                 uint newCorner = 3 * (uint)face;
                 SetOppositeCorners(newCorner, corner);
                 SetOppositeCorners(newCorner + 1, cornerB);
                 SetOppositeCorners(newCorner + 2, cornerC);
 
-                _cornerTable.MapCornerToVertex(newCorner, vertexX);
-                _cornerTable.MapCornerToVertex(newCorner + 1, vertexP);
-                _cornerTable.MapCornerToVertex(newCorner + 2, vertexN);
+                CornerTable.MapCornerToVertex(newCorner, vertexX);
+                CornerTable.MapCornerToVertex(newCorner + 1, vertexP);
+                CornerTable.MapCornerToVertex(newCorner + 2, vertexN);
                 for (byte ci = 0; ci < 3; ++ci)
                 {
-                    _isVertHole[(int)_cornerTable.Vertex(newCorner + ci)] = false;
+                    _isVertHole[(int)CornerTable.Vertex(newCorner + ci)] = false;
                 }
                 _initFaceConfigurations.Add(true);
                 _initCorners.Add((int)newCorner);
@@ -413,13 +412,13 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 _initCorners.Add((int)corner);
             }
         }
-        Assertions.ThrowIf(numFaces != _cornerTable.FacesCount, "Unexpected number of decoded faces.");
-        int numVertices = _cornerTable.VerticesCount;
+        Assertions.ThrowIf(numFaces != CornerTable.FacesCount, "Unexpected number of decoded faces.");
+        int numVertices = CornerTable.VerticesCount;
 
         foreach (var invalidVertex in invalidVertices)
         {
             uint srcVertex = (uint)numVertices - 1;
-            while (_cornerTable.LeftMostCorner(srcVertex) == Constants.kInvalidCornerIndex)
+            while (CornerTable.LeftMostCorner(srcVertex) == Constants.kInvalidCornerIndex)
             {
                 srcVertex = (uint)--numVertices - 1;
             }
@@ -427,13 +426,13 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             {
                 continue;
             }
-            foreach (uint cornerId in new VertexCornersIterator(_cornerTable, srcVertex, true))
+            foreach (uint cornerId in new VertexCornersIterator(CornerTable, srcVertex, true))
             {
-                Assertions.ThrowIf(_cornerTable.Vertex(cornerId) != srcVertex, "Vertex mapped to |cornerId| was not |srcVertex|. This indicates corrupted data and we should terminate the decoding.");
-                _cornerTable.MapCornerToVertex(cornerId, invalidVertex);
+                Assertions.ThrowIf(CornerTable.Vertex(cornerId) != srcVertex, "Vertex mapped to |cornerId| was not |srcVertex|. This indicates corrupted data and we should terminate the decoding.");
+                CornerTable.MapCornerToVertex(cornerId, invalidVertex);
             }
-            _cornerTable.SetLeftMostCorner(invalidVertex, _cornerTable.LeftMostCorner(srcVertex));
-            _cornerTable.MakeVertexIsolated(srcVertex);
+            CornerTable.SetLeftMostCorner(invalidVertex, CornerTable.LeftMostCorner(srcVertex));
+            CornerTable.MakeVertexIsolated(srcVertex);
             _isVertHole[(int)invalidVertex] = _isVertHole[(int)srcVertex];
             _isVertHole[(int)srcVertex] = false;
             numVertices--;
@@ -443,8 +442,8 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
 
     private void SetOppositeCorners(uint corner_0, uint corner_1)
     {
-        _cornerTable!.SetOppositeCorner(corner_0, corner_1);
-        _cornerTable.SetOppositeCorner(corner_1, corner_0);
+        CornerTable!.SetOppositeCorner(corner_0, corner_1);
+        CornerTable.SetOppositeCorner(corner_1, corner_0);
     }
 
     private bool IsTopologySplit(int encoderSymbolId, out int faceEdge, out int encoderSplitSymbolId)
@@ -474,13 +473,13 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
     {
         uint[] corners = [
             corner,
-            _cornerTable!.Next(corner),
-            _cornerTable.Previous(corner)
+            CornerTable!.Next(corner),
+            CornerTable.Previous(corner)
         ];
         for (byte c = 0; c < 3; ++c)
         {
-            uint oppCorner = _cornerTable.Opposite(corners[c]);
-            if (oppCorner == uint.MaxValue)
+            uint oppCorner = CornerTable.Opposite(corners[c]);
+            if (oppCorner == Constants.kInvalidCornerIndex)
             {
                 for (int i = 0; i < _attributeData.Count; ++i)
                 {
@@ -503,21 +502,22 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
     {
         uint[] corners = [
             corner,
-            _cornerTable!.Next(corner),
-            _cornerTable.Previous(corner)
+            CornerTable!.Next(corner),
+            CornerTable.Previous(corner)
         ];
-        uint srcFaceId = _cornerTable.Face(corner);
+        uint srcFaceId = CornerTable.Face(corner);
         for (byte c = 0; c < 3; ++c)
         {
-            uint oppCorner = _cornerTable.Opposite(corners[c]);
-            if (oppCorner == uint.MaxValue)
+            uint oppCorner = CornerTable.Opposite(corners[c]);
+            if (oppCorner == Constants.kInvalidCornerIndex)
             {
                 for (int i = 0; i < _attributeData.Count; ++i)
                 {
                     _attributeData[i].AttributeSeamCorners.Add((int)corners[c]);
                 }
+                continue;
             }
-            uint oppFaceId = _cornerTable.Face(oppCorner);
+            uint oppFaceId = CornerTable.Face(oppCorner);
             if (oppFaceId < srcFaceId)
             {
                 continue;
@@ -535,7 +535,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
 
     private void AssignPointsToCorners(int numConnectivityVertices)
     {
-        Mesh!.SetNumFaces(_cornerTable!.FacesCount);
+        Mesh!.SetNumFaces(CornerTable!.FacesCount);
         if (_attributeData.Count == 0)
         {
             for (uint f = 0; f < Mesh.FacesCount; ++f)
@@ -544,7 +544,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 var startCorner = 3 * f;
                 for (byte c = 0; c < 3; ++c)
                 {
-                    face[c] = (int)_cornerTable.Vertex(startCorner + c);
+                    face[c] = (int)CornerTable.Vertex(startCorner + c);
                 }
                 Mesh.SetFace(f, face);
             }
@@ -553,10 +553,10 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         }
         var pointToCornerMap = new List<int>();
         var cornerToPointMap = new List<int>();
-        cornerToPointMap.Fill(_cornerTable.CornersCount, 0);
-        for (uint v = 0; v < _cornerTable.VerticesCount; ++v)
+        cornerToPointMap.Fill(CornerTable.CornersCount, 0);
+        for (uint v = 0; v < CornerTable.VerticesCount; ++v)
         {
-            var c = _cornerTable.LeftMostCorner(v);
+            var c = CornerTable.LeftMostCorner(v);
             if (c == Constants.kInvalidCornerIndex)
             {
                 continue;
@@ -575,7 +575,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                         continue;
                     }
                     var vertId = _attributeData[i].ConnectivityData!.Vertex(c);
-                    var actC = _cornerTable.SwingRight(c);
+                    var actC = CornerTable.SwingRight(c);
                     var seamFound = false;
                     while (actC != c)
                     {
@@ -586,7 +586,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                             seamFound = true;
                             break;
                         }
-                        actC = _cornerTable.SwingRight(actC);
+                        actC = CornerTable.SwingRight(actC);
                     }
                     if (seamFound)
                     {
@@ -598,7 +598,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             cornerToPointMap[(int)c] = pointToCornerMap.Count;
             pointToCornerMap.Add((int)c);
             var prevC = c;
-            c = _cornerTable.SwingRight(c);
+            c = CornerTable.SwingRight(c);
             while (c != Constants.kInvalidCornerIndex && c != deduplicationFirstCorner)
             {
                 var attributeSeam = false;
@@ -620,7 +620,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                     cornerToPointMap[(int)c] = cornerToPointMap[(int)prevC];
                 }
                 prevC = c;
-                c = _cornerTable.SwingRight(c);
+                c = CornerTable.SwingRight(c);
             }
         }
         // Add faces.
@@ -663,6 +663,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         if (decoderType == (byte)MeshAttributeElementType.VertexAttribute)
         {
             MeshAttributeIndicesEncodingData? encodingData;
+            Traverser.Traverser? attributeTraverser = null;
 
             if (attDataId < 0)
             {
@@ -673,26 +674,23 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 encodingData = _attributeData[attDataId].EncodingData;
                 _attributeData[attDataId].IsConnectivityUsed = false;
             }
+            var traversalSequencer = new MeshTraversalSequencer(Mesh, encodingData!);
+            var attributeObserver = new MeshAttributeIndicesEncodingObserver(CornerTable!, Mesh, encodingData!, traversalSequencer);
+
             if (traversalMethod == MeshTraversalMethod.PredictionDegree)
             {
-                var traversalSequencer = new MeshTraversalSequencer(Mesh, encodingData!);
-                var attributeObserver = new MeshAttributeIndicesEncodingObserver(_cornerTable!, Mesh, encodingData!, traversalSequencer);
-                var attributeTraverser = new MaxPredictionDegreeTraverser(_cornerTable!, attributeObserver);
-                traversalSequencer.Traverser = attributeTraverser;
-                sequencer = traversalSequencer;
+                attributeTraverser = new MaxPredictionDegreeTraverser(CornerTable!, attributeObserver);
             }
             else if (traversalMethod == MeshTraversalMethod.DepthFirst)
             {
-                var traversalSequencer = new MeshTraversalSequencer(Mesh, encodingData!);
-                var attributeObserver = new MeshAttributeIndicesEncodingObserver(_cornerTable!, Mesh, encodingData!, traversalSequencer);
-                var attributeTraverser = new DepthFirstTraverser(_cornerTable!, attributeObserver);
-                traversalSequencer.Traverser = attributeTraverser;
-                sequencer = traversalSequencer;
+                attributeTraverser = new DepthFirstTraverser(CornerTable!, attributeObserver);
             }
             else
             {
                 Assertions.Throw("Unsupported attribute traversal method.");
             }
+            traversalSequencer.Traverser = attributeTraverser;
+            sequencer = traversalSequencer;
         }
         else
         {
@@ -705,7 +703,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             sequencer = traversalSequencer;
         }
         Assertions.ThrowIf(sequencer == null, "Sequencer must be set.");
-        SetAttributesDecoder(attDataId, new SequentialAttributeDecodersController(sequencer!, this, Mesh));
+        SetAttributesDecoder(attDecoderId, new SequentialAttributeDecodersController(sequencer!, this, Mesh));
     }
 
     public override MeshAttributeCornerTable? GetAttributeCornerTable(int attId)

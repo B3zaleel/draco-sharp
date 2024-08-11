@@ -47,36 +47,36 @@ internal class MeshEdgeBreakerTraversalPredictiveDecoder : MeshEdgeBreakerTraver
 
     protected override void NewActiveCornerReached(uint corner)
     {
-        uint next = _cornerTable!.Next(corner);
-        uint prev = _cornerTable.Previous(corner);
+        uint next = CornerTable!.Next(corner);
+        uint prev = CornerTable.Previous(corner);
         switch (_lastSymbol)
         {
             case Constants.EdgeBreakerTopologyBitPattern.C:
             case Constants.EdgeBreakerTopologyBitPattern.S:
-                _vertexValences[(int)_cornerTable.Vertex(next)] += 1;
-                _vertexValences[(int)_cornerTable.Vertex(prev)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(next)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(prev)] += 1;
                 break;
             case Constants.EdgeBreakerTopologyBitPattern.R:
-                _vertexValences[(int)_cornerTable.Vertex(corner)] += 1;
-                _vertexValences[(int)_cornerTable.Vertex(next)] += 1;
-                _vertexValences[(int)_cornerTable.Vertex(prev)] += 2;
+                _vertexValences[(int)CornerTable.Vertex(corner)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(next)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(prev)] += 2;
                 break;
             case Constants.EdgeBreakerTopologyBitPattern.L:
-                _vertexValences[(int)_cornerTable.Vertex(corner)] += 1;
-                _vertexValences[(int)_cornerTable.Vertex(next)] += 2;
-                _vertexValences[(int)_cornerTable.Vertex(prev)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(corner)] += 1;
+                _vertexValences[(int)CornerTable.Vertex(next)] += 2;
+                _vertexValences[(int)CornerTable.Vertex(prev)] += 1;
                 break;
             case Constants.EdgeBreakerTopologyBitPattern.E:
-                _vertexValences[(int)_cornerTable.Vertex(corner)] += 2;
-                _vertexValences[(int)_cornerTable.Vertex(next)] += 2;
-                _vertexValences[(int)_cornerTable.Vertex(prev)] += 2;
+                _vertexValences[(int)CornerTable.Vertex(corner)] += 2;
+                _vertexValences[(int)CornerTable.Vertex(next)] += 2;
+                _vertexValences[(int)CornerTable.Vertex(prev)] += 2;
                 break;
             default:
                 break;
         }
         if (_lastSymbol == Constants.EdgeBreakerTopologyBitPattern.C || _lastSymbol == Constants.EdgeBreakerTopologyBitPattern.R)
         {
-            var pivot = (int)_cornerTable.Vertex(_cornerTable.Next(corner));
+            var pivot = (int)CornerTable.Vertex(CornerTable.Next(corner));
             if (_vertexValences[pivot] < Constants.NumUniqueValences)
             {
                 _predictedSymbol = Constants.EdgeBreakerTopologyBitPattern.R;
