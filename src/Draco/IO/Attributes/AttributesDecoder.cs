@@ -17,7 +17,7 @@ internal abstract class AttributesDecoder(ConnectivityDecoder? connectivityDecod
 
     public virtual void DecodeAttributesData(DecoderBuffer decoderBuffer)
     {
-        uint numAttributes = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0)
+        uint numAttributes = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
             ? decoderBuffer.ReadUInt32()
             : (uint)decoderBuffer.DecodeVarIntUnsigned();
 
@@ -45,7 +45,7 @@ internal abstract class AttributesDecoder(ConnectivityDecoder? connectivityDecod
                 byteStride: Constants.DataTypeLength((DataType)dataType) * numComponents,
                 byteOffset: 0
             );
-            uint uniqueId = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(1, 3)
+            uint uniqueId = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(1, 3)
                 ? decoderBuffer.ReadUInt16()
                 : (uint)decoderBuffer.DecodeVarIntUnsigned();
             geometryAttribute.UniqueId = uniqueId;

@@ -54,7 +54,7 @@ internal class SequentialAttributeDecoder
         for (int i = 0; i < predictionScheme.ParentAttributesCount; ++i)
         {
             var attributeId = ConnectivityDecoder!.PointCloud!.GetNamedAttributeId(predictionScheme.GetParentAttributeType(i));
-            if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
+            if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0))
             {
                 predictionScheme.ParentAttribute = ConnectivityDecoder.PointCloud.GetAttributeById(attributeId)!;
             }

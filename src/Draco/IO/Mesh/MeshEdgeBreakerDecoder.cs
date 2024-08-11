@@ -25,16 +25,16 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
     {
         _numNewVertices = 0;
         _newToParentVertexMap.Clear();
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
         {
-            _numNewVertices = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0)
+            _numNewVertices = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
                 ? decoderBuffer.ReadUInt32()
                 : (uint)decoderBuffer.DecodeVarIntUnsigned();
         }
-        _numEncodedVertices = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0)
+        _numEncodedVertices = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
             ? decoderBuffer.ReadUInt32()
             : (uint)decoderBuffer.DecodeVarIntUnsigned();
-        uint numFaces = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0)
+        uint numFaces = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
             ? decoderBuffer.ReadUInt32()
             : (uint)decoderBuffer.DecodeVarIntUnsigned();
         Assertions.ThrowIf(_numEncodedVertices > numFaces * 3, "There cannot be more vertices than 3 * num_faces.");
@@ -43,13 +43,13 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         ulong maxNumVertexEdges = numEncodedVertices64 * (numEncodedVertices64 - 1) / 2;
         Assertions.ThrowIf(maxNumVertexEdges < minNumFaceEdges, "It is impossible to construct a manifold mesh with these properties.");
         byte numAttributeData = decoderBuffer.ReadByte();
-        uint numEncodedSymbols = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0)
+        uint numEncodedSymbols = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
             ? decoderBuffer.ReadUInt32()
             : (uint)decoderBuffer.DecodeVarIntUnsigned();
         Assertions.ThrowIf(numFaces < numEncodedSymbols, "Number of faces needs to be the same or greater than the number of symbols.");
         uint maxEncodedFaces = numEncodedSymbols + (numEncodedSymbols / 3);
         Assertions.ThrowIf(numFaces > maxEncodedFaces, "Faces can only be 1 1/3 times bigger than number of encoded symbols.");
-        uint numEncodedSplitSymbols = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0)
+        uint numEncodedSplitSymbols = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
             ? decoderBuffer.ReadUInt32()
             : (uint)decoderBuffer.DecodeVarIntUnsigned();
         Assertions.ThrowIf(numEncodedSplitSymbols > numEncodedSymbols, "Split symbols are a sub-set of all symbols.");
@@ -67,13 +67,13 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         _isVertHole.Fill((int)(_numEncodedVertices + numEncodedSplitSymbols), true);
         int topologySplitDecodedBytes = -1;
 
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
         {
-            uint encodedConnectivitySize = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0)
+            uint encodedConnectivitySize = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
                 ? decoderBuffer.ReadUInt32()
                 : (uint)decoderBuffer.DecodeVarIntUnsigned();
             Assertions.ThrowIf(encodedConnectivitySize == 0);
-            var eventBuffer = new DecoderBuffer(decoderBuffer.ReadBytes((int)encodedConnectivitySize), decoderBuffer.BitStream_Version);
+            var eventBuffer = new DecoderBuffer(decoderBuffer.ReadBytes((int)encodedConnectivitySize), decoderBuffer.BitStreamVersion);
             topologySplitDecodedBytes = (int)encodedConnectivitySize;
             DecodeHoleAndTopologySplitEvents(eventBuffer);
         }
@@ -91,7 +91,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         if (_attributeData.Count > 0)
         {
             // Decode connectivity of non-position attributes.
-            if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 1))
+            if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 1))
             {
                 for (uint ci = 0; ci < CornerTable.CornersCount; ci += 3)
                 {
@@ -135,7 +135,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
     private void DecodeHoleAndTopologySplitEvents(DecoderBuffer decoderBuffer)
     {
         uint numTopologySplits;
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0))
         {
             numTopologySplits = decoderBuffer.ReadUInt32();
         }
@@ -146,7 +146,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         if (numTopologySplits > 0)
         {
             Assertions.ThrowIf(numTopologySplits > CornerTable!.FacesCount);
-            if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(1, 2))
+            if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(1, 2))
             {
                 for (uint i = 0; i < numTopologySplits; ++i)
                 {
@@ -178,7 +178,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 for (uint i = 0; i < numTopologySplits; ++i)
                 {
                     uint edge_data;
-                    if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+                    if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
                     {
                         edge_data = decoderBuffer.DecodeLeastSignificantBits32(2);
                     }
@@ -192,17 +192,17 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             }
         }
         uint numHoleEvents = 0;
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0))
         {
             numHoleEvents = decoderBuffer.ReadUInt32();
         }
-        else if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 1))
+        else if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 1))
         {
             numHoleEvents = (uint)decoderBuffer.DecodeVarIntUnsigned();
         }
         if (numHoleEvents > 0)
         {
-            if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(1, 2))
+            if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(1, 2))
             {
                 for (uint i = 0; i < numHoleEvents; ++i)
                 {
@@ -653,7 +653,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             _posDataDecoderId = attDecoderId;
         }
         var traversalMethod = MeshTraversalMethod.DepthFirst;
-        if (decoderBuffer.BitStream_Version >= Constants.BitStreamVersion(1, 2))
+        if (decoderBuffer.BitStreamVersion >= Constants.BitStreamVersion(1, 2))
         {
             var traversalMethodEncoded = decoderBuffer.ReadByte();
             Assertions.ThrowIf(traversalMethodEncoded >= (byte)MeshTraversalMethod.Count, "Traversal method is invalid.");

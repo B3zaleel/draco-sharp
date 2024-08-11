@@ -10,7 +10,7 @@ internal sealed class DecoderBuffer : IDisposable
     private byte _bitBufferIndex = 0;
     private readonly BinaryReader _binaryReader;
 
-    public ushort BitStream_Version { get; set; }
+    public ushort BitStreamVersion { get; set; }
 
     public DecoderBuffer(BinaryReader binaryReader)
     {
@@ -20,7 +20,7 @@ internal sealed class DecoderBuffer : IDisposable
     public DecoderBuffer(byte[] data, ushort bitStreamVersion)
     {
         _binaryReader = new BinaryReader(new MemoryStream(data));
-        BitStream_Version = bitStreamVersion;
+        BitStreamVersion = bitStreamVersion;
     }
 
     public ulong DecodeVarIntUnsigned()
@@ -158,7 +158,7 @@ internal sealed class DecoderBuffer : IDisposable
         size = 0;
         if (decodeSize)
         {
-            size = BitStream_Version < Constants.BitStreamVersion(2, 2) ? _binaryReader.ReadUInt32() : DecodeVarIntUnsigned();
+            size = BitStreamVersion < Constants.BitStreamVersion(2, 2) ? _binaryReader.ReadUInt32() : DecodeVarIntUnsigned();
         }
         _bitMode = true;
         _bitBuffer = _binaryReader.ReadByte();

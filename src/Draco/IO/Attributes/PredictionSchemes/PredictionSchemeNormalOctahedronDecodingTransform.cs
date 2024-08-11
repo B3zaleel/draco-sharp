@@ -66,7 +66,7 @@ internal class PredictionSchemeNormalOctahedronDecodingTransform<TDataType, TCor
     public override void DecodeTransformData(DecoderBuffer decoderBuffer)
     {
         MaxQuantizedValue = (int)Convert.ChangeType(decoderBuffer.Read<TDataType>(), typeof(int));
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
         {
             decoderBuffer.ReadInt32();
         }

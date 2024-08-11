@@ -27,7 +27,7 @@ internal class SequentialNormalAttributeDecoder : SequentialIntegerAttributeDeco
 
     protected override void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0))
         {
             _octahedronTransform!.DecodeParameters(decoderBuffer, Attribute!);
         }
@@ -36,7 +36,7 @@ internal class SequentialNormalAttributeDecoder : SequentialIntegerAttributeDeco
 
     public override void DecodeDataNeededByPortableTransform(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0))
         {
             _octahedronTransform!.DecodeParameters(decoderBuffer, PortableAttribute!);
         }

@@ -75,14 +75,14 @@ internal class MeshPredictionSchemeTexCoordsDecoder<TDataType, TTransform>(Point
 
     public override void DecodePredictionData(DecoderBuffer decoderBuffer)
     {
-        var numOrientations = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2) ? decoderBuffer.ReadUInt32() : (uint)decoderBuffer.DecodeVarIntUnsigned();
+        var numOrientations = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2) ? decoderBuffer.ReadUInt32() : (uint)decoderBuffer.DecodeVarIntUnsigned();
         Assertions.ThrowIf(numOrientations < 0);
         Assertions.ThrowIf(numOrientations > MeshData.CornerTable!.CornersCount);
         _orientations.Fill((int)numOrientations, true);
         var lastOrientation = true;
         var decoder = new RAnsBitDecoder();
         decoder.StartDecoding(decoderBuffer);
-        _version = decoderBuffer.BitStream_Version;
+        _version = decoderBuffer.BitStreamVersion;
 
         for (int i = 0; i < numOrientations; ++i)
         {
