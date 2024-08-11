@@ -78,7 +78,7 @@ internal class AttributeQuantizationTransform : AttributeTransform
 
         if (pointIds.Count == 0)
         {
-            for (uint i = 0; i < targetAttribute.Size; ++i)
+            for (uint i = 0; i < targetAttribute.UniqueEntriesCount; ++i)
             {
                 var attValueId = attribute.MappedIndex(i);
                 attValue = attribute.GetValue<float>(attValueId, numComponents);
@@ -120,7 +120,7 @@ internal class AttributeQuantizationTransform : AttributeTransform
         var attributeValue = new float[targetAttribute.NumComponents];
         var sourceAttributeDataPosition = attribute.GetAddress(0);
 
-        for (uint i = 0; i < targetAttribute.Size; ++i)
+        for (uint i = 0; i < targetAttribute.UniqueEntriesCount; ++i)
         {
             for (int c = 0; c < targetAttribute.NumComponents; ++c)
             {

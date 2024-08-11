@@ -49,7 +49,7 @@ internal class AttributeOctahedronTransform : AttributeTransform
 
         if (pointIds.Count == 0)
         {
-            for (uint i = 0; i < targetAttribute.Size; ++i)
+            for (uint i = 0; i < targetAttribute.UniqueEntriesCount; ++i)
             {
                 attributeValue = attribute.GetValue<float>(attribute.MappedIndex(i), 3).Select(value => (double)value).ToArray();
                 var (s, t) = converter.FloatVectorToQuantizedOctahedralCoords(attributeValue);
@@ -83,7 +83,7 @@ internal class AttributeOctahedronTransform : AttributeTransform
         var sourceAttributeDataPosition = attribute.GetAddress(0);
         var targetAttributeDataPosition = targetAttribute.GetAddress(0);
 
-        for (uint i = 0; i < targetAttribute.Size; ++i)
+        for (uint i = 0; i < targetAttribute.UniqueEntriesCount; ++i)
         {
             var s = attribute.Buffer!.Read<int>(sourceAttributeDataPosition);
             sourceAttributeDataPosition += Constants.SizeOf<int>();

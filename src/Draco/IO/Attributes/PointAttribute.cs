@@ -4,7 +4,7 @@ namespace Draco.IO.Attributes;
 
 public class PointAttribute : GeometryAttribute
 {
-    public uint Size { get; private set; } = 0;
+    public uint UniqueEntriesCount { get; private set; } = 0;
     private readonly List<uint> _indicesMap = [];
 
     public bool IsMappingIdentity { get; private set; } = false;
@@ -41,7 +41,7 @@ public class PointAttribute : GeometryAttribute
         var entrySize = Constants.DataTypeLength(DataType) * NumComponents;
         Buffer.Update(Enumerable.Repeat(0, numAttributeValues + entrySize).ToArray());
         ResetBuffer(Buffer, entrySize, 0);
-        Size = (uint)numAttributeValues;
+        UniqueEntriesCount = (uint)numAttributeValues;
     }
 
     public void SetIdentityMapping()
