@@ -27,7 +27,7 @@ internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransfor
     }
     public override PointAttribute? ParentAttribute
     {
-        get => base.ParentAttribute;
+        get => _predictor.PositionAttribute;
         set
         {
             Assertions.ThrowIf(value == null || value!.AttributeType != GeometryAttributeType.Position, "Invalid attribute type.");
