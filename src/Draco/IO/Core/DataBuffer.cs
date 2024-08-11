@@ -5,7 +5,7 @@ namespace Draco.IO.Core;
 public class DataBuffer
 {
     internal byte[] _data = [];
-    public long Id { get; set; }
+    public long Id { get; private set; }
     public long UpdateCount { get; set; }
     public long DataSize => _data.Length;
 
@@ -13,11 +13,13 @@ public class DataBuffer
     {
         _data = new byte[data.Length * Constants.SizeOf<T>()];
         Write(data, 0);
+        UpdateCount++;
     }
 
     public void Resize(long size)
     {
         Array.Resize(ref _data, (int)size);
+        UpdateCount++;
     }
 
     public T Read<T>(long position)
