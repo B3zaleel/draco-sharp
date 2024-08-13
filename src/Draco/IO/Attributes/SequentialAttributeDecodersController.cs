@@ -38,7 +38,7 @@ internal class SequentialAttributeDecodersController : AttributesDecoder
     public override PointAttribute? GetPortableAttribute(int pointAttributeId)
     {
         var id = GetLocalIdForPointAttribute(pointAttributeId);
-        return id < 0 || id >= _sequentialDecoders.Count ? null : _sequentialDecoders[id].GetPortableAttribute();
+        return id < 0 || id >= _sequentialDecoders.Count ? null : _sequentialDecoders[id].PortableAttribute;
     }
 
     public override void DecodePortableAttributes(DecoderBuffer decoderBuffer)
