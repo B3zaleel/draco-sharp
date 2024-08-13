@@ -30,17 +30,17 @@ internal class MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>(MeshPre
         return PositionAttribute != null;
     }
 
-    public Vector3<TDataType> GetPositionForEntryId(int entryId)
+    public Vector3<long> GetPositionForEntryId(int entryId)
     {
         var pointIndex = EntryToPointMap[entryId];
-        var pos = new Vector3<TDataType>(PositionAttribute!.ConvertValue<TDataType>(PositionAttribute.MappedIndex(pointIndex), 3));
+        var pos = new Vector3<long>(PositionAttribute!.ConvertValue<TDataType>(PositionAttribute.MappedIndex(pointIndex), 3).Select(val => Constants.ConstCast<TDataType, long>(val)).ToArray());
         return pos;
     }
 
-    public Vector2<TDataType> GetTexCoordForEntryId(int entryId, TDataType[] data)
+    public Vector2<long> GetTexCoordForEntryId(int entryId, TDataType[] data)
     {
         var dataOffset = entryId * kNumComponents;
-        return new Vector2<TDataType>(data[dataOffset], data[dataOffset + 1]);
+        return new Vector2<long>(Constants.ConstCast<TDataType, long>(data[dataOffset]), Constants.ConstCast<TDataType, long>(data[dataOffset + 1]));
     }
 
     public void ComputePredictedValue(uint cornerId, TDataType[] data, int dataId)
@@ -59,8 +59,8 @@ internal class MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>(MeshPre
 
             if (prevUV == nextUV)
             {
-                PredictedValue[0] = prevUV[0];
-                PredictedValue[1] = prevUV[1];
+                PredictedValue[0] = Constants.ConstCast<long, TDataType>(prevUV[0]);
+                PredictedValue[1] = Constants.ConstCast<long, TDataType>(prevUV[1]);
                 return;
             }
             var tipPos = GetPositionForEntryId(dataId);
@@ -69,7 +69,7 @@ internal class MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>(MeshPre
             var pn = prevPos - nextPos;
             var pnNorm2Squared = pn.SquaredNorm();
 
-            if (pnNorm2Squared != (TDataType)Convert.ChangeType(0, typeof(TDataType)))
+            if (pnNorm2Squared != 0)
             {
                 var cn = tipPos - nextPos;
                 var cnDotPn = pn.Dot(cn);
@@ -84,10 +84,10 @@ internal class MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>(MeshPre
                 Assertions.ThrowIf(cnDotPnAsLong > long.MaxValue / (long)Convert.ChangeType(pnAbsMaxElement, typeof(long)));
                 var xPos = nextPos + (cnDotPn * pn) / pnNorm2Squared;
                 var cxNorm2Squared = (tipPos - xPos).SquaredNorm();
-                var cxUV = new Core.Vector<TDataType>(pnUV[1], (TDataType)default - pnUV[0]);
-                var normSquared = MathUtilities.IntSqrt(Constants.ConstCast<TDataType, long>(cxNorm2Squared) * Constants.ConstCast<TDataType, long>(pnNorm2Squared));
+                var cxUV = new Core.Vector<long>(pnUV[1], -pnUV[0]);
+                var normSquared = MathUtilities.IntSqrt(cxNorm2Squared * pnNorm2Squared);
                 cxUV *= normSquared;
-                Vector2<TDataType> predictedUV;
+                Vector2<long> predictedUV;
 
                 if (_isEncoding)
                 {
@@ -97,12 +97,12 @@ internal class MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>(MeshPre
 
                     if ((cUV - predictedUV0).SquaredNorm() < (cUV - predictedUV1).SquaredNorm())
                     {
-                        predictedUV = new Vector2<TDataType>(predictedUV0);
+                        predictedUV = new Vector2<long>(predictedUV0);
                         Orientations.Add(true);
                     }
                     else
                     {
-                        predictedUV = new Vector2<TDataType>(predictedUV1);
+                        predictedUV = new Vector2<long>(predictedUV1);
                         Orientations.Add(false);
                     }
                 }
@@ -111,10 +111,10 @@ internal class MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>(MeshPre
                     Assertions.ThrowIf(Orientations.Count == 0);
                     var orientation = Orientations.Last();
                     Orientations.PopBack();
-                    predictedUV = new Vector2<TDataType>(orientation ? (xUV + cxUV) / pnNorm2Squared : (xUV - cxUV) / pnNorm2Squared);
+                    predictedUV = new Vector2<long>(orientation ? (xUV + cxUV) / pnNorm2Squared : (xUV - cxUV) / pnNorm2Squared);
                 }
-                PredictedValue[0] = predictedUV[0];
-                PredictedValue[1] = predictedUV[1];
+                PredictedValue[0] = Constants.ConstCast<long, TDataType>(predictedUV[0]);
+                PredictedValue[1] = Constants.ConstCast<long, TDataType>(predictedUV[1]);
                 return;
             }
         }
