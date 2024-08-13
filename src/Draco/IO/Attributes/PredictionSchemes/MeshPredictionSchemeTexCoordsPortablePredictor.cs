@@ -85,7 +85,7 @@ internal class MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>(MeshPre
                 var xPos = nextPos + (cnDotPn * pn) / pnNorm2Squared;
                 var cxNorm2Squared = (tipPos - xPos).SquaredNorm();
                 var cxUV = new Core.Vector<TDataType>(pnUV[1], (TDataType)default - pnUV[0]);
-                var normSquared = MathUtilities.IntSqrt(cxNorm2Squared * pnNorm2Squared);
+                var normSquared = MathUtilities.IntSqrt(Constants.ConstCast<TDataType, long>(cxNorm2Squared) * Constants.ConstCast<TDataType, long>(pnNorm2Squared));
                 cxUV *= normSquared;
                 Vector2<TDataType> predictedUV;
 
