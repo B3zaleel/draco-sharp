@@ -7,7 +7,7 @@
     <Nullable>enable</Nullable>
     <PackageId>Draco</PackageId>
     <Version>0.1.0</Version>
-    <Authors>B3zaleel</Authors>
+    <Authors>Bezaleel Olakunori</Authors>
     <Description>Decode and encode Draco streams.</Description>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/B3zaleel/draco-sharp</RepositoryUrl>
