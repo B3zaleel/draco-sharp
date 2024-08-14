@@ -5,7 +5,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <PackageId>Draco</PackageId>
+    <PackageId>B3zaleel.Draco</PackageId>
     <Version>0.1.0</Version>
     <Authors>Bezaleel Olakunori</Authors>
     <Description>Decode and encode Draco streams.</Description>
