@@ -71,7 +71,7 @@ internal class MeshPredictionSchemeGeometricNormalDecoder<TDataType, TTransform>
     {
         Transform.DecodeTransformData(decoderBuffer);
 
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
         {
             var predictionMode = decoderBuffer.ReadByte();
             Assertions.ThrowIf(predictionMode > (byte)NormalPredictionMode.TriangleArea, "Invalid prediction mode.");

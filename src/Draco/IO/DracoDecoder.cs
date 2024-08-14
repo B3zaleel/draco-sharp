@@ -24,7 +24,7 @@ public class DracoDecoder
     {
         using var decoderBuffer = new DecoderBuffer(binaryReader);
         Header = ParseHeader(decoderBuffer);
-        decoderBuffer.BitStream_Version = Header.Version;
+        decoderBuffer.BitStreamVersion = Header.Version;
         if (Header.Version >= Constants.BitStreamVersion(1, 3) && (Header.Flags & Constants.Metadata.FlagMask) == Constants.Metadata.FlagMask)
         {
             var metadataDecoder = new MetadataDecoder();

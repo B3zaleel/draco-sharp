@@ -5,7 +5,27 @@ namespace Draco.IO.Attributes;
 
 internal class SequentialAttributeDecoder
 {
-    public PointAttribute? PortableAttribute { get; set; }
+    private PointAttribute? _portableAttribute;
+    public PointAttribute? PortableAttribute
+    {
+        get
+        {
+            if (!Attribute!.IsMappingIdentity && _portableAttribute != null && _portableAttribute!.IsMappingIdentity)
+            {
+                _portableAttribute.SetExplicitMapping(Attribute.IndicesMapSize);
+
+                for (uint i = 0; i < Attribute.IndicesMapSize; ++i)
+                {
+                    _portableAttribute.SetPointMapEntry(i, Attribute.MappedIndex(i));
+                }
+            }
+            return _portableAttribute;
+        }
+        set
+        {
+            _portableAttribute = value;
+        }
+    }
     public PointAttribute? Attribute { get; private set; }
     public int AttributeId { get; private set; } = -1;
     public ConnectivityDecoder? ConnectivityDecoder { get; private set; }
@@ -35,26 +55,12 @@ internal class SequentialAttributeDecoder
 
     public virtual void TransformAttributeToOriginalFormat(List<uint> pointIds) { }
 
-    public PointAttribute? GetPortableAttribute()
-    {
-        if (Attribute!.IsMappingIdentity && PortableAttribute != null && PortableAttribute!.IsMappingIdentity)
-        {
-            PortableAttribute.SetExplicitMapping(Attribute.IndicesMapSize);
-
-            for (uint i = 0; i < Attribute.IndicesMapSize; ++i)
-            {
-                PortableAttribute.SetPointMapEntry(i, Attribute.MappedIndex(i));
-            }
-        }
-        return PortableAttribute;
-    }
-
     public void InitPredictionScheme(DecoderBuffer decoderBuffer, IPredictionScheme predictionScheme)
     {
         for (int i = 0; i < predictionScheme.ParentAttributesCount; ++i)
         {
             var attributeId = ConnectivityDecoder!.PointCloud!.GetNamedAttributeId(predictionScheme.GetParentAttributeType(i));
-            if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
+            if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0))
             {
                 predictionScheme.ParentAttribute = ConnectivityDecoder.PointCloud.GetAttributeById(attributeId)!;
             }

@@ -112,7 +112,7 @@ internal class MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataTyp
 
     public void DecodeTransformData(DecoderBuffer decoderBuffer)
     {
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
         {
             _selectedMode = (MultiParallelogramMode)decoderBuffer.ReadByte();
         }

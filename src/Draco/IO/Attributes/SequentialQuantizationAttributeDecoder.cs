@@ -15,7 +15,7 @@ internal class SequentialQuantizationAttributeDecoder : SequentialIntegerAttribu
 
     protected override void DecodeIntegerValues(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0))
         {
             DecodeQuantizedDataInfo(decoderBuffer);
         }
@@ -24,7 +24,7 @@ internal class SequentialQuantizationAttributeDecoder : SequentialIntegerAttribu
 
     public override void DecodeDataNeededByPortableTransform(DecoderBuffer decoderBuffer, List<uint> pointIds)
     {
-        if (decoderBuffer.BitStream_Version >= Constants.BitStreamVersion(2, 0))
+        if (decoderBuffer.BitStreamVersion >= Constants.BitStreamVersion(2, 0))
         {
             DecodeQuantizedDataInfo(decoderBuffer);
         }

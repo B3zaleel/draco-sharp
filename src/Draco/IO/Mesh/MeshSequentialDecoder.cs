@@ -9,7 +9,7 @@ internal class MeshSequentialDecoder : MeshDecoder
     {
         uint numFaces, numPoints;
 
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
         {
             numFaces = decoderBuffer.ReadUInt32();
             numPoints = decoderBuffer.ReadUInt32();
@@ -51,7 +51,7 @@ internal class MeshSequentialDecoder : MeshDecoder
                     Mesh.AddFace(face);
                 }
             }
-            else if (numPoints < (1 << 21) && decoderBuffer.BitStream_Version >= Constants.BitStreamVersion(2, 2))
+            else if (numPoints < (1 << 21) && decoderBuffer.BitStreamVersion >= Constants.BitStreamVersion(2, 2))
             {
                 for (uint i = 0; i < numFaces; ++i)
                 {

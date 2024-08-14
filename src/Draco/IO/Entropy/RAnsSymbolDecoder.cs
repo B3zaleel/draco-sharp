@@ -13,7 +13,7 @@ internal class RAnsSymbolDecoder : ISymbolDecoder
     {
         _rAnsPrecisionBits = RAnsSymbolCoding.ComputeRAnsPrecisionFromUniqueSymbolsBitLength(maxBitLength);
 
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0))
         {
             NumSymbols = decoderBuffer.ReadUInt32();
         }
@@ -57,7 +57,7 @@ internal class RAnsSymbolDecoder : ISymbolDecoder
 
     public void StartDecoding(DecoderBuffer decoderBuffer)
     {
-        ulong bytesEncoded = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0)
+        ulong bytesEncoded = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
             ? decoderBuffer.ReadUInt64()
             : decoderBuffer.DecodeVarIntUnsigned();
         _ans!.ReadInit(decoderBuffer.ReadBytes((int)bytesEncoded), (int)bytesEncoded);

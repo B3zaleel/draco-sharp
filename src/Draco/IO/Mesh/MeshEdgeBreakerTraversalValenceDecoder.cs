@@ -21,15 +21,15 @@ internal class MeshEdgeBreakerTraversalValenceDecoder : MeshEdgeBreakerTraversal
 
     protected override void Traversal_Start(DecoderBuffer decoderBuffer)
     {
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
         {
             DecodeTraversalSymbols(decoderBuffer);
         }
         DecodeStartFaces(decoderBuffer);
         DecodeAttributeSeams(decoderBuffer);
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
         {
-            uint numSplitSymbols = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0)
+            uint numSplitSymbols = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
                 ? decoderBuffer.ReadUInt32()
                 : (uint)decoderBuffer.DecodeVarIntUnsigned();
             Assertions.ThrowIf(numSplitSymbols >= _numVertices);
@@ -90,7 +90,7 @@ internal class MeshEdgeBreakerTraversalValenceDecoder : MeshEdgeBreakerTraversal
         }
         else
         {
-            _lastSymbol = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2)
+            _lastSymbol = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2)
                 ? (int)base.DecodeSymbol(decoderBuffer)
                 : Constants.EdgeBreakerTopologyBitPattern.E;
         }

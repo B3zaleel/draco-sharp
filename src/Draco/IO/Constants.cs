@@ -138,6 +138,11 @@ internal static class Constants
         };
     }
 
+    public static TOut ConstCast<TIn, TOut>(TIn value)
+    {
+        return (TOut)Convert.ChangeType(value, typeof(TOut))!;
+    }
+
     public static TOut StaticCast<TIn, TOut>(TIn value)
     {
         var valueBytes = value switch

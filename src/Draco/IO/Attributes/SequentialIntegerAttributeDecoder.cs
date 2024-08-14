@@ -36,7 +36,7 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
         }
         DecodeIntegerValues(decoderBuffer, pointIds);
 
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 0))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0))
         {
             StoreValues((uint)pointIds.Count);
         }

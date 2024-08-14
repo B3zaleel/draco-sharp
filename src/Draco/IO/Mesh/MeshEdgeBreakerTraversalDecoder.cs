@@ -34,15 +34,15 @@ internal class MeshEdgeBreakerTraversalDecoder : MeshEdgeBreakerDecoder
     protected void DecodeTraversalSymbols(DecoderBuffer decoderBuffer)
     {
         decoderBuffer.StartBitDecoding(true, out ulong traversalSize);
-        _symbolDecoderBuffer = new DecoderBuffer(decoderBuffer.ReadBytes((int)traversalSize), decoderBuffer.BitStream_Version);
+        _symbolDecoderBuffer = new DecoderBuffer(decoderBuffer.ReadBytes((int)traversalSize), decoderBuffer.BitStreamVersion);
     }
 
     protected void DecodeStartFaces(DecoderBuffer decoderBuffer)
     {
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
         {
             decoderBuffer.StartBitDecoding(true, out ulong traversalSize);
-            _startFaceDecoderBuffer = new DecoderBuffer(decoderBuffer.ReadBytes((int)traversalSize), decoderBuffer.BitStream_Version);
+            _startFaceDecoderBuffer = new DecoderBuffer(decoderBuffer.ReadBytes((int)traversalSize), decoderBuffer.BitStreamVersion);
         }
         else
         {
@@ -66,7 +66,7 @@ internal class MeshEdgeBreakerTraversalDecoder : MeshEdgeBreakerDecoder
     protected override void Traversal_Done(DecoderBuffer decoderBuffer)
     {
         decoderBuffer.EndBitDecoding();
-        if (decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2))
+        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
         {
             _startFaceDecoderBuffer!.EndBitDecoding();
         }
@@ -100,7 +100,7 @@ internal class MeshEdgeBreakerTraversalDecoder : MeshEdgeBreakerDecoder
 
     protected override bool DecodeStartFaceConfiguration(DecoderBuffer decoderBuffer)
     {
-        uint faceConfiguration = decoderBuffer.BitStream_Version < Constants.BitStreamVersion(2, 2)
+        uint faceConfiguration = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2)
             ? _startFaceDecoderBuffer!.DecodeLeastSignificantBits32(1)
             : _startFaceDecoder.DecodeNextBit();
         return (faceConfiguration & 1) == 1;
