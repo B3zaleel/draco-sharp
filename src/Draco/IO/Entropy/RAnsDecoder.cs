@@ -26,7 +26,7 @@ internal class RAnsDecoder : AnsDecoder
         if (x == 0)
         {
             BufferOffset = offset - 1;
-            State = (uint)buffer[offset - 2] & 0x3f;
+            State = (uint)buffer[offset - 1] & 0x3f;
         }
         else if (x == 1)
         {
