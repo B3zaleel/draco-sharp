@@ -9,6 +9,7 @@
     <Version>0.1.0</Version>
     <Authors>Bezaleel Olakunori</Authors>
     <Description>Decode and encode Draco streams.</Description>
+    <Copyright>Copyright © Bezaleel Olakunori 2024</Copyright>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryUrl>https://github.com/B3zaleel/draco-sharp</RepositoryUrl>
     <PackageTags>compression 3d draco</PackageTags>
