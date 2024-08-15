@@ -1,21 +1,24 @@
 namespace Draco.IO.Metadata;
 
-internal class MetadataDecoder
+internal static class MetadataDecoder
 {
-    public MetadataElement[]? AttMetadata;
-    public MetadataElement? FileMetadata;
-
-    public void Decode(DecoderBuffer decoderBuffer)
+    public static DracoMetadata Decode(DecoderBuffer decoderBuffer)
     {
-        var num_att_metadata = (uint)decoderBuffer.DecodeVarIntUnsigned();
-        AttMetadata = new MetadataElement[num_att_metadata];
-        for (uint i = 0; i < num_att_metadata; ++i)
+        var attributesMetadataCount = (uint)decoderBuffer.DecodeVarIntUnsigned();
+        var attributesMetadata = new MetadataElement[attributesMetadataCount];
+        for (uint i = 0; i < attributesMetadataCount; ++i)
         {
             var id = (uint)decoderBuffer.DecodeVarIntUnsigned();
-            AttMetadata[i] = DecodeMetadataElement(decoderBuffer);
-            AttMetadata[i].Id = id;
+            attributesMetadata[i] = DecodeMetadataElement(decoderBuffer);
+            attributesMetadata[i].Id = id;
         }
-        FileMetadata = DecodeMetadataElement(decoderBuffer);
+        var fileMetadata = DecodeMetadataElement(decoderBuffer);
+
+        return new DracoMetadata
+        {
+            Attributes = attributesMetadata.ToList(),
+            File = fileMetadata
+        };
     }
 
     private static MetadataElement DecodeMetadataElement(DecoderBuffer decoderBuffer)

@@ -21,14 +21,11 @@ public class DracoDecoder
         using var decoderBuffer = new DecoderBuffer(binaryReader);
         var header = ParseHeader(decoderBuffer);
         decoderBuffer.BitStreamVersion = header.Version;
-        MetadataElement[]? attMetadata = null;
-        MetadataElement? fileMetadata = null;
+        DracoMetadata? metadata = null;
+
         if (header.Version >= Constants.BitStreamVersion(1, 3) && (header.Flags & Constants.Metadata.FlagMask) == Constants.Metadata.FlagMask)
         {
-            var metadataDecoder = new MetadataDecoder();
-            metadataDecoder.Decode(decoderBuffer);
-            attMetadata = metadataDecoder.AttMetadata;
-            fileMetadata = metadataDecoder.FileMetadata;
+            metadata = MetadataDecoder.Decode(decoderBuffer);
         }
         var connectivityDecoder = GetDecoder(decoderBuffer, header);
         connectivityDecoder.BitStreamVersion = header.Version;
@@ -38,8 +35,7 @@ public class DracoDecoder
         return new Draco
         {
             Header = header,
-            AttMetadata = attMetadata,
-            FileMetadata = fileMetadata,
+            Metadata = metadata,
             Attributes = connectivityDecoder.PointCloud!.Attributes
         };
     }
