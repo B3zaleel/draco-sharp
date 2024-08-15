@@ -5,11 +5,10 @@ namespace Draco.IO.PointCloud;
 
 public class PointCloud
 {
-    private readonly List<PointAttribute> _attributes = [];
     private readonly List<List<int>> _namedAttributeIndex = [];
 
+    public List<PointAttribute> Attributes { get; private set; } = [];
     public int PointsCount { get; set; } = 0;
-    public int AttributesCount { get => _attributes.Count; }
 
     public PointCloud()
     {
@@ -43,16 +42,16 @@ public class PointCloud
     public PointAttribute? GetNamedAttribute(GeometryAttributeType type, int i)
     {
         var attId = GetNamedAttributeId(type, i);
-        return attId == -1 ? null : _attributes[attId];
+        return attId == -1 ? null : Attributes[attId];
     }
 
     public PointAttribute? GetNamedAttributeByUniqueId(GeometryAttributeType type, uint uniqueId)
     {
         for (int attId = 0; attId < _namedAttributeIndex[(sbyte)type].Count; ++attId)
         {
-            if (_attributes[_namedAttributeIndex[(sbyte)type][attId]].UniqueId == uniqueId)
+            if (Attributes[_namedAttributeIndex[(sbyte)type][attId]].UniqueId == uniqueId)
             {
-                return _attributes[_namedAttributeIndex[(sbyte)type][attId]];
+                return Attributes[_namedAttributeIndex[(sbyte)type][attId]];
             }
         }
         return null;
@@ -60,21 +59,21 @@ public class PointCloud
 
     public PointAttribute GetAttributeById(int id)
     {
-        Assertions.ThrowIf(id < 0 || id >= _attributes.Count, "Invalid attribute id.");
-        return _attributes[id];
+        Assertions.ThrowIf(id < 0 || id >= Attributes.Count, "Invalid attribute id.");
+        return Attributes[id];
     }
 
     public PointAttribute? GetAttributeByUniqueId(uint uniqueId)
     {
         var attId = GetAttributeIdByUniqueId(uniqueId);
-        return attId == -1 ? null : _attributes[attId];
+        return attId == -1 ? null : Attributes[attId];
     }
 
     public int GetAttributeIdByUniqueId(uint uniqueId)
     {
-        for (int attId = 0; attId < _attributes.Count; ++attId)
+        for (int attId = 0; attId < Attributes.Count; ++attId)
         {
-            if (_attributes[attId].UniqueId == uniqueId)
+            if (Attributes[attId].UniqueId == uniqueId)
             {
                 return attId;
             }
@@ -84,8 +83,8 @@ public class PointCloud
 
     public int AddAttribute(PointAttribute pointAttribute)
     {
-        SetAttribute(_attributes.Count, pointAttribute);
-        return _attributes.Count - 1;
+        SetAttribute(Attributes.Count, pointAttribute);
+        return Attributes.Count - 1;
     }
 
     public int AddAttribute(GeometryAttribute att, bool identityMapping, int numAttributeValues)
@@ -120,15 +119,15 @@ public class PointCloud
 
     public virtual void SetAttribute(int attId, PointAttribute pointAttribute)
     {
-        if (_attributes.Count <= attId)
+        if (Attributes.Count <= attId)
         {
-            _attributes.Resize(attId + 1, () => new());
+            Attributes.Resize(attId + 1, () => new());
         }
         if (pointAttribute.AttributeType < GeometryAttributeType.NamedAttributesCount)
         {
             _namedAttributeIndex[(sbyte)pointAttribute.AttributeType].Add(attId);
         }
         pointAttribute.UniqueId = (uint)attId;
-        _attributes[attId] = pointAttribute;
+        Attributes[attId] = pointAttribute;
     }
 }

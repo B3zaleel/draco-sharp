@@ -45,7 +45,7 @@ internal abstract class ConnectivityDecoder
 
     public PointAttribute? GetPortableAttribute(int parentAttributeId)
     {
-        if (parentAttributeId < 0 || parentAttributeId >= PointCloud!.AttributesCount)
+        if (parentAttributeId < 0 || parentAttributeId >= PointCloud!.Attributes.Count)
         {
             return null;
         }

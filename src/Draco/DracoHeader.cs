@@ -1,4 +1,6 @@
-namespace Draco.IO;
+using Draco.IO;
+
+namespace Draco;
 
 public class DracoHeader(byte majorVersion, byte minorVersion, byte encoderType, byte encoderMethod, ushort flags)
 {
