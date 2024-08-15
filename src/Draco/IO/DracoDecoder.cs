@@ -19,7 +19,7 @@ public class DracoDecoder
     public Draco Decode(BinaryReader binaryReader)
     {
         using var decoderBuffer = new DecoderBuffer(binaryReader);
-        var header = ParseHeader(decoderBuffer);
+        var header = DecodeHeader(decoderBuffer);
         decoderBuffer.BitStreamVersion = header.Version;
         DracoMetadata? metadata = null;
 
@@ -27,7 +27,7 @@ public class DracoDecoder
         {
             metadata = MetadataDecoder.Decode(decoderBuffer);
         }
-        var connectivityDecoder = GetDecoder(decoderBuffer, header);
+        var connectivityDecoder = GetConnectivityDecoder(decoderBuffer, header);
         connectivityDecoder.BitStreamVersion = header.Version;
         connectivityDecoder.DecodeConnectivity(decoderBuffer);
         connectivityDecoder.DecodeAttributes(decoderBuffer);
@@ -40,7 +40,7 @@ public class DracoDecoder
         };
     }
 
-    private static DracoHeader ParseHeader(DecoderBuffer decoderBuffer)
+    private static DracoHeader DecodeHeader(DecoderBuffer decoderBuffer)
     {
         var dracoMagic = decoderBuffer.ReadASCIIBytes(Constants.DracoMagic.Length);
         if (dracoMagic != Constants.DracoMagic)
@@ -62,7 +62,7 @@ public class DracoDecoder
         );
     }
 
-    private ConnectivityDecoder GetDecoder(DecoderBuffer decoderBuffer, DracoHeader header)
+    private static ConnectivityDecoder GetConnectivityDecoder(DecoderBuffer decoderBuffer, DracoHeader header)
     {
         if (header!.EncoderType == Constants.EncodingType.PointCloud)
         {
