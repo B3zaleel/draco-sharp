@@ -1,4 +1,3 @@
-using Draco.IO;
 using Draco.IO.Attributes;
 using Draco.IO.Metadata;
 
