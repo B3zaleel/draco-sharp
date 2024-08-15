@@ -43,74 +43,74 @@ internal sealed class DecoderBuffer : IDisposable
 
     public long DecodeVarInt()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         var symbol = DecodeVarIntUnsigned();
         return BitUtilities.ConvertSymbolToSignedInt(symbol);
     }
 
     public byte ReadByte()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadByte();
     }
 
     public ushort ReadUInt16()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadUInt16();
     }
 
     public uint ReadUInt32()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadUInt32();
     }
 
     public ulong ReadUInt64()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadUInt64();
     }
 
     public sbyte ReadSByte()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadSByte();
     }
 
     public short ReadInt16()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadInt16();
     }
 
     public int ReadInt32()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadInt32();
     }
 
     public float ReadSingle()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadSingle();
     }
 
     public string ReadASCIIBytes(int count)
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return Encoding.ASCII.GetString(_binaryReader.ReadBytes(count));
     }
 
     public byte[] ReadBytes(int count)
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadBytes(count);
     }
 
     public sbyte[] ReadSBytes(int count)
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         sbyte[] values = new sbyte[count];
         for (int i = 0; i < count; i++)
         {
