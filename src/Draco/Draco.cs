@@ -1,5 +1,4 @@
 using Draco.IO.Attributes;
-using Draco.IO.Metadata;
 
 namespace Draco;
 
@@ -9,7 +8,6 @@ namespace Draco;
 public class Draco
 {
     public required DracoHeader Header { get; set; }
-    public MetadataElement[]? AttMetadata { get; set; }
-    public MetadataElement? FileMetadata { get; set; }
+    public DracoMetadata? Metadata { get; set; }
     public List<PointAttribute> Attributes { get; set; } = [];
 }
