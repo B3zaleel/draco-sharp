@@ -1,3 +1,5 @@
+using Draco.IO.Enums;
+
 namespace Draco.IO.Mesh;
 
 internal class MeshAttributeData

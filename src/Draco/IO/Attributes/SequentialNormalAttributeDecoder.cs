@@ -1,4 +1,5 @@
 using Draco.IO.Attributes.PredictionSchemes;
+using Draco.IO.Enums;
 using Draco.IO.Extensions;
 
 namespace Draco.IO.Attributes;

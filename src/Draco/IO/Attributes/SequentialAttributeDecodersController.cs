@@ -1,3 +1,5 @@
+using Draco.IO.Enums;
+
 namespace Draco.IO.Attributes;
 
 internal class SequentialAttributeDecodersController : AttributesDecoder

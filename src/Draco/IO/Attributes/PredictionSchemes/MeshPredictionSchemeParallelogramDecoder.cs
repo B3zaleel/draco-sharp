@@ -1,4 +1,5 @@
 using System.Numerics;
+using Draco.IO.Enums;
 using Draco.IO.Extensions;
 using Draco.IO.Mesh;
 
