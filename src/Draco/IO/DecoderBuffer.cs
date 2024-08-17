@@ -7,7 +7,7 @@ internal sealed class DecoderBuffer : IDisposable
 {
     private bool _bitMode = false;
     private byte _bitBuffer = 0;
-    private byte _bitBufferIndex = 0;
+    private byte _bitBufferIndex = 8;
     private readonly BinaryReader _binaryReader;
 
     public ushort BitStreamVersion { get; set; }
@@ -144,8 +144,7 @@ internal sealed class DecoderBuffer : IDisposable
         {
             if (_bitBufferIndex >= 8)
             {
-                _bitBuffer = _binaryReader.ReadByte();
-                _bitBufferIndex = 0;
+                ReloadBitBuffer();
             }
             value |= (byte)(((_bitBuffer >> _bitBufferIndex) & 1) << i);
             _bitBufferIndex++;
@@ -166,13 +165,21 @@ internal sealed class DecoderBuffer : IDisposable
             size = BitStreamVersion < Constants.BitStreamVersion(2, 2) ? _binaryReader.ReadUInt32() : DecodeVarIntUnsigned();
         }
         _bitMode = true;
-        _bitBuffer = _binaryReader.ReadByte();
-        _bitBufferIndex = 0;
+        ReloadBitBuffer();
     }
 
     public void EndBitDecoding()
     {
         _bitMode = false;
+    }
+
+    private void ReloadBitBuffer()
+    {
+        if (_bitBufferIndex > 0)
+        {
+            _bitBuffer = _binaryReader.ReadByte();
+        }
+        _bitBufferIndex = 0;
     }
 
     public void Dispose()
