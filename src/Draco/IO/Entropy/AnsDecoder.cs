@@ -51,14 +51,7 @@ internal class AnsDecoder
         uint rem = x % Constants.DracoAnsP8Precision;
         uint xn = quot * p;
         var val = rem < p;
-        if (val)
-        {
-            State = xn + rem;
-        }
-        else
-        {
-            State = x - xn - p;
-        }
+        State = val ? xn + rem : x - xn - p;
         return val;
     }
 

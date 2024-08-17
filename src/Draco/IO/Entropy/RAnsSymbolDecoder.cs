@@ -13,14 +13,9 @@ internal class RAnsSymbolDecoder : ISymbolDecoder
     {
         _rAnsPrecisionBits = RAnsSymbolCoding.ComputeRAnsPrecisionFromUniqueSymbolsBitLength(maxBitLength);
 
-        if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0))
-        {
-            NumSymbols = decoderBuffer.ReadUInt32();
-        }
-        else
-        {
-            NumSymbols = (uint)decoderBuffer.DecodeVarIntUnsigned();
-        }
+        NumSymbols = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
+            ? decoderBuffer.ReadUInt32()
+            : (uint)decoderBuffer.DecodeVarIntUnsigned();
         _probabilityTable.Fill((int)NumSymbols, 0U);
         if (NumSymbols == 0)
         {
