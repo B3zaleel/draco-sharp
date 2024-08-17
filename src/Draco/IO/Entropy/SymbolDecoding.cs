@@ -34,7 +34,7 @@ internal static class SymbolDecoding
         tagDecoder.Create(decoderBuffer, 5);
         tagDecoder.StartDecoding(decoderBuffer);
         Assertions.ThrowIf(numValues > 0 && tagDecoder.NumSymbols == 0, "Wrong number of symbols.");
-        decoderBuffer.StartBitDecoding(false, out ulong _);
+        decoderBuffer.StartBitDecoding();
         int value_id = 0;
         for (uint i = 0; i < numValues; i += numComponents)
         {

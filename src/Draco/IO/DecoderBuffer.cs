@@ -153,6 +153,11 @@ internal sealed class DecoderBuffer : IDisposable
         return value;
     }
 
+    public void StartBitDecoding()
+    {
+        StartBitDecoding(false, out _);
+    }
+
     public void StartBitDecoding(bool decodeSize, out ulong size)
     {
         size = 0;

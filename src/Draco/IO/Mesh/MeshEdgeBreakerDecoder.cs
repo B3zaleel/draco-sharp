@@ -174,7 +174,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                     lastSourceSymbolId = (int)event_data.SourceSymbolId;
                     _topologySplitData.Add(event_data);
                 }
-                decoderBuffer.StartBitDecoding(false, out ulong _);
+                decoderBuffer.StartBitDecoding();
                 for (uint i = 0; i < numTopologySplits; ++i)
                 {
                     uint edge_data;
