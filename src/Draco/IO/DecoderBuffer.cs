@@ -138,6 +138,7 @@ internal sealed class DecoderBuffer : IDisposable
     public uint DecodeLeastSignificantBits32(byte count)
     {
         Assertions.ThrowIfNot(_bitMode, Constants.BitOperationDisallowedMessage);
+        Assertions.ThrowIf(count > 32, "Count cannot be greater than 32");
         uint value = 0;
 
         for (byte i = 0; i < count; i++)
