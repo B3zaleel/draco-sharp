@@ -137,7 +137,7 @@ internal sealed class DecoderBuffer : IDisposable
 
     public uint DecodeLeastSignificantBits32(byte count)
     {
-        Assertions.ThrowIfNot(_bitMode, "Cannot execute this whilst bit mode is not on");
+        Assertions.ThrowIfNot(_bitMode, Constants.BitOperationDisallowedMessage);
         uint value = 0;
 
         for (byte i = 0; i < count; i++)
