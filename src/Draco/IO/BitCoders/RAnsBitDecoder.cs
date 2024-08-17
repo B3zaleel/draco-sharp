@@ -14,8 +14,8 @@ internal class RAnsBitDecoder
         _decoderBuffer = decoderBuffer;
         _probZero = decoderBuffer.ReadByte();
         _ansDecoder = new();
-        uint size_in_bytes = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2) ? decoderBuffer.ReadUInt32() : (uint)decoderBuffer.DecodeVarIntUnsigned();
-        _ansDecoder.ReadInit(decoderBuffer.ReadBytes((int)size_in_bytes), (int)size_in_bytes);
+        uint sizeInBytes = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2) ? decoderBuffer.ReadUInt32() : (uint)decoderBuffer.DecodeVarIntUnsigned();
+        _ansDecoder.ReadInit(decoderBuffer.ReadBytes((int)sizeInBytes), (int)sizeInBytes);
     }
 
     public uint DecodeNextBit()
