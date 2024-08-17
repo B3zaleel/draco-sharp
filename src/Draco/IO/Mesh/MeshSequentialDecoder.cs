@@ -98,7 +98,7 @@ internal class MeshSequentialDecoder : MeshDecoder
                 {
                     if (indexDiff > lastIndexValue)
                     {
-                        throw new InvalidDataException("Subtracting index_diff would result in a negative index.");
+                        throw new InvalidDataException("Subtracting indexDiff would result in a negative index.");
                     }
                     indexDiff = -indexDiff;
                 }
@@ -106,7 +106,7 @@ internal class MeshSequentialDecoder : MeshDecoder
                 {
                     if (indexDiff > (int.MaxValue - lastIndexValue))
                     {
-                        throw new InvalidDataException("Adding index_diff to last_index_value would overflow.");
+                        throw new InvalidDataException("Adding indexDiff to lastIndexValue would overflow.");
                     }
                 }
                 int indexValue = indexDiff + lastIndexValue;

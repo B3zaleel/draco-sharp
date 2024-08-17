@@ -1,4 +1,5 @@
 using Draco.IO.Core;
+using Draco.IO.Enums;
 
 namespace Draco.IO.Attributes;
 

@@ -7,7 +7,7 @@ internal sealed class DecoderBuffer : IDisposable
 {
     private bool _bitMode = false;
     private byte _bitBuffer = 0;
-    private byte _bitBufferIndex = 0;
+    private byte _bitBufferIndex = 8;
     private readonly BinaryReader _binaryReader;
 
     public ushort BitStreamVersion { get; set; }
@@ -43,74 +43,74 @@ internal sealed class DecoderBuffer : IDisposable
 
     public long DecodeVarInt()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         var symbol = DecodeVarIntUnsigned();
         return BitUtilities.ConvertSymbolToSignedInt(symbol);
     }
 
     public byte ReadByte()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadByte();
     }
 
     public ushort ReadUInt16()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadUInt16();
     }
 
     public uint ReadUInt32()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadUInt32();
     }
 
     public ulong ReadUInt64()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadUInt64();
     }
 
     public sbyte ReadSByte()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadSByte();
     }
 
     public short ReadInt16()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadInt16();
     }
 
     public int ReadInt32()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadInt32();
     }
 
     public float ReadSingle()
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadSingle();
     }
 
     public string ReadASCIIBytes(int count)
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return Encoding.ASCII.GetString(_binaryReader.ReadBytes(count));
     }
 
     public byte[] ReadBytes(int count)
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         return _binaryReader.ReadBytes(count);
     }
 
     public sbyte[] ReadSBytes(int count)
     {
-        Assertions.ThrowIf(_bitMode, "Cannot execute this whilst bit mode is on");
+        Assertions.ThrowIf(_bitMode, Constants.NonBitOperationDisallowedMessage);
         sbyte[] values = new sbyte[count];
         for (int i = 0; i < count; i++)
         {
@@ -137,20 +137,25 @@ internal sealed class DecoderBuffer : IDisposable
 
     public uint DecodeLeastSignificantBits32(byte count)
     {
-        Assertions.ThrowIfNot(_bitMode, "Cannot execute this whilst bit mode is not on");
+        Assertions.ThrowIfNot(_bitMode, Constants.BitOperationDisallowedMessage);
+        Assertions.ThrowIf(count > 32, "Count cannot be greater than 32");
         uint value = 0;
 
         for (byte i = 0; i < count; i++)
         {
             if (_bitBufferIndex >= 8)
             {
-                _bitBuffer = _binaryReader.ReadByte();
-                _bitBufferIndex = 0;
+                ReloadBitBuffer();
             }
             value |= (byte)(((_bitBuffer >> _bitBufferIndex) & 1) << i);
             _bitBufferIndex++;
         }
         return value;
+    }
+
+    public void StartBitDecoding()
+    {
+        StartBitDecoding(false, out _);
     }
 
     public void StartBitDecoding(bool decodeSize, out ulong size)
@@ -161,13 +166,21 @@ internal sealed class DecoderBuffer : IDisposable
             size = BitStreamVersion < Constants.BitStreamVersion(2, 2) ? _binaryReader.ReadUInt32() : DecodeVarIntUnsigned();
         }
         _bitMode = true;
-        _bitBuffer = _binaryReader.ReadByte();
-        _bitBufferIndex = 0;
+        ReloadBitBuffer();
     }
 
     public void EndBitDecoding()
     {
         _bitMode = false;
+    }
+
+    private void ReloadBitBuffer()
+    {
+        if (_bitBufferIndex > 0)
+        {
+            _bitBuffer = _binaryReader.ReadByte();
+        }
+        _bitBufferIndex = 0;
     }
 
     public void Dispose()

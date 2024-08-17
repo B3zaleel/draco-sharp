@@ -34,15 +34,15 @@ internal static class SymbolDecoding
         tagDecoder.Create(decoderBuffer, 5);
         tagDecoder.StartDecoding(decoderBuffer);
         Assertions.ThrowIf(numValues > 0 && tagDecoder.NumSymbols == 0, "Wrong number of symbols.");
-        decoderBuffer.StartBitDecoding(false, out ulong _);
-        int value_id = 0;
+        decoderBuffer.StartBitDecoding();
+        int valueId = 0;
         for (uint i = 0; i < numValues; i += numComponents)
         {
             var bitLength = (byte)tagDecoder.DecodeSymbol();
             for (int j = 0; j < numComponents; ++j)
             {
                 var value = decoderBuffer.DecodeLeastSignificantBits32(bitLength);
-                values[value_id++] = value;
+                values[valueId++] = value;
             }
         }
         tagDecoder.EndDecoding();

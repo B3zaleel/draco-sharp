@@ -1,4 +1,5 @@
 using Draco.IO.Attributes;
+using Draco.IO.Enums;
 using Draco.IO.Extensions;
 using Draco.IO.Mesh.Traverser;
 
@@ -37,7 +38,7 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
         uint numFaces = decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 0)
             ? decoderBuffer.ReadUInt32()
             : (uint)decoderBuffer.DecodeVarIntUnsigned();
-        Assertions.ThrowIf(_numEncodedVertices > numFaces * 3, "There cannot be more vertices than 3 * num_faces.");
+        Assertions.ThrowIf(_numEncodedVertices > numFaces * 3, "There cannot be more vertices than 3 * numFaces.");
         uint minNumFaceEdges = 3 * numFaces / 2;
         ulong numEncodedVertices64 = _numEncodedVertices;
         ulong maxNumVertexEdges = numEncodedVertices64 * (numEncodedVertices64 - 1) / 2;
@@ -150,14 +151,14 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             {
                 for (uint i = 0; i < numTopologySplits; ++i)
                 {
-                    var event_data = new TopologySplitEventData
+                    var eventData = new TopologySplitEventData
                     {
                         SplitSymbolId = decoderBuffer.ReadUInt32(),
                         SourceSymbolId = decoderBuffer.ReadUInt32()
                     };
-                    byte edge_data = decoderBuffer.ReadByte();
-                    event_data.SourceEdge = (uint)(edge_data & 1);
-                    _topologySplitData.Add(event_data);
+                    byte edgeData = decoderBuffer.ReadByte();
+                    eventData.SourceEdge = (uint)(edgeData & 1);
+                    _topologySplitData.Add(eventData);
                 }
             }
             else
@@ -165,28 +166,28 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
                 int lastSourceSymbolId = 0;
                 for (uint i = 0; i < numTopologySplits; ++i)
                 {
-                    var event_data = new TopologySplitEventData();
+                    var eventData = new TopologySplitEventData();
                     uint delta = (uint)decoderBuffer.DecodeVarIntUnsigned();
-                    event_data.SourceSymbolId = (uint)(delta + lastSourceSymbolId);
+                    eventData.SourceSymbolId = (uint)(delta + lastSourceSymbolId);
                     delta = (uint)decoderBuffer.DecodeVarIntUnsigned();
-                    Assertions.ThrowIf(delta > event_data.SourceSymbolId);
-                    event_data.SplitSymbolId = (uint)(event_data.SourceSymbolId - (int)delta);
-                    lastSourceSymbolId = (int)event_data.SourceSymbolId;
-                    _topologySplitData.Add(event_data);
+                    Assertions.ThrowIf(delta > eventData.SourceSymbolId);
+                    eventData.SplitSymbolId = (uint)(eventData.SourceSymbolId - (int)delta);
+                    lastSourceSymbolId = (int)eventData.SourceSymbolId;
+                    _topologySplitData.Add(eventData);
                 }
-                decoderBuffer.StartBitDecoding(false, out ulong _);
+                decoderBuffer.StartBitDecoding();
                 for (uint i = 0; i < numTopologySplits; ++i)
                 {
-                    uint edge_data;
+                    uint edgeData;
                     if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))
                     {
-                        edge_data = decoderBuffer.DecodeLeastSignificantBits32(2);
+                        edgeData = decoderBuffer.DecodeLeastSignificantBits32(2);
                     }
                     else
                     {
-                        edge_data = decoderBuffer.DecodeLeastSignificantBits32(1);
+                        edgeData = decoderBuffer.DecodeLeastSignificantBits32(1);
                     }
-                    _topologySplitData[(int)i].SourceEdge = edge_data & 1;
+                    _topologySplitData[(int)i].SourceEdge = edgeData & 1;
                 }
                 decoderBuffer.EndBitDecoding();
             }
@@ -363,11 +364,11 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
             {
                 int encoderSymbolId = numSymbols - symbolId - 1;
 
-                while (IsTopologySplit(encoderSymbolId, out int split_edge, out int encoderSplitSymbolId))
+                while (IsTopologySplit(encoderSymbolId, out int splitEdge, out int encoderSplitSymbolId))
                 {
                     Assertions.ThrowIf(encoderSplitSymbolId < 0, "Wrong split symbol id.");
                     uint actTopCorner = activeCornerStack.Last();
-                    uint newActiveCorner = split_edge == Constants.EdgeFaceName.RightFaceEdge ? CornerTable!.Next(actTopCorner) : CornerTable!.Previous(actTopCorner);
+                    uint newActiveCorner = splitEdge == Constants.EdgeFaceName.RightFaceEdge ? CornerTable!.Next(actTopCorner) : CornerTable!.Previous(actTopCorner);
                     int decoderSplitSymbolId = numSymbols - encoderSplitSymbolId - 1;
                     topologySplitActiveCorners[decoderSplitSymbolId] = newActiveCorner;
                 }
@@ -757,8 +758,8 @@ internal abstract class MeshEdgeBreakerDecoder : MeshDecoder
     }
 
     protected abstract void Traversal_Init(DecoderBuffer decoderBuffer);
-    protected abstract void Traversal_SetNumEncodedVertices(uint num_vertices);
-    protected abstract void Traversal_SetNumAttributeData(uint num_data);
+    protected abstract void Traversal_SetNumEncodedVertices(uint numVertices);
+    protected abstract void Traversal_SetNumAttributeData(uint numData);
     protected abstract void Traversal_Start(DecoderBuffer decoderBuffer);
     protected abstract void Traversal_Done(DecoderBuffer decoderBuffer);
     protected abstract uint DecodeAttributeSeam(int attribute);

@@ -1,4 +1,5 @@
 using System.Numerics;
+using Draco.IO.Enums;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 

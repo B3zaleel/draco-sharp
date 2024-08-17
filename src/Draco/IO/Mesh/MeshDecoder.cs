@@ -3,7 +3,7 @@ using Draco.IO.Attributes;
 namespace Draco.IO.Mesh;
 
 /// <summary>
-/// represents a class that reconstructs a 3D mesh from input data that was encoded by a <see cref="IMeshEncoder"/>.
+/// Represents a class that reconstructs a 3D mesh from input data that was encoded by a <see cref="MeshEncoder"/>.
 /// </summary>
 internal abstract class MeshDecoder : ConnectivityDecoder
 {

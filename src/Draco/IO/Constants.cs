@@ -1,3 +1,5 @@
+using Draco.IO.Enums;
+
 namespace Draco.IO;
 
 internal static class Constants
@@ -5,6 +7,8 @@ internal static class Constants
     public const string DracoMagic = "DRACO";
     public const byte MajorVersion = 2;
     public const byte MinorVersion = 2;
+    public const string BitOperationDisallowedMessage = "Cannot execute this whilst bit mode is not on";
+    public const string NonBitOperationDisallowedMessage = "Cannot execute this whilst bit mode is on";
 
     public static ushort BitStreamVersion(byte majorVersion, byte minorVersion) => (ushort)((majorVersion << 8) | minorVersion);
 
@@ -186,109 +190,4 @@ internal static class Constants
         }
         return result;
     }
-}
-
-public enum GeometryAttributeType : sbyte
-{
-    Invalid = -1,
-    Position = 0,
-    Normal = 1,
-    Color = 2,
-    TexCoord = 3,
-    Generic,
-    NamedAttributesCount
-}
-
-/// <summary>
-/// Represents different variants of <see cref="Mesh.Mesh"/> attributes.
-/// </summary>
-public enum MeshAttributeElementType : byte
-{
-    /// <summary>
-    /// All corners attached to a vertex share the same attribute value. A typical example are the vertex positions and often vertex colors.
-    /// </summary>
-    VertexAttribute = 0,
-    /// <summary>
-    /// The most general attribute where every corner of the mesh can have a different attribute value. Often used for texture coordinates or normals.
-    /// </summary>
-    CornerAttribute = 1,
-    /// <summary>
-    /// All corners of a single face share the same value.
-    /// </summary>
-    FaceAttribute = 2
-}
-
-public enum AttributeTransformType : sbyte
-{
-    InvalidTransform = -1,
-    NoTransform = 0,
-    QuantizationTransform = 1,
-    OctahedronTransform = 2,
-}
-
-public enum SequentialAttributeEncoderType : byte
-{
-    Generic = 0,
-    Integer,
-    Quantization,
-    Normals
-}
-
-public enum PredictionSchemeMethod : sbyte
-{
-    None = -2,
-    Undefined = -1,
-    Difference = 0,
-    Parallelogram = 1,
-    MultiParallelogram = 2,
-    TexCoordsDeprecated = 3,
-    ConstrainedMultiParallelogram = 4,
-    TexCoordsPortable = 5,
-    GeometricNormal = 6,
-    Count
-}
-
-public enum PredictionSchemeTransformType : sbyte
-{
-    None = -1,
-    Delta = 0,
-    Wrap = 1,
-    NormalOctahedron = 2,
-    NormalOctahedronCanonicalized = 3,
-    Count,
-}
-
-public enum MeshTraversalMethod : byte
-{
-    DepthFirst = 0,
-    PredictionDegree,
-    Count
-}
-
-public enum DataType : byte
-{
-    Invalid = 0,
-    Int8,
-    UInt8,
-    Int16,
-    UInt16,
-    Int32,
-    UInt32,
-    Int64,
-    UInt64,
-    Float32,
-    Float64,
-    Bool,
-    Count
-}
-
-public enum NormalPredictionMode : byte
-{
-    OneTriangle = 0,
-    TriangleArea = 1,
-}
-
-public enum MultiParallelogramMode : byte
-{
-    Optimal = 0
 }

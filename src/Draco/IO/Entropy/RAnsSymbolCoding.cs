@@ -3,7 +3,7 @@ namespace Draco.IO.Entropy;
 internal static class RAnsSymbolCoding
 {
     /// <summary>
-    /// Computes the desired precision of the rANS method for the specified number of unique symbols the input data (defined by their bit_length).
+    /// Computes the desired precision of the rANS method for the specified number of unique symbols the input data (defined by their bit length).
     /// </summary>
     /// <param name="symbolsBitLength"></param>
     /// <returns></returns>

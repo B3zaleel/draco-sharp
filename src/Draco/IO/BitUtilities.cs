@@ -42,9 +42,9 @@ internal class BitUtilities
 
     public static long ConvertSymbolToSignedInt(ulong val)
     {
-        var is_positive = (val & 1) == 0;
+        var isPositive = (val & 1) == 0;
         val >>= 1;
-        if (is_positive)
+        if (isPositive)
         {
             return (long)val;
         }
@@ -53,9 +53,9 @@ internal class BitUtilities
 
     public static int ConvertSymbolToSignedInt(uint val)
     {
-        var is_positive = (val & 1) == 0;
+        var isPositive = (val & 1) == 0;
         val >>= 1;
-        if (is_positive)
+        if (isPositive)
         {
             return (int)val;
         }

@@ -19,18 +19,15 @@ public class DracoDecoder
     public Draco Decode(BinaryReader binaryReader)
     {
         using var decoderBuffer = new DecoderBuffer(binaryReader);
-        var header = ParseHeader(decoderBuffer);
+        var header = DecodeHeader(decoderBuffer);
         decoderBuffer.BitStreamVersion = header.Version;
-        MetadataElement[]? attMetadata = null;
-        MetadataElement? fileMetadata = null;
+        DracoMetadata? metadata = null;
+
         if (header.Version >= Constants.BitStreamVersion(1, 3) && (header.Flags & Constants.Metadata.FlagMask) == Constants.Metadata.FlagMask)
         {
-            var metadataDecoder = new MetadataDecoder();
-            metadataDecoder.Decode(decoderBuffer);
-            attMetadata = metadataDecoder.AttMetadata;
-            fileMetadata = metadataDecoder.FileMetadata;
+            metadata = MetadataDecoder.Decode(decoderBuffer);
         }
-        var connectivityDecoder = GetDecoder(decoderBuffer, header);
+        var connectivityDecoder = GetConnectivityDecoder(decoderBuffer, header);
         connectivityDecoder.BitStreamVersion = header.Version;
         connectivityDecoder.DecodeConnectivity(decoderBuffer);
         connectivityDecoder.DecodeAttributes(decoderBuffer);
@@ -38,13 +35,12 @@ public class DracoDecoder
         return new Draco
         {
             Header = header,
-            AttMetadata = attMetadata,
-            FileMetadata = fileMetadata,
+            Metadata = metadata,
             Attributes = connectivityDecoder.PointCloud!.Attributes
         };
     }
 
-    private static DracoHeader ParseHeader(DecoderBuffer decoderBuffer)
+    private static DracoHeader DecodeHeader(DecoderBuffer decoderBuffer)
     {
         var dracoMagic = decoderBuffer.ReadASCIIBytes(Constants.DracoMagic.Length);
         if (dracoMagic != Constants.DracoMagic)
@@ -66,7 +62,7 @@ public class DracoDecoder
         );
     }
 
-    private ConnectivityDecoder GetDecoder(DecoderBuffer decoderBuffer, DracoHeader header)
+    private static ConnectivityDecoder GetConnectivityDecoder(DecoderBuffer decoderBuffer, DracoHeader header)
     {
         if (header!.EncoderType == Constants.EncodingType.PointCloud)
         {
