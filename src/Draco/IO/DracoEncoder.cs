@@ -1,3 +1,5 @@
+using Draco.IO.Metadata;
+
 namespace Draco.IO;
 
 public class DracoEncoder
@@ -18,6 +20,11 @@ public class DracoEncoder
         using var encoderBuffer = new EncoderBuffer(binaryWriter);
         EncodeHeader(encoderBuffer, draco.Header);
         encoderBuffer.BitStreamVersion = draco.Header.Version;
+
+        if (draco.Header.Version >= Constants.BitStreamVersion(1, 3) && (draco.Header.Flags & Constants.Metadata.FlagMask) == Constants.Metadata.FlagMask)
+        {
+            MetadataEncoder.Encode(encoderBuffer, draco.Metadata!);
+        }
     }
 
     private static void EncodeHeader(EncoderBuffer encoderBuffer, DracoHeader header)
