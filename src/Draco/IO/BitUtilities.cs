@@ -2,6 +2,18 @@ namespace Draco.IO;
 
 internal class BitUtilities
 {
+    /// <summary>
+    /// Counts the number of '1' bits in a 32-bit unsigned integer.
+    /// </summary>
+    /// <param name="n">The integer.</param>
+    /// <returns></returns>
+    public static uint CountOneBits32(uint n)
+    {
+        n -= (n >> 1) & 0x55555555;
+        n = ((n >> 2) & 0x33333333) + (n & 0x33333333);
+        return (((n + (n >> 4)) & 0xF0F0F0F) * 0x1010101) >> 24;
+    }
+
     public static uint ReverseBits32(uint n)
     {
         n = ((n >> 1) & 0x55555555) | ((n & 0x55555555) << 1);
