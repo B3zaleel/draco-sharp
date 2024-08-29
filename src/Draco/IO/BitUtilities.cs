@@ -23,6 +23,12 @@ internal class BitUtilities
         return (n >> 16) | (n << 16);
     }
 
+    public static void CopyBits32(ref uint dest, int destOffset, uint src, int srcOffset, int count)
+    {
+        uint mask = (~0U) >> (32 - count) << destOffset;
+        dest = (dest & (~mask)) | (((src >> srcOffset) << destOffset) & mask);
+    }
+
     public static int MostSignificantBit(uint num)
     {
         int msb = -1;
