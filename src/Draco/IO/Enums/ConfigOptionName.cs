@@ -10,6 +10,7 @@ public static class ConfigOptionName
     public const string EdgeBreakerMethod = "edgebreaker_method";
     public const string StoreNumberOfEncodedFaces = "store_number_of_encoded_faces";
     public const string StoreNumberOfEncodedPoints = "store_number_of_encoded_points";
+    public const string SymbolEncodingMethod = "symbol_encoding_method";
 
     public static class Attribute
     {
