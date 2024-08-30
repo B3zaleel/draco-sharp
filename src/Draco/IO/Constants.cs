@@ -9,6 +9,10 @@ internal static class Constants
     public const byte MinorVersion = 2;
     public const string BitOperationDisallowedMessage = "Cannot execute this whilst bit mode is not on";
     public const string NonBitOperationDisallowedMessage = "Cannot execute this whilst bit mode is on";
+    /// <summary>
+    /// The default maximum speed for both encoding/decoding.
+    /// </summary>
+    public const byte DefaultSpeed = 5;
 
     public static ushort BitStreamVersion(byte majorVersion, byte minorVersion) => (ushort)((majorVersion << 8) | minorVersion);
 
