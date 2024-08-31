@@ -25,4 +25,25 @@ internal static class Ans
         value |= data[0];
         return value;
     }
+
+    public static void MemPutLE16(byte[] data, int offset, uint value)
+    {
+        data[offset + 0] = (byte)((value >> 0) & 0xFF);
+        data[offset + 1] = (byte)((value >> 8) & 0xFF);
+    }
+
+    public static void MemPutLE24(byte[] data, int offset, uint value)
+    {
+        data[offset + 0] = (byte)((value >> 0) & 0xFF);
+        data[offset + 1] = (byte)((value >> 8) & 0xFF);
+        data[offset + 2] = (byte)((value >> 16) & 0xFF);
+    }
+
+    public static void MemPutLE32(byte[] data, int offset, uint value)
+    {
+        data[offset + 0] = (byte)((value >> 0) & 0xFF);
+        data[offset + 1] = (byte)((value >> 8) & 0xFF);
+        data[offset + 2] = (byte)((value >> 16) & 0xFF);
+        data[offset + 3] = (byte)((value >> 24) & 0xFF);
+    }
 }
