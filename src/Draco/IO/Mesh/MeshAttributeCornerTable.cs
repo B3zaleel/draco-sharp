@@ -29,6 +29,52 @@ internal class MeshAttributeCornerTable : CornerTable
         NoInteriorSeams = true;
     }
 
+    public MeshAttributeCornerTable(CornerTable cornerTable, Mesh mesh, PointAttribute attribute) : this(cornerTable)
+    {
+        for (uint cornerId = 0; cornerId < cornerTable.CornersCount; ++cornerId)
+        {
+            var faceId = cornerTable.Face(cornerId);
+            if (cornerTable.IsDegenerated(faceId))
+            {
+                continue;
+            }
+            var oppositeCorner = cornerTable.Opposite(cornerId);
+            if (oppositeCorner == Constants.kInvalidCornerIndex)
+            {
+                _isEdgeOnSeam[(int)cornerId] = true;
+                _isVertexOnSeam[(int)cornerTable.Vertex(cornerTable.Next(cornerId))] = true;
+                _isVertexOnSeam[(int)cornerTable.Vertex(cornerTable.Previous(cornerId))] = true;
+                continue;
+            }
+            if (oppositeCorner < cornerId)
+            {
+                continue;
+            }
+            var actC = cornerId;
+            var actSiblingC = oppositeCorner;
+            for (int i = 0; i < 2; ++i)
+            {
+                actC = cornerTable.Next(actC);
+                actSiblingC = cornerTable.Previous(actSiblingC);
+                var pointId = mesh.CornerToPointId(actC);
+                var siblingPointId = mesh.CornerToPointId(actSiblingC);
+
+                if (attribute.MappedIndex(pointId) != attribute.MappedIndex(siblingPointId))
+                {
+                    NoInteriorSeams = false;
+                    _isEdgeOnSeam[(int)cornerId] = true;
+                    _isEdgeOnSeam[(int)oppositeCorner] = true;
+                    _isVertexOnSeam[(int)cornerTable.Vertex(cornerTable.Next(cornerId))] = true;
+                    _isVertexOnSeam[(int)cornerTable.Vertex(cornerTable.Previous(cornerId))] = true;
+                    _isVertexOnSeam[(int)cornerTable.Vertex(cornerTable.Next(oppositeCorner))] = true;
+                    _isVertexOnSeam[(int)cornerTable.Vertex(cornerTable.Previous(oppositeCorner))] = true;
+                    break;
+                }
+            }
+        }
+        RecomputeVertices(mesh, attribute);
+    }
+
     public void AddSeamEdge(uint corner)
     {
         Assertions.ThrowIfNot(ValenceCache.IsCacheEmpty());
