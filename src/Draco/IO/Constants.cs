@@ -59,6 +59,30 @@ internal static class Constants
         public const byte RightFaceEdge = 1;
     }
 
+    public static readonly byte[] EdgeBreakerTopologyBitPatternLength = [1, 3, 0, 3, 0, 3, 0, 3];
+
+    public static readonly byte[] EdgeBreakerTopologyToSymbolId =
+    [
+        EdgeBreakerSymbol.C,
+        EdgeBreakerSymbol.S,
+        EdgeBreakerSymbol.Invalid,
+        EdgeBreakerSymbol.L,
+        EdgeBreakerSymbol.Invalid,
+        EdgeBreakerSymbol.R,
+        EdgeBreakerSymbol.Invalid,
+        EdgeBreakerSymbol.E
+    ];
+
+    public static class EdgeBreakerSymbol
+    {
+        public const byte C = 0;
+        public const byte S = 1;
+        public const byte L = 2;
+        public const byte R = 3;
+        public const byte E = 4;
+        public const byte Invalid = 5;
+    }
+
     public static readonly byte[] EdgeBreakerSymbolToTopologyId =
     [
         EdgeBreakerTopologyBitPattern.C,
