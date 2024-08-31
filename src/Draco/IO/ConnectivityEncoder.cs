@@ -166,7 +166,7 @@ internal abstract class ConnectivityEncoder(Config config)
         }
     }
 
+    public virtual void EncodeAttributesEncoderIdentifier(EncoderBuffer encoderBuffer, int attributeEncoderId) { }
     public abstract void GenerateAttributesEncoder(int attributeEncoderId);
-    public abstract void EncodeAttributesEncoderIdentifier(EncoderBuffer encoderBuffer, int attributeEncoderId);
     public abstract void ComputeNumberOfEncodedPoints();
 }
