@@ -55,7 +55,7 @@ internal static class Constants
 
     public static class EdgeFaceName
     {
-        public const sbyte LeftFaceEdge = 0;
+        public const byte LeftFaceEdge = 0;
         public const byte RightFaceEdge = 1;
     }
 
