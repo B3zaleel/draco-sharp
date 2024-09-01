@@ -2,6 +2,7 @@ namespace Draco.IO.Enums;
 
 public static class ConfigOptionName
 {
+    public const string EncodingMethod = "encoding_method";
     public const string EncodingSpeed = "encoding_speed";
     public const string DecodingSpeed = "decoding_speed";
     public const string CompressConnectivity = "compress_connectivity";

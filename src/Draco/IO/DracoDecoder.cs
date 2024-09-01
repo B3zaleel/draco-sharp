@@ -36,6 +36,7 @@ public class DracoDecoder
         {
             Header = header,
             Metadata = metadata,
+            ConnectedData = connectivityDecoder.PointCloud!,
             Attributes = connectivityDecoder.PointCloud!.Attributes
         };
     }
