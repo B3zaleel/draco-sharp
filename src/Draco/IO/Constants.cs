@@ -120,6 +120,9 @@ internal static class Constants
     public const ushort LRAnsBase = 4096;
     public const ushort TaggedRAnsBase = 16384;
     public const ushort TaggedRAnsPrecision = 4096;
+    public const byte MaxTagSymbolBitLength = 32;
+    public const byte MaxRawEncodingBitLength = 18;
+    public const byte DefaultSymbolCodingCompressionLevel = 7;
 
     public static class SymbolCoding
     {
