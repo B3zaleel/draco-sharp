@@ -9,6 +9,10 @@ internal static class Constants
     public const byte MinorVersion = 2;
     public const string BitOperationDisallowedMessage = "Cannot execute this whilst bit mode is not on";
     public const string NonBitOperationDisallowedMessage = "Cannot execute this whilst bit mode is on";
+    /// <summary>
+    /// The default maximum speed for both encoding/decoding.
+    /// </summary>
+    public const byte DefaultSpeed = 5;
 
     public static ushort BitStreamVersion(byte majorVersion, byte minorVersion) => (ushort)((majorVersion << 8) | minorVersion);
 
@@ -51,8 +55,32 @@ internal static class Constants
 
     public static class EdgeFaceName
     {
-        public const sbyte LeftFaceEdge = 0;
+        public const byte LeftFaceEdge = 0;
         public const byte RightFaceEdge = 1;
+    }
+
+    public static readonly byte[] EdgeBreakerTopologyBitPatternLength = [1, 3, 0, 3, 0, 3, 0, 3];
+
+    public static readonly byte[] EdgeBreakerTopologyToSymbolId =
+    [
+        EdgeBreakerSymbol.C,
+        EdgeBreakerSymbol.S,
+        EdgeBreakerSymbol.Invalid,
+        EdgeBreakerSymbol.L,
+        EdgeBreakerSymbol.Invalid,
+        EdgeBreakerSymbol.R,
+        EdgeBreakerSymbol.Invalid,
+        EdgeBreakerSymbol.E
+    ];
+
+    public static class EdgeBreakerSymbol
+    {
+        public const byte C = 0;
+        public const byte S = 1;
+        public const byte L = 2;
+        public const byte R = 3;
+        public const byte E = 4;
+        public const byte Invalid = 5;
     }
 
     public static readonly byte[] EdgeBreakerSymbolToTopologyId =
@@ -92,6 +120,9 @@ internal static class Constants
     public const ushort LRAnsBase = 4096;
     public const ushort TaggedRAnsBase = 16384;
     public const ushort TaggedRAnsPrecision = 4096;
+    public const byte MaxTagSymbolBitLength = 32;
+    public const byte MaxRawEncodingBitLength = 18;
+    public const byte DefaultSymbolCodingCompressionLevel = 7;
 
     public static class SymbolCoding
     {

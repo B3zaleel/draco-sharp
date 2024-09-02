@@ -10,6 +10,15 @@ internal sealed class EncoderBuffer : IDisposable
     private byte _bitBufferIndex = 0;
     private readonly BinaryWriter _binaryWriter;
 
+    public byte[] Data
+    {
+        get
+        {
+            var buffer = new byte[_binaryWriter.BaseStream.Length];
+            _binaryWriter.BaseStream.Read(buffer, 0, (int)_binaryWriter.BaseStream.Length);
+            return buffer;
+        }
+    }
     public ushort BitStreamVersion { get; set; }
 
     public EncoderBuffer(BinaryWriter binaryWriter)

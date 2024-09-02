@@ -1,3 +1,4 @@
+using Draco.IO.Enums;
 using Draco.IO.Extensions;
 
 namespace Draco.IO.Mesh;
@@ -22,6 +23,23 @@ internal class CornerTable
     public CornerTable()
     {
         ValenceCache = new(this);
+    }
+
+    public CornerTable(List<uint[]> faces)
+    {
+        ValenceCache = new(this);
+        _cornerToVertexMap.Fill(faces.Count * 3, Constants.kInvalidVertexIndex);
+        for (uint faceIndex = 0; faceIndex < faces.Count; ++faceIndex)
+        {
+            for (byte i = 0; i < 3; ++i)
+            {
+                _cornerToVertexMap[(int)FirstCorner(faceIndex) + i] = faces[(int)faceIndex][i];
+            }
+        }
+        int numVertices = -1;
+        ComputeOppositeCorners(ref numVertices);
+        BreakNonManifoldEdges();
+        ComputeVertexCorners(numVertices);
     }
 
     public void Reset(int numFaces)
@@ -278,10 +296,9 @@ internal class CornerTable
         }
     }
 
-    public void ComputeOppositeCorners(ref int? numVertices)
+    public void ComputeOppositeCorners(ref int numVertices)
     {
         Assertions.ThrowIfNot(ValenceCache.IsCacheEmpty());
-        Assertions.ThrowIf(numVertices == null);
         _oppositeCorners.Resize(CornersCount, Constants.kInvalidCornerIndex);
         List<int> numCornersOnVertices = [];
         numCornersOnVertices.Fill(CornersCount, 0);
@@ -549,6 +566,51 @@ internal class CornerTable
         {
             _cornerToVertexMap[(int)cornerId] = vertex;
         }
+    }
+
+    public static CornerTable? CreateFromPositionAttribute(Mesh mesh)
+    {
+        return CreateFromAttribute(mesh, GeometryAttributeType.Position);
+    }
+
+    public static CornerTable? CreateFromAttribute(Mesh mesh, GeometryAttributeType attributeType)
+    {
+        var attribute = mesh.GetNamedAttribute(attributeType);
+        if (attribute == null)
+        {
+            return null;
+        }
+
+        var faces = new List<uint[]>(mesh.FacesCount);
+        for (uint i = 0; i < mesh.FacesCount; ++i)
+        {
+            var newFace = new uint[3];
+            var face = mesh.GetFace(i);
+
+            for (byte j = 0; j < 3; ++j)
+            {
+                newFace[j] = attribute.MappedIndex((uint)face[j]);
+            }
+            faces.Add(newFace);
+        }
+        return new CornerTable(faces);
+    }
+
+    public static CornerTable? CreateFromAllAttributes(Mesh mesh)
+    {
+        var faces = new List<uint[]>(mesh.FacesCount);
+        for (uint i = 0; i < mesh.FacesCount; ++i)
+        {
+            var newFace = new uint[3];
+            var face = mesh.GetFace(i);
+
+            for (byte j = 0; j < 3; ++j)
+            {
+                newFace[j] = (uint)face[j];
+            }
+            faces.Add(newFace);
+        }
+        return new CornerTable(faces);
     }
 
     private class VertexEdgePair
