@@ -19,14 +19,7 @@ internal class SequentialAttributeEncoder
     public byte UniqueId { get => (byte)SequentialAttributeEncoderType.Generic; }
     public ConnectivityEncoder? ConnectivityEncoder { get; private set; }
 
-    public SequentialAttributeEncoder() { }
-
     public SequentialAttributeEncoder(ConnectivityEncoder connectivityEncoder, int attributeId)
-    {
-        Init(connectivityEncoder, attributeId);
-    }
-
-    public virtual void Init(ConnectivityEncoder connectivityEncoder, int attributeId)
     {
         ConnectivityEncoder = connectivityEncoder;
         Attribute = connectivityEncoder.PointCloud?.GetAttributeById(attributeId);
