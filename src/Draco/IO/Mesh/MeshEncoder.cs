@@ -9,6 +9,7 @@ internal abstract class MeshEncoder(Config config) : ConnectivityEncoder(config)
 {
     public Mesh Mesh { get; protected set; } = new();
     public override PointCloud.PointCloud? PointCloud { get => Mesh; }
+    public override int GeometryType { get => Constants.EncodingType.TriangularMesh; }
     public virtual CornerTable? CornerTable { get; protected set; }
     public int EncodedFacesCount { get; protected set; }
 

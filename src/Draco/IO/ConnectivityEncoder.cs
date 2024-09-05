@@ -7,6 +7,7 @@ internal abstract class ConnectivityEncoder(Config config)
 {
     public Config Config { get; } = config;
     public int BitStreamVersion { get; set; }
+    public virtual int GeometryType { get; }
     public virtual PointCloud.PointCloud? PointCloud { get; }
     public List<AttributesEncoder> AttributesEncoders { get; } = [];
     public List<int> AttributeToEncoderMap { get; } = [];
