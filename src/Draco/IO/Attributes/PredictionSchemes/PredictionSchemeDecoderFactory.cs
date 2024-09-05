@@ -6,7 +6,7 @@ namespace Draco.IO.Attributes.PredictionSchemes;
 
 internal static class PredictionSchemeDecoderFactory
 {
-    public static IPredictionSchemeDecoder<TDataType>? CreatePredictionSchemeForDecoder<TDataType, TTransform>(PredictionSchemeMethod method, int attributeId, ConnectivityDecoder connectivityDecoder, TTransform transform)
+    public static IPredictionSchemeDecoder<TDataType>? CreatePredictionScheme<TDataType, TTransform>(PredictionSchemeMethod method, int attributeId, ConnectivityDecoder connectivityDecoder, TTransform transform)
         where TDataType : struct,
             IComparisonOperators<TDataType, TDataType, bool>,
             IComparable,
