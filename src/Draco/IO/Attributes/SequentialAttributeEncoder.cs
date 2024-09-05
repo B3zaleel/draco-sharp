@@ -16,7 +16,7 @@ internal class SequentialAttributeEncoder
     public List<int> ParentAttributes { get; set; } = [];
     protected bool IsParentEncoder { get; private set; }
     public int AttributeId { get; private set; } = -1;
-    public byte UniqueId { get => (byte)SequentialAttributeEncoderType.Generic; }
+    public virtual byte UniqueId { get => (byte)SequentialAttributeEncoderType.Generic; }
     public ConnectivityEncoder? ConnectivityEncoder { get; private set; }
 
     public SequentialAttributeEncoder(ConnectivityEncoder connectivityEncoder, int attributeId)
