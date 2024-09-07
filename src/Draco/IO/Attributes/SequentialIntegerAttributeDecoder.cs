@@ -46,7 +46,7 @@ internal class SequentialIntegerAttributeDecoder : SequentialAttributeDecoder
     protected virtual IPredictionSchemeDecoder<int>? CreatePredictionScheme(PredictionSchemeMethod method, PredictionSchemeTransformType transformType)
     {
         return transformType == PredictionSchemeTransformType.Wrap
-            ? PredictionSchemeDecoderFactory.CreatePredictionScheme<int, PredictionSchemeDecodingTransform<int, int>>(method, AttributeId, ConnectivityDecoder!, new PredictionSchemeWrapDecodingTransform<int>())
+            ? PredictionSchemeDecoderFactory.CreatePredictionScheme<int, IPredictionSchemeDecodingTransform<int, int>>(method, AttributeId, ConnectivityDecoder!, new PredictionSchemeWrapDecodingTransform<int>())
             : null;
     }
 

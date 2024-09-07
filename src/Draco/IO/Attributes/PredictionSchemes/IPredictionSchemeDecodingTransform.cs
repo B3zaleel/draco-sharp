@@ -2,21 +2,7 @@ using System.Numerics;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 
-internal class PredictionSchemeDecodingTransform<TDataType> : PredictionSchemeDecodingTransform<TDataType, TDataType>
-    where TDataType : struct,
-        IComparisonOperators<TDataType, TDataType, bool>,
-        IComparable,
-        IEqualityOperators<TDataType, TDataType, bool>,
-        IAdditionOperators<TDataType, TDataType, TDataType>,
-        ISubtractionOperators<TDataType, TDataType, TDataType>,
-        IDivisionOperators<TDataType, TDataType, TDataType>,
-        IMultiplyOperators<TDataType, TDataType, TDataType>,
-        IDecrementOperators<TDataType>,
-        IBitwiseOperators<TDataType, TDataType, TDataType>,
-        IMinMaxValue<TDataType>
-{ }
-
-internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
+internal interface IPredictionSchemeDecodingTransform<TDataType, TCorrectedType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -40,8 +26,8 @@ internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
         IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
         IMinMaxValue<TCorrectedType>
 {
-    protected int ComponentsCount { get; set; }
-    public virtual int QuantizationBits { get; } = -1;
+    public int ComponentsCount { get; set; }
+    public int QuantizationBits { get; }
 
     public virtual void Init(int componentsCount)
     {

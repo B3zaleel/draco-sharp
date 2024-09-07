@@ -18,7 +18,7 @@ internal class MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataTyp
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
+    where TTransform : IPredictionSchemeDecodingTransform<TDataType, TDataType>
 {
     private const int kMaxNumParallelograms = 4;
     private MultiParallelogramMode _selectedMode = MultiParallelogramMode.Optimal;

@@ -17,7 +17,7 @@ internal class PredictionSchemeWrapDecodingTransform<TDataType> : PredictionSche
         IMinMaxValue<TDataType>
 { }
 
-internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeWrapTransform<TDataType, TCorrectedType>
+internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeWrapTransform<TDataType, TCorrectedType>, IPredictionSchemeDecodingTransform<TDataType, TCorrectedType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -41,7 +41,9 @@ internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> 
         IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
         IMinMaxValue<TCorrectedType>
 {
-    public override TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
+    public int QuantizationBits { get; } = -1;
+
+    public TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
     {
         var originalValues = new TDataType[ComponentsCount];
         predictedValues = ClampPredictedValue(predictedValues);
@@ -64,7 +66,7 @@ internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> 
         return originalValues;
     }
 
-    public override void DecodeTransformData(DecoderBuffer decoderBuffer)
+    public void DecodeTransformData(DecoderBuffer decoderBuffer)
     {
         MinValue = decoderBuffer.Read<TDataType>();
         MaxValue = decoderBuffer.Read<TDataType>();

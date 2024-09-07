@@ -18,7 +18,7 @@ internal class PredictionSchemeNormalOctahedronCanonicalizedDecodingTransform<TD
         IMinMaxValue<TDataType>
 { }
 
-internal class PredictionSchemeNormalOctahedronCanonicalizedDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeNormalOctahedronCanonicalizedTransform<TDataType, TCorrectedType>
+internal class PredictionSchemeNormalOctahedronCanonicalizedDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeNormalOctahedronCanonicalizedTransform<TDataType, TCorrectedType>, IPredictionSchemeDecodingTransform<TDataType, TCorrectedType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -42,7 +42,10 @@ internal class PredictionSchemeNormalOctahedronCanonicalizedDecodingTransform<TD
         IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
         IMinMaxValue<TCorrectedType>
 {
-    public override TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
+    public int ComponentsCount { get; set; }
+    public int QuantizationBits { get => _octahedronToolBox.QuantizationBits; }
+
+    public TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
     {
         int[] predicted = [(int)Convert.ChangeType(predictedValues[0], typeof(int)), (int)Convert.ChangeType(predictedValues[1], typeof(int))];
         int[] corrected = [(int)Convert.ChangeType(correctedValues[0], typeof(int)), (int)Convert.ChangeType(correctedValues[1], typeof(int))];
@@ -74,7 +77,7 @@ internal class PredictionSchemeNormalOctahedronCanonicalizedDecodingTransform<TD
         return [(TDataType)Convert.ChangeType(original[0] + CenterValue, typeof(TDataType)), (TDataType)Convert.ChangeType(original[1] + CenterValue, typeof(TDataType))];
     }
 
-    public override void DecodeTransformData(DecoderBuffer decoderBuffer)
+    public void DecodeTransformData(DecoderBuffer decoderBuffer)
     {
         MaxQuantizedValue = (int)Convert.ChangeType(decoderBuffer.Read<TDataType>(), typeof(int));
         decoderBuffer.ReadInt32();

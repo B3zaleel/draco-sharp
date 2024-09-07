@@ -17,7 +17,7 @@ internal class PredictionSchemeNormalOctahedronDecodingTransform<TDataType> : Pr
         IMinMaxValue<TDataType>
 { }
 
-internal class PredictionSchemeNormalOctahedronDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeNormalOctahedronTransform<TDataType, TCorrectedType>
+internal class PredictionSchemeNormalOctahedronDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeNormalOctahedronTransform<TDataType, TCorrectedType>, IPredictionSchemeDecodingTransform<TDataType, TCorrectedType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -41,7 +41,10 @@ internal class PredictionSchemeNormalOctahedronDecodingTransform<TDataType, TCor
         IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
         IMinMaxValue<TCorrectedType>
 {
-    public override TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
+    public int ComponentsCount { get; set; }
+    public int QuantizationBits { get => _octahedronToolBox.QuantizationBits; }
+
+    public TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
     {
         int[] predicted = [(int)Convert.ChangeType(predictedValues[0], typeof(int)), (int)Convert.ChangeType(predictedValues[1], typeof(int))];
         int[] corrected = [(int)Convert.ChangeType(correctedValues[0], typeof(int)), (int)Convert.ChangeType(correctedValues[1], typeof(int))];
@@ -63,7 +66,7 @@ internal class PredictionSchemeNormalOctahedronDecodingTransform<TDataType, TCor
         return [(TDataType)Convert.ChangeType((uint)original[0] + (uint)CenterValue, typeof(TDataType)), (TDataType)Convert.ChangeType((uint)original[1] + (uint)CenterValue, typeof(TDataType))];
     }
 
-    public override void DecodeTransformData(DecoderBuffer decoderBuffer)
+    public void DecodeTransformData(DecoderBuffer decoderBuffer)
     {
         MaxQuantizedValue = (int)Convert.ChangeType(decoderBuffer.Read<TDataType>(), typeof(int));
         if (decoderBuffer.BitStreamVersion < Constants.BitStreamVersion(2, 2))

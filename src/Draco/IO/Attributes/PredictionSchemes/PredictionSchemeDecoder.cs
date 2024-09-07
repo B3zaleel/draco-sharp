@@ -15,7 +15,7 @@ internal abstract class PredictionSchemeDecoder<TDataType, TTransform>(PointAttr
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
+    where TTransform : IPredictionSchemeDecodingTransform<TDataType, TDataType>
 {
     public abstract PredictionSchemeMethod Method { get; }
     public TTransform Transform { get; set; } = transform;
