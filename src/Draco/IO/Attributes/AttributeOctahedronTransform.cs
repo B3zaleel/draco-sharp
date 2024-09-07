@@ -41,6 +41,11 @@ internal class AttributeOctahedronTransform : AttributeTransform
         _quantizationBits = decoderBuffer.ReadByte();
     }
 
+    public override void EncodeParameters(EncoderBuffer encoderBuffer)
+    {
+        encoderBuffer.WriteByte((byte)_quantizationBits);
+    }
+
     public override void TransformAttribute(PointAttribute attribute, List<uint> pointIds, PointAttribute targetAttribute)
     {
         var portableAttributeDataPosition = targetAttribute.GetAddress(0);

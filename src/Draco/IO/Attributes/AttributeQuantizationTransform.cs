@@ -68,6 +68,19 @@ internal class AttributeQuantizationTransform : AttributeTransform
         Assertions.ThrowIfNot(IsQuantizationValid(QuantizationBits));
     }
 
+    public override void EncodeParameters(EncoderBuffer encoderBuffer)
+    {
+        if (IsInitialized)
+        {
+            for (int i = 0; i < MinValues.Count; ++i)
+            {
+                encoderBuffer.Write(MinValues[i]);
+            }
+            encoderBuffer.WriteSingle(Range);
+            encoderBuffer.WriteByte((byte)QuantizationBits);
+        }
+    }
+
     public override void TransformAttribute(PointAttribute attribute, List<uint> pointIds, PointAttribute targetAttribute)
     {
         Assertions.ThrowIfNot(IsInitialized);
