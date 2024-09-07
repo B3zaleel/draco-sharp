@@ -1,3 +1,4 @@
+using Draco.IO.Enums;
 using Draco.IO.Extensions;
 
 namespace Draco.IO.Attributes;
@@ -7,17 +8,19 @@ internal class SequentialAttributeEncodersController : AttributesEncoder
     private readonly List<uint> _pointIds = [];
     private readonly List<bool> _sequentialEncoderMarkedAsParent = [];
     private readonly PointsSequencer _sequencer;
-    private readonly List<SequentialAttributeEncoder> _sequentialEncoders = [];
+    private List<SequentialAttributeEncoder> _sequentialEncoders = [];
 
     public SequentialAttributeEncodersController(PointsSequencer sequencer, ConnectivityEncoder? connectivityEncoder, PointCloud.PointCloud? pointCloud) : base(connectivityEncoder, pointCloud)
     {
         _sequencer = sequencer;
+        CreateSequentialEncoders(connectivityEncoder!);
     }
 
     public SequentialAttributeEncodersController(PointsSequencer sequencer, int pointAttributeId, ConnectivityEncoder? connectivityEncoder, PointCloud.PointCloud? pointCloud) : base(connectivityEncoder, pointCloud)
     {
         _sequencer = sequencer;
         AddAttributeId(pointAttributeId);
+        CreateSequentialEncoders(connectivityEncoder!);
     }
 
     public override void EncodeAttributesData(EncoderBuffer encoderBuffer)
@@ -95,5 +98,51 @@ internal class SequentialAttributeEncodersController : AttributesEncoder
         {
             _sequentialEncoders[i].TransformAttributeToPortableFormat(_pointIds);
         }
+    }
+
+    public void CreateSequentialEncoders(ConnectivityEncoder connectivityEncoder)
+    {
+        _sequentialEncoders = new List<SequentialAttributeEncoder>(AttributesCount);
+        for (int i = 0; i < AttributesCount; ++i)
+        {
+            _sequentialEncoders.Add(CreateSequentialEncoder(connectivityEncoder, i));
+            if (i < _sequentialEncoderMarkedAsParent.Count)
+            {
+                if (_sequentialEncoderMarkedAsParent[i])
+                {
+                    _sequentialEncoders[i].MarkParentAttribute();
+                }
+            }
+        }
+    }
+
+    private SequentialAttributeEncoder CreateSequentialEncoder(ConnectivityEncoder connectivityEncoder, int i)
+    {
+        int attributeId = GetAttributeId(i);
+        var attribute = ConnectivityEncoder!.PointCloud!.GetAttributeById(attributeId);
+
+        switch (attribute.DataType)
+        {
+            case DataType.UInt8:
+            case DataType.Int8:
+            case DataType.UInt16:
+            case DataType.Int16:
+            case DataType.UInt32:
+            case DataType.Int32:
+                return new SequentialIntegerAttributeEncoder(connectivityEncoder, attributeId);
+            case DataType.Float32:
+                {
+                    if (ConnectivityEncoder.Config.GetAttributeOption(attributeId, ConfigOptionName.Attribute.QuantizationBits, -1) > 0)
+                    {
+                        return attribute.AttributeType == GeometryAttributeType.Normal
+                            ? new SequentialNormalAttributeEncoder(connectivityEncoder, attributeId)
+                            : new SequentialQuantizationAttributeEncoder(connectivityEncoder, attributeId);
+                    }
+                    break;
+                }
+            default:
+                break;
+        }
+        return new SequentialAttributeEncoder(connectivityEncoder, attributeId);
     }
 }
