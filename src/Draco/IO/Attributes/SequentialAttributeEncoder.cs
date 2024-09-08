@@ -14,7 +14,7 @@ internal class SequentialAttributeEncoder
         protected set => _portableAttribute = value;
     }
     public List<int> ParentAttributes { get; set; } = [];
-    protected bool IsParentEncoder { get; private set; }
+    protected bool IsParentEncoder { get; private set; } = false;
     public int AttributeId { get; private set; } = -1;
     public virtual byte UniqueId { get => (byte)SequentialAttributeEncoderType.Generic; }
     public ConnectivityEncoder? ConnectivityEncoder { get; private set; }
@@ -24,6 +24,7 @@ internal class SequentialAttributeEncoder
         ConnectivityEncoder = connectivityEncoder;
         Attribute = connectivityEncoder.PointCloud?.GetAttributeById(attributeId);
         AttributeId = attributeId;
+        IsParentEncoder = false;
     }
 
     public void MarkParentAttribute()
