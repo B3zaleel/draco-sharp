@@ -55,6 +55,14 @@ internal class AttributeQuantizationTransform : AttributeTransform
         data.AppendParameterValue(Range);
     }
 
+    public void SetParameters(int quantizationBits, List<float> minValues, int numComponents, float range)
+    {
+        Assertions.ThrowIfNot(IsQuantizationValid(quantizationBits));
+        QuantizationBits = quantizationBits;
+        MinValues = minValues;
+        Range = range;
+    }
+
     public override void DecodeParameters(DecoderBuffer decoderBuffer, PointAttribute targetAttribute)
     {
         MinValues = [];
