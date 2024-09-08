@@ -63,6 +63,50 @@ internal class AttributeQuantizationTransform : AttributeTransform
         Range = range;
     }
 
+    public void ComputeParameters(PointAttribute attribute, int quantizationBits)
+    {
+        Assertions.ThrowIf(QuantizationBits != -1, "Already initialized.");
+        Assertions.ThrowIfNot(IsQuantizationValid(quantizationBits));
+        QuantizationBits = quantizationBits;
+        Range = 0.0f;
+        var attributeValue = attribute.GetValue<float>(0, attribute.NumComponents);
+        MinValues = new List<float>(attribute.GetValue<float>(0, attribute.NumComponents));
+        var maxValues = attribute.GetValue<float>(0, attribute.NumComponents);
+
+        for (uint i = 1; i < attribute.UniqueEntriesCount; ++i)
+        {
+            attributeValue = attribute.GetValue<float>(i, attribute.NumComponents);
+
+            for (int c = 0; c < attribute.NumComponents; ++c)
+            {
+                Assertions.ThrowIf(float.IsNaN(attributeValue[c]), "NaN values are not supported.");
+                if (MinValues[c] > attributeValue[c])
+                {
+                    MinValues[c] = attributeValue[c];
+                }
+                if (maxValues[c] < attributeValue[c])
+                {
+                    maxValues[c] = attributeValue[c];
+                }
+            }
+        }
+
+        for (int c = 0; c < attribute.NumComponents; ++c)
+        {
+            Assertions.ThrowIf(float.IsNaN(MinValues[c]) || float.IsInfinity(MinValues[c]) || float.IsNaN(maxValues[c]) || float.IsInfinity(maxValues[c]), "NaN values are not supported.");
+            var diff = maxValues[c] - MinValues[c];
+            if (diff > Range)
+            {
+                Range = diff;
+            }
+        }
+
+        if (Range == 0.0f)
+        {
+            Range = 1.0f;
+        }
+    }
+
     public override void DecodeParameters(DecoderBuffer decoderBuffer, PointAttribute targetAttribute)
     {
         MinValues = [];
