@@ -123,6 +123,8 @@ internal static class Constants
     public const byte MaxTagSymbolBitLength = 32;
     public const byte MaxRawEncodingBitLength = 18;
     public const byte DefaultSymbolCodingCompressionLevel = 7;
+    // Encoding constants
+    public const byte ConstrainedMultiParallelogramMaxNumParallelograms = 4;
 
     public static class SymbolCoding
     {
