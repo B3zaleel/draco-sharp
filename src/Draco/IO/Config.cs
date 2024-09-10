@@ -1,4 +1,5 @@
 using Draco.IO.Enums;
+using Draco.IO.Extensions;
 
 namespace Draco.IO;
 
@@ -91,5 +92,11 @@ public class Config
     public bool IsAttributeOptionSet(int attributeKey, string name)
     {
         return (_attributeConfigValues.ContainsKey(attributeKey) && _attributeConfigValues[attributeKey].ContainsKey(name)) || IsOptionSet(name);
+    }
+
+    public void SetSymbolEncodingCompressionLevel(int compressionLevel)
+    {
+        Assertions.ThrowIf(compressionLevel < 0 || compressionLevel > 10, "Invalid compression level");
+        SetOption(ConfigOptionName.SymbolEncodingCompressionLevel, compressionLevel);
     }
 }
