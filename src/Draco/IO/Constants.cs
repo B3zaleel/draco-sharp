@@ -223,4 +223,71 @@ internal static class Constants
         }
         return result;
     }
+
+    public static bool NextPermutation<T>(T[] items)
+        where T : IComparable
+    {
+        var begin = 0;
+        var end = items.Length;
+
+        if (begin == end)
+        {
+            return false;
+        }
+
+        var i = begin;
+        ++i;
+        if (i == end)
+        {
+            return false;
+        }
+
+        i = end;
+        --i;
+
+        while (true)
+        {
+            var j = i;
+            --i;
+
+            if (items[i].CompareTo(items[j]) < 0)
+            {
+                var k = end;
+
+                while (items[i].CompareTo(items[--k]) >= 0)
+                {
+                    // Pass
+                }
+
+                Swap(items, i, k);
+                Reverse(items, j);
+                return true;
+            }
+
+            if (i == begin)
+            {
+                Reverse(items, begin);
+                return false;
+            }
+        }
+    }
+
+    private static void Reverse<T>(T[] items, int start)
+    {
+        int i = start, j = items.Length - 1;
+
+        while (i < j)
+        {
+            Swap(items, i, j);
+            i++;
+            j--;
+        }
+    }
+
+    private static void Swap<T>(T[] items, int i, int j)
+    {
+        T temp = items[i];
+        items[i] = items[j];
+        items[j] = temp;
+    }
 }
