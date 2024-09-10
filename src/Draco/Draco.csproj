@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <PackageId>B3zaleel.Draco</PackageId>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Authors>Bezaleel Olakunori</Authors>
     <Description>Decode and encode Draco streams.</Description>
     <Copyright>Copyright © Bezaleel Olakunori 2024</Copyright>
