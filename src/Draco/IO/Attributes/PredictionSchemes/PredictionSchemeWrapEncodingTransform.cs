@@ -1,9 +1,8 @@
 using System.Numerics;
-using Draco.IO.Extensions;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 
-internal class PredictionSchemeWrapDecodingTransform<TDataType> : PredictionSchemeWrapDecodingTransform<TDataType, TDataType>
+internal class PredictionSchemeWrapEncodingTransform<TDataType> : PredictionSchemeWrapEncodingTransform<TDataType, TDataType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -17,7 +16,7 @@ internal class PredictionSchemeWrapDecodingTransform<TDataType> : PredictionSche
         IMinMaxValue<TDataType>
 { }
 
-internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> : PredictionSchemeWrapTransform<TDataType, TCorrectedType>, IPredictionSchemeDecodingTransform<TDataType, TCorrectedType>
+internal class PredictionSchemeWrapEncodingTransform<TDataType, TCorrectedType> : PredictionSchemeWrapTransform<TDataType, TCorrectedType>, IPredictionSchemeEncodingTransform<TDataType, TCorrectedType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -43,34 +42,56 @@ internal class PredictionSchemeWrapDecodingTransform<TDataType, TCorrectedType> 
 {
     public int QuantizationBits { get; } = -1;
 
-    public TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
+    public void Init(TDataType[] originalData, int size, int componentsCount)
     {
-        var originalValues = new TDataType[ComponentsCount];
-        predictedValues = ClampPredictedValue(predictedValues);
-        var predictedValuesAsUint = Constants.ReinterpretCast<TDataType, uint>(predictedValues);
-        var correctedValuesAsUint = Constants.ReinterpretCast<TCorrectedType, uint>(correctedValues);
+        Init(componentsCount);
+        if (size == 0)
+        {
+            return;
+        }
+        var minValue = originalData[0];
+        var maxValue = minValue;
+
+        for (int i = 1; i < size; ++i)
+        {
+            if (originalData[i] < minValue)
+            {
+                minValue = originalData[i];
+            }
+            else if (originalData[i] > maxValue)
+            {
+                maxValue = originalData[i];
+            }
+        }
+        MinValue = minValue;
+        MaxValue = maxValue;
+        InitCorrectionBounds();
+    }
+
+    public TCorrectedType[] ComputeCorrection(TDataType[] originalValues, TDataType[] predictedValues)
+    {
+        var correctedValues = new TCorrectedType[ComponentsCount];
 
         for (int i = 0; i < ComponentsCount; ++i)
         {
-            originalValues[i] = Constants.StaticCast<uint, TDataType>(predictedValuesAsUint[i] + correctedValuesAsUint[i]);
+            predictedValues = ClampPredictedValue(predictedValues);
+            correctedValues[i] = Constants.ConstCast<TDataType, TCorrectedType>(originalValues[i] - predictedValues[i]);
 
-            if (originalValues[i] > MaxValue)
+            if (Constants.ConstCast<TCorrectedType, TDataType>(correctedValues[i]) < MinCorrection)
             {
-                originalValues[i] -= MaxDiff;
+                correctedValues[i] += Constants.ConstCast<TDataType, TCorrectedType>(MaxDiff);
             }
-            else if (originalValues[i] < MinValue)
+            else if (Constants.ConstCast<TCorrectedType, TDataType>(correctedValues[i]) > MaxCorrection)
             {
-                originalValues[i] += MaxDiff;
+                correctedValues[i] -= Constants.ConstCast<TDataType, TCorrectedType>(MaxDiff);
             }
         }
-        return originalValues;
+        return correctedValues;
     }
 
-    public void DecodeTransformData(DecoderBuffer decoderBuffer)
+    public void EncodeTransformData(EncoderBuffer encoderBuffer)
     {
-        MinValue = decoderBuffer.Read<TDataType>();
-        MaxValue = decoderBuffer.Read<TDataType>();
-        Assertions.ThrowIf(MinValue > MaxValue);
-        InitCorrectionBounds();
+        encoderBuffer.Write(MinValue);
+        encoderBuffer.Write(MaxValue);
     }
 }

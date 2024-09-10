@@ -11,6 +11,11 @@ internal class RAnsBitEncoder
     private byte _numLocalBits = 0;
     private EncoderBuffer? _encoderBuffer = null;
 
+    public void StartEncoding()
+    {
+        Clear();
+    }
+
     public void StartEncoding(EncoderBuffer encoderBuffer)
     {
         _encoderBuffer = encoderBuffer;

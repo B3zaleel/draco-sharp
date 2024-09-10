@@ -14,23 +14,17 @@ internal class SequentialAttributeEncoder
         protected set => _portableAttribute = value;
     }
     public List<int> ParentAttributes { get; set; } = [];
-    protected bool IsParentEncoder { get; private set; }
+    protected bool IsParentEncoder { get; private set; } = false;
     public int AttributeId { get; private set; } = -1;
-    public byte UniqueId { get => (byte)SequentialAttributeEncoderType.Generic; }
+    public virtual byte UniqueId { get => (byte)SequentialAttributeEncoderType.Generic; }
     public ConnectivityEncoder? ConnectivityEncoder { get; private set; }
 
-    public SequentialAttributeEncoder() { }
-
     public SequentialAttributeEncoder(ConnectivityEncoder connectivityEncoder, int attributeId)
-    {
-        Init(connectivityEncoder, attributeId);
-    }
-
-    public virtual void Init(ConnectivityEncoder connectivityEncoder, int attributeId)
     {
         ConnectivityEncoder = connectivityEncoder;
         Attribute = connectivityEncoder.PointCloud?.GetAttributeById(attributeId);
         AttributeId = attributeId;
+        IsParentEncoder = false;
     }
 
     public void MarkParentAttribute()

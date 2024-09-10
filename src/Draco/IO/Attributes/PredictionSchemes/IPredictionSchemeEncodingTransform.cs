@@ -1,22 +1,9 @@
 using System.Numerics;
+using Draco.IO.Enums;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 
-internal class PredictionSchemeDecodingTransform<TDataType> : PredictionSchemeDecodingTransform<TDataType, TDataType>
-    where TDataType : struct,
-        IComparisonOperators<TDataType, TDataType, bool>,
-        IComparable,
-        IEqualityOperators<TDataType, TDataType, bool>,
-        IAdditionOperators<TDataType, TDataType, TDataType>,
-        ISubtractionOperators<TDataType, TDataType, TDataType>,
-        IDivisionOperators<TDataType, TDataType, TDataType>,
-        IMultiplyOperators<TDataType, TDataType, TDataType>,
-        IDecrementOperators<TDataType>,
-        IBitwiseOperators<TDataType, TDataType, TDataType>,
-        IMinMaxValue<TDataType>
-{ }
-
-internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
+internal interface IPredictionSchemeEncodingTransform<TDataType, TCorrectedType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -40,26 +27,27 @@ internal class PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
         IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
         IMinMaxValue<TCorrectedType>
 {
-    protected int ComponentsCount { get; set; }
-    public virtual int QuantizationBits { get; } = -1;
+    public int ComponentsCount { get; set; }
+    public int QuantizationBits { get; }
+    public PredictionSchemeTransformType Type { get => PredictionSchemeTransformType.Delta; }
 
-    public virtual void Init(int componentsCount)
+    public virtual void Init(TDataType[] originalData, int size, int componentsCount)
     {
         ComponentsCount = componentsCount;
     }
 
-    public virtual TDataType[] ComputeOriginalValue(TDataType[] predictedValues, TCorrectedType[] correctedValues)
+    public virtual TCorrectedType[] ComputeCorrectionValue(TDataType[] originalValues, TDataType[] predictedValues)
     {
-        var originalValues = new TDataType[ComponentsCount];
+        var correctionValues = new TCorrectedType[ComponentsCount];
 
         for (int i = 0; i < ComponentsCount; ++i)
         {
-            originalValues[i] = predictedValues[i] + (TDataType)Convert.ChangeType(correctedValues[i], typeof(TDataType))!;
+            correctionValues[i] = (TCorrectedType)Convert.ChangeType(originalValues[i] - predictedValues[i], typeof(TCorrectedType))!;
         }
-        return originalValues;
+        return correctionValues;
     }
 
-    public virtual void DecodeTransformData(DecoderBuffer decoderBuffer) { }
+    public virtual void EncodeTransformData(EncoderBuffer encoderBuffer) { }
 
     public virtual bool AreCorrectionsPositive()
     {

@@ -18,7 +18,7 @@ internal class PredictionSchemeWrapTransform<TDataType> : PredictionSchemeWrapTr
         IMinMaxValue<TDataType>
 { }
 
-internal class PredictionSchemeWrapTransform<TDataType, TCorrectedType> : PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
+internal class PredictionSchemeWrapTransform<TDataType, TCorrectedType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -42,6 +42,7 @@ internal class PredictionSchemeWrapTransform<TDataType, TCorrectedType> : Predic
         IBitwiseOperators<TCorrectedType, TCorrectedType, TCorrectedType>,
         IMinMaxValue<TCorrectedType>
 {
+    public int ComponentsCount { get; set; }
     private readonly List<TDataType> _clampedValue = [];
     private TDataType One { get => (TDataType)Convert.ChangeType(1, typeof(TDataType)); }
     private TDataType Zero { get => (TDataType)Convert.ChangeType(0, typeof(TDataType)); }
@@ -52,13 +53,13 @@ internal class PredictionSchemeWrapTransform<TDataType, TCorrectedType> : Predic
     public TDataType MinCorrection { get; private set; }
     public TDataType MaxCorrection { get; private set; }
 
-    public override void Init(int componentsCount)
+    public void Init(int componentsCount)
     {
         ComponentsCount = componentsCount;
         _clampedValue.Resize(ComponentsCount, (TDataType)default!);
     }
 
-    public override bool AreCorrectionsPositive()
+    public bool AreCorrectionsPositive()
     {
         return false;
     }

@@ -20,8 +20,8 @@ internal class SequentialNormalAttributeDecoder : SequentialIntegerAttributeDeco
     {
         return transformType switch
         {
-            PredictionSchemeTransformType.NormalOctahedron => PredictionSchemeDecoderFactory.CreatePredictionSchemeForDecoder<int, PredictionSchemeDecodingTransform<int, int>>(method, AttributeId, ConnectivityDecoder!, new PredictionSchemeNormalOctahedronDecodingTransform<int>()),
-            PredictionSchemeTransformType.NormalOctahedronCanonicalized => PredictionSchemeDecoderFactory.CreatePredictionSchemeForDecoder<int, PredictionSchemeDecodingTransform<int, int>>(method, AttributeId, ConnectivityDecoder!, new PredictionSchemeNormalOctahedronDecodingTransform<int>()),
+            PredictionSchemeTransformType.NormalOctahedron => PredictionSchemeDecoderFactory.CreatePredictionScheme<int, IPredictionSchemeDecodingTransform<int, int>>(method, AttributeId, ConnectivityDecoder!, new PredictionSchemeNormalOctahedronDecodingTransform<int>()),
+            PredictionSchemeTransformType.NormalOctahedronCanonicalized => PredictionSchemeDecoderFactory.CreatePredictionScheme<int, IPredictionSchemeDecodingTransform<int, int>>(method, AttributeId, ConnectivityDecoder!, new PredictionSchemeNormalOctahedronDecodingTransform<int>()),
             _ => null
         };
     }

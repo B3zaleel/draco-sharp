@@ -1,4 +1,5 @@
 using Draco.IO.Enums;
+using Draco.IO.Extensions;
 
 namespace Draco.IO;
 
@@ -29,6 +30,11 @@ public class Config
         return _configValues.ContainsKey(name) ? (T)_configValues[name] : defaultValue;
     }
 
+    public T[] GetOptionValues<T>(string name, int count)
+    {
+        return _configValues.ContainsKey(name) ? (T[])_configValues[name] : [];
+    }
+
     public void SetOption<T>(string name, T value)
     {
         if (_configValues.ContainsKey(name))
@@ -55,6 +61,15 @@ public class Config
         return GetOption(name, defaultValue);
     }
 
+    public T[] GetAttributeOptionValues<T>(int attributeKey, string name, int count)
+    {
+        if (_attributeConfigValues.ContainsKey(attributeKey))
+        {
+            return _attributeConfigValues[attributeKey].ContainsKey(name) ? (T[])_attributeConfigValues[attributeKey][name] : [];
+        }
+        return GetOptionValues<T>(name, count);
+    }
+
     public void SetAttributeOption<T>(int attributeKey, string name, T value)
     {
         if (_attributeConfigValues.ContainsKey(attributeKey))
@@ -77,5 +92,11 @@ public class Config
     public bool IsAttributeOptionSet(int attributeKey, string name)
     {
         return (_attributeConfigValues.ContainsKey(attributeKey) && _attributeConfigValues[attributeKey].ContainsKey(name)) || IsOptionSet(name);
+    }
+
+    public void SetSymbolEncodingCompressionLevel(int compressionLevel)
+    {
+        Assertions.ThrowIf(compressionLevel < 0 || compressionLevel > 10, "Invalid compression level");
+        SetOption(ConfigOptionName.SymbolEncodingCompressionLevel, compressionLevel);
     }
 }

@@ -17,7 +17,7 @@ internal class Vector<TScalar>
 {
     public byte Dimension { get; }
     public TScalar[] Components { get; private set; }
-    public TScalar this[int index] { get => Components[index]; }
+    public TScalar this[int index] { get => Components[index]; set => Components[index] = value; }
 
     public Vector(byte dimension)
     {

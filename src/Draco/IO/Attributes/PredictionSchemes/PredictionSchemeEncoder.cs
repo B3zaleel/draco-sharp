@@ -3,7 +3,7 @@ using Draco.IO.Enums;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 
-internal abstract class PredictionSchemeDecoder<TDataType, TTransform>(PointAttribute attribute, TTransform transform) : IPredictionSchemeDecoder<TDataType>
+internal abstract class PredictionSchemeEncoder<TDataType, TTransform>(PointAttribute attribute, TTransform transform) : IPredictionSchemeEncoder<TDataType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -15,7 +15,7 @@ internal abstract class PredictionSchemeDecoder<TDataType, TTransform>(PointAttr
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : IPredictionSchemeDecodingTransform<TDataType, TDataType>
+    where TTransform : IPredictionSchemeEncodingTransform<TDataType, TDataType>
 {
     public abstract PredictionSchemeMethod Method { get; }
     public TTransform Transform { get; set; } = transform;
@@ -25,9 +25,9 @@ internal abstract class PredictionSchemeDecoder<TDataType, TTransform>(PointAttr
     public virtual PointAttribute? ParentAttribute { get; set; }
     public virtual GeometryAttributeType ParentAttributeType { get; set; } = GeometryAttributeType.Invalid;
 
-    public virtual void DecodePredictionData(DecoderBuffer decoderBuffer)
+    public virtual void EncodePredictionData(EncoderBuffer encoderBuffer)
     {
-        Transform.DecodeTransformData(decoderBuffer);
+        Transform.EncodeTransformData(encoderBuffer);
     }
 
     protected bool AreCorrectionsPositive()
@@ -40,5 +40,5 @@ internal abstract class PredictionSchemeDecoder<TDataType, TTransform>(PointAttr
         return GeometryAttributeType.Invalid;
     }
 
-    public abstract TDataType[] ComputeOriginalValues(TDataType[] data, int size, int numComponents, List<uint> entryToPointMap);
+    public abstract TDataType[] ComputeCorrectionValues(TDataType[] data, int size, int numComponents, List<uint> entryToPointMap);
 }

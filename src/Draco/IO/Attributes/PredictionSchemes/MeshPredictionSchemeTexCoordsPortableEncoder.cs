@@ -5,7 +5,7 @@ using Draco.IO.Extensions;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 
-internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransform>(PointAttribute attribute, TTransform transform, MeshPredictionSchemeData meshData) : MeshPredictionSchemeDecoder<TDataType, TTransform>(attribute, transform, meshData)
+internal class MeshPredictionSchemeTexCoordsPortableEncoder<TDataType, TTransform>(PointAttribute attribute, TTransform transform, MeshPredictionSchemeData meshData) : MeshPredictionSchemeEncoder<TDataType, TTransform>(attribute, transform, meshData)
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -17,7 +17,7 @@ internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransfor
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : IPredictionSchemeDecodingTransform<TDataType, TDataType>
+    where TTransform : IPredictionSchemeEncodingTransform<TDataType, TDataType>
 {
     private readonly MeshPredictionSchemeTexCoordsPortablePredictor<TDataType> _predictor = new(meshData, false);
     public override PredictionSchemeMethod Method { get => PredictionSchemeMethod.TexCoordsPortable; }
@@ -47,40 +47,36 @@ internal class MeshPredictionSchemeTexCoordsPortableDecoder<TDataType, TTransfor
         return GeometryAttributeType.Position;
     }
 
-    public override TDataType[] ComputeOriginalValues(TDataType[] correctedData, int _, int numComponents, List<uint> entryToPointMap)
+    public override TDataType[] ComputeCorrectionValues(TDataType[] data, int size, int numComponents, List<uint> entryToPointMap)
     {
-        Assertions.ThrowIf(numComponents != MeshPredictionSchemeTexCoordsPortablePredictor<TDataType>.kNumComponents);
         _predictor.EntryToPointMap = entryToPointMap;
-        Transform.Init(numComponents);
-        var originalValues = new TDataType[MeshData.DataToCornerMap!.Count * numComponents];
+        Transform.Init(data, size, numComponents);
+        var correctionValues = new TDataType[size * numComponents];
 
-        for (int p = 0; p < MeshData.DataToCornerMap!.Count; ++p)
+        for (int p = MeshData.DataToCornerMap!.Count - 1; p >= 0; --p)
         {
             var cornerId = MeshData.DataToCornerMap[p];
-            _predictor.ComputePredictedValue(cornerId, originalValues, p);
-            var dstOffset = p * numComponents;
-            originalValues.SetSubArray(Transform.ComputeOriginalValue(_predictor.PredictedValue, correctedData.GetSubArray(dstOffset, numComponents)), dstOffset);
+            _predictor.ComputePredictedValue(cornerId, data, p);
+            int dstOffset = p * numComponents;
+            correctionValues.SetSubArray(Transform.ComputeCorrectionValue(data.GetSubArray(dstOffset), _predictor.PredictedValue), dstOffset);
         }
-        return originalValues;
+        return correctionValues;
     }
 
-    public override void DecodePredictionData(DecoderBuffer decoderBuffer)
+    public override void EncodePredictionData(EncoderBuffer encoderBuffer)
     {
-        var numOrientations = decoderBuffer.ReadInt32();
-        Assertions.ThrowIf(numOrientations < 0);
+        int numOrientations = _predictor.Orientations.Count;
+        encoderBuffer.WriteInt32(numOrientations);
         var lastOrientation = true;
-        var decoder = new RAnsBitDecoder();
-        decoder.StartDecoding(decoderBuffer);
-
+        var encoder = new RAnsBitEncoder();
+        encoder.StartEncoding(encoderBuffer);
         for (int i = 0; i < numOrientations; ++i)
         {
-            if (decoder.DecodeNextBit() == 0)
-            {
-                lastOrientation = !lastOrientation;
-            }
-            _predictor.Orientations.Add(lastOrientation);
+            var orientation = _predictor.Orientations[i];
+            encoder.EncodeBit(orientation == lastOrientation);
+            lastOrientation = orientation;
         }
-        decoder.EndDecoding(decoderBuffer);
-        base.DecodePredictionData(decoderBuffer);
+        encoder.EndEncoding();
+        base.EncodePredictionData(encoderBuffer);
     }
 }

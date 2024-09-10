@@ -6,7 +6,7 @@ namespace Draco.IO.Attributes.PredictionSchemes;
 
 internal static class PredictionSchemeDecoderFactory
 {
-    public static IPredictionSchemeDecoder<TDataType>? CreatePredictionSchemeForDecoder<TDataType, TTransform>(PredictionSchemeMethod method, int attributeId, ConnectivityDecoder connectivityDecoder, TTransform transform)
+    public static IPredictionSchemeDecoder<TDataType>? CreatePredictionScheme<TDataType, TTransform>(PredictionSchemeMethod method, int attributeId, ConnectivityDecoder connectivityDecoder, TTransform transform)
         where TDataType : struct,
             IComparisonOperators<TDataType, TDataType, bool>,
             IComparable,
@@ -18,7 +18,7 @@ internal static class PredictionSchemeDecoderFactory
             IDecrementOperators<TDataType>,
             IBitwiseOperators<TDataType, TDataType, TDataType>,
             IMinMaxValue<TDataType>
-        where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
+        where TTransform : IPredictionSchemeDecodingTransform<TDataType, TDataType>
     {
         if (method == PredictionSchemeMethod.None)
         {
@@ -48,7 +48,7 @@ internal static class PredictionSchemeDecoderFactory
             IDecrementOperators<TDataType>,
             IBitwiseOperators<TDataType, TDataType, TDataType>,
             IMinMaxValue<TDataType>
-        where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
+        where TTransform : IPredictionSchemeDecodingTransform<TDataType, TDataType>
     {
         var attribute = meshDecoder.PointCloud!.GetAttributeById(attributeId)!;
         var cornerTable = meshDecoder.CornerTable;

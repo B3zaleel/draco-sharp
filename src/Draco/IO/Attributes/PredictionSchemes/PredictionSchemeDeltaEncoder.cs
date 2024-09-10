@@ -4,7 +4,7 @@ using Draco.IO.Extensions;
 
 namespace Draco.IO.Attributes.PredictionSchemes;
 
-internal class PredictionSchemeDeltaDecoder<TDataType, TTransform>(PointAttribute attribute, TTransform transform) : PredictionSchemeDecoder<TDataType, TTransform>(attribute, transform)
+internal class PredictionSchemeDeltaEncoder<TDataType, TTransform>(PointAttribute attribute, TTransform transform) : PredictionSchemeEncoder<TDataType, TTransform>(attribute, transform)
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -16,23 +16,22 @@ internal class PredictionSchemeDeltaDecoder<TDataType, TTransform>(PointAttribut
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : IPredictionSchemeDecodingTransform<TDataType, TDataType>
+    where TTransform : IPredictionSchemeEncodingTransform<TDataType, TDataType>
 {
     public override PredictionSchemeMethod Method { get => PredictionSchemeMethod.Difference; }
 
-    public override TDataType[] ComputeOriginalValues(TDataType[] correctedData, int size, int numComponents, List<uint> entryToPointMap)
+    public override TDataType[] ComputeCorrectionValues(TDataType[] data, int size, int numComponents, List<uint> entryToPointMap)
     {
-        Transform.Init(numComponents);
-        var originalValues = new TDataType[size * numComponents];
+        Transform.Init(data, size, numComponents);
+        var correctionValues = new TDataType[size * numComponents];
+        for (int i = size - numComponents; i > 0; i -= numComponents)
+        {
+            correctionValues.SetSubArray(Transform.ComputeCorrectionValue(data.GetSubArray(i), data.GetSubArray(i - numComponents)), i);
+        }
         var zeroValues = new TDataType[numComponents];
         var zero = (TDataType)Convert.ChangeType(0, typeof(TDataType));
         Array.Fill(zeroValues, zero);
-        originalValues.SetSubArray(Transform.ComputeOriginalValue(zeroValues.GetSubArray(0), correctedData.GetSubArray(0)), 0);
-
-        for (int i = numComponents; i < size; i += numComponents)
-        {
-            originalValues.SetSubArray(Transform.ComputeOriginalValue(originalValues.GetSubArray(i - numComponents), correctedData.GetSubArray(i)), i);
-        }
-        return originalValues;
+        correctionValues.SetSubArray(Transform.ComputeCorrectionValue(data.GetSubArray(0), zeroValues), 0);
+        return correctionValues;
     }
 }

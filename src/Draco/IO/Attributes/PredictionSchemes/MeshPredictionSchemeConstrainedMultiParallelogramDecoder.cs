@@ -18,26 +18,25 @@ internal class MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataTyp
         IDecrementOperators<TDataType>,
         IBitwiseOperators<TDataType, TDataType, TDataType>,
         IMinMaxValue<TDataType>
-    where TTransform : PredictionSchemeDecodingTransform<TDataType, TDataType>
+    where TTransform : IPredictionSchemeDecodingTransform<TDataType, TDataType>
 {
-    private const int kMaxNumParallelograms = 4;
     private MultiParallelogramMode _selectedMode = MultiParallelogramMode.Optimal;
-    private readonly List<bool>[] _isCreaseEdge = new List<bool>[kMaxNumParallelograms];
+    private readonly List<bool>[] _isCreaseEdge = new List<bool>[Constants.ConstrainedMultiParallelogramMaxNumParallelograms];
 
     public override PredictionSchemeMethod Method { get => PredictionSchemeMethod.ConstrainedMultiParallelogram; }
 
     public override TDataType[] ComputeOriginalValues(TDataType[] correctedData, int _, int numComponents, List<uint> __)
     {
         Transform.Init(numComponents);
-        var predictedValues = new List<TDataType>[kMaxNumParallelograms];
+        var predictedValues = new List<TDataType>[Constants.ConstrainedMultiParallelogramMaxNumParallelograms];
         var originalValues = new TDataType[MeshData.DataToCornerMap!.Count * numComponents];
 
-        for (int i = 0; i < kMaxNumParallelograms; ++i)
+        for (int i = 0; i < Constants.ConstrainedMultiParallelogramMaxNumParallelograms; ++i)
         {
             predictedValues[i] = new List<TDataType>(correctedData.Length);
             predictedValues[i].Fill(correctedData.Length, (TDataType)default);
         }
-        var isCreaseEdgePos = new int[kMaxNumParallelograms];
+        var isCreaseEdgePos = new int[Constants.ConstrainedMultiParallelogramMaxNumParallelograms];
         Array.Fill(isCreaseEdgePos, 0);
         var multiPredValues = new TDataType[numComponents];
         Array.Fill(multiPredValues, default);
@@ -55,7 +54,7 @@ internal class MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataTyp
                 if (MeshPredictionSchemeParallelogramDecoder<TDataType, TTransform>.TryComputeParallelogramPrediction(p, cornerId, MeshData.CornerTable!, MeshData.VertexToDataMap!, originalValues, numComponents, out TDataType[] parallelogramPredictedValues))
                 {
                     ++numParallelograms;
-                    if (numParallelograms == kMaxNumParallelograms)
+                    if (numParallelograms == Constants.ConstrainedMultiParallelogramMaxNumParallelograms)
                     {
                         break;
                     }
@@ -117,7 +116,7 @@ internal class MeshPredictionSchemeConstrainedMultiParallelogramDecoder<TDataTyp
         {
             _selectedMode = (MultiParallelogramMode)decoderBuffer.ReadByte();
         }
-        for (int i = 0; i < kMaxNumParallelograms; ++i)
+        for (int i = 0; i < Constants.ConstrainedMultiParallelogramMaxNumParallelograms; ++i)
         {
             var numFlags = (uint)decoderBuffer.DecodeVarIntUnsigned();
             if (numFlags > 0)

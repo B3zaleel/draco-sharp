@@ -17,7 +17,7 @@ internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType> : P
         IMinMaxValue<TDataType>
 { }
 
-internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType, TCorrectedType> : PredictionSchemeDecodingTransform<TDataType, TCorrectedType>
+internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType, TCorrectedType>
     where TDataType : struct,
         IComparisonOperators<TDataType, TDataType, bool>,
         IComparable,
@@ -42,7 +42,7 @@ internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType, TCo
         IMinMaxValue<TCorrectedType>
 {
     private int _maxQuantizedValue;
-    private readonly OctahedronToolBox _octahedronToolBox = new();
+    protected readonly OctahedronToolBox _octahedronToolBox = new();
 
     public int MaxQuantizedValue
     {
@@ -55,7 +55,6 @@ internal abstract class PredictionSchemeNormalOctahedronTransform<TDataType, TCo
         }
     }
     public int CenterValue { get => _octahedronToolBox.CenterValue; }
-    public override int QuantizationBits { get => _octahedronToolBox.QuantizationBits; }
 
     protected bool IsInDiamond(int s, int t)
     {

@@ -31,6 +31,7 @@ internal abstract class AttributeTransform
     public abstract void TransformAttribute(PointAttribute attribute, List<uint> pointIds, PointAttribute targetAttribute);
     public abstract void InverseTransformAttribute(PointAttribute attribute, PointAttribute targetAttribute);
     public abstract void DecodeParameters(DecoderBuffer decoderBuffer, PointAttribute targetAttribute);
+    public abstract void EncodeParameters(EncoderBuffer encoderBuffer);
     public abstract DataType GetTransformedDataType(PointAttribute attribute);
     public abstract int GetTransformedNumComponents(PointAttribute attribute);
 }
