@@ -2,12 +2,22 @@ using Draco.IO;
 
 namespace Draco;
 
-public class DracoHeader(byte majorVersion, byte minorVersion, byte encoderType, byte encoderMethod, ushort flags)
+public class DracoHeader
 {
-    public byte MajorVersion { get; } = majorVersion;
-    public byte MinorVersion { get; } = minorVersion;
-    public ushort Version { get; } = Constants.BitStreamVersion(majorVersion, minorVersion);
-    public byte EncoderType { get; } = encoderType;
-    public byte EncoderMethod { get; } = encoderMethod;
-    public ushort Flags { get; } = flags;
+    public byte MajorVersion { get; }
+    public byte MinorVersion { get; }
+    public ushort Version { get; }
+    public byte EncoderType { get; }
+    public byte EncoderMethod { get; }
+    public ushort Flags { get; }
+
+    internal DracoHeader(byte majorVersion, byte minorVersion, byte encoderType, byte encoderMethod, ushort flags)
+    {
+        MajorVersion = majorVersion;
+        MinorVersion = minorVersion;
+        Version = Constants.BitStreamVersion(majorVersion, minorVersion);
+        EncoderType = encoderType;
+        EncoderMethod = encoderMethod;
+        Flags = flags;
+    }
 }

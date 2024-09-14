@@ -3,7 +3,7 @@ using Draco.IO.Extensions;
 
 namespace Draco.IO.Mesh;
 
-internal class MeshEdgeBreakerTraversalPredictiveEncoder(Config config) : MeshEdgeBreakerTraversalEncoder(config)
+internal class MeshEdgeBreakerTraversalPredictiveEncoder(Config config, Mesh mesh) : MeshEdgeBreakerTraversalEncoder(config, mesh)
 {
     private readonly List<int> _vertexValences = [];
     private readonly List<bool> _predictions = [];

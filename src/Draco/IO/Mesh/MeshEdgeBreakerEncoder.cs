@@ -26,7 +26,7 @@ internal abstract class MeshEdgeBreakerEncoder : MeshEncoder
     public abstract int NumEncodedSymbols { get; }
     protected EncoderBuffer TraversalBuffer { get; private set; }
 
-    public MeshEdgeBreakerEncoder(Config config) : base(config)
+    public MeshEdgeBreakerEncoder(Config config, Mesh mesh) : base(config, mesh)
     {
         _attributeEncoderToDataIdMap.Clear();
         _useSingleConnectivity = config.IsOptionSet(ConfigOptionName.SplitMeshOnSeams)

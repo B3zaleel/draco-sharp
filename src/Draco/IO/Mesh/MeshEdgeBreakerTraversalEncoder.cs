@@ -2,7 +2,7 @@ using Draco.IO.BitCoders;
 
 namespace Draco.IO.Mesh;
 
-internal class MeshEdgeBreakerTraversalEncoder(Config config) : MeshEdgeBreakerEncoder(config)
+internal class MeshEdgeBreakerTraversalEncoder(Config config, Mesh mesh) : MeshEdgeBreakerEncoder(config, mesh)
 {
     private uint _numAttributeData = 0;
     private RAnsBitEncoder _startFaceEncoder = new();
