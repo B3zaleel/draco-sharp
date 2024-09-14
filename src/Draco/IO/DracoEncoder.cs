@@ -78,7 +78,7 @@ public class DracoEncoder
 
             if (header.EncoderMethod == Constants.EncodingMethod.SequentialEncoding)
             {
-                return new MeshSequentialEncoder(config);
+                return new MeshSequentialEncoder(config, mesh);
             }
             else if (header.EncoderMethod == Constants.EncodingMethod.EdgeBreakerEncoding)
             {
@@ -99,9 +99,9 @@ public class DracoEncoder
 
                 var meshEdgeBreakerEncoder = selectedEdgeBreakerMethod switch
                 {
-                    Constants.EdgeBreakerTraversalDecoderType.StandardEdgeBreaker => new MeshEdgeBreakerTraversalEncoder(config),
-                    Constants.EdgeBreakerTraversalDecoderType.ValenceEdgeBreaker => new MeshEdgeBreakerTraversalValenceEncoder(config),
-                    Constants.EdgeBreakerTraversalDecoderType.PredictiveEdgeBreaker => new MeshEdgeBreakerTraversalPredictiveEncoder(config),
+                    Constants.EdgeBreakerTraversalDecoderType.StandardEdgeBreaker => new MeshEdgeBreakerTraversalEncoder(config, mesh),
+                    Constants.EdgeBreakerTraversalDecoderType.ValenceEdgeBreaker => new MeshEdgeBreakerTraversalValenceEncoder(config, mesh),
+                    Constants.EdgeBreakerTraversalDecoderType.PredictiveEdgeBreaker => new MeshEdgeBreakerTraversalPredictiveEncoder(config, mesh),
                     _ => throw new InvalidDataException($"Unsupported edge breaker traversal encoder type {selectedEdgeBreakerMethod}"),
                 };
                 encoderBuffer.WriteByte((byte)selectedEdgeBreakerMethod);

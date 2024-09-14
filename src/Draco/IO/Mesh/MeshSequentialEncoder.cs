@@ -4,7 +4,7 @@ using Draco.IO.Enums;
 
 namespace Draco.IO.Mesh;
 
-internal class MeshSequentialEncoder(Config config) : MeshEncoder(config)
+internal class MeshSequentialEncoder(Config config, Mesh mesh) : MeshEncoder(config, mesh)
 {
     public override void EncodeConnectivity(EncoderBuffer encoderBuffer)
     {
