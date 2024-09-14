@@ -1,3 +1,4 @@
+using Draco.IO.Attributes;
 using Draco.IO.Enums;
 using Draco.IO.Mesh;
 using Draco.IO.Metadata;
@@ -6,34 +7,53 @@ namespace Draco.IO;
 
 public class DracoEncoder
 {
-    public void Encode(string path, Config config, Draco draco)
+    public void Encode(string path, Config config, PointCloud.PointCloud connectedData, List<PointAttribute> attributes, DracoMetadata? metadata = null)
     {
         using var fs = new FileStream(path, FileMode.Open, FileAccess.Read);
-        Encode(new BinaryWriter(fs), config, draco);
+        Encode(new BinaryWriter(fs), config, connectedData, attributes, metadata);
     }
 
-    public void Encode(Stream stream, Config config, Draco draco)
+    public void Encode(Stream stream, Config config, PointCloud.PointCloud connectedData, List<PointAttribute> attributes, DracoMetadata? metadata = null)
     {
-        Encode(new BinaryWriter(stream), config, draco);
+        Encode(new BinaryWriter(stream), config, connectedData, attributes, metadata);
     }
 
-    public void Encode(BinaryWriter binaryWriter, Config config, Draco draco)
+    public void Encode(BinaryWriter binaryWriter, Config config, PointCloud.PointCloud connectedData, List<PointAttribute> attributes, DracoMetadata? metadata = null)
     {
+        var (encoderType, encoderMethod) = GetEncoderTypeAndMethod(config, connectedData);
+        ushort flags = metadata == null ? (ushort)0 : Constants.Metadata.FlagMask;
+        var header = new DracoHeader(Constants.MajorVersion, Constants.MinorVersion, encoderType, encoderMethod, flags);
         using var encoderBuffer = new EncoderBuffer(binaryWriter);
-        EncodeHeader(encoderBuffer, draco.Header);
-        encoderBuffer.BitStreamVersion = draco.Header.Version;
+        encoderBuffer.BitStreamVersion = header.Version;
+        EncodeHeader(encoderBuffer, header);
 
-        if (draco.Header.Version >= Constants.BitStreamVersion(1, 3) && (draco.Header.Flags & Constants.Metadata.FlagMask) == Constants.Metadata.FlagMask)
+        if (metadata != null)
         {
-            MetadataEncoder.Encode(encoderBuffer, draco.Metadata!);
+            MetadataEncoder.Encode(encoderBuffer, metadata);
         }
-        var connectivityEncoder = GetConnectivityEncoder(encoderBuffer, config, draco.ConnectedData);
+        var connectivityEncoder = GetConnectivityEncoder(encoderBuffer, config, header, connectedData);
         connectivityEncoder.EncodeConnectivity(encoderBuffer);
         connectivityEncoder.EncodeAttributes(encoderBuffer);
         if (config.GetOption(ConfigOptionName.StoreNumberOfEncodedPoints, false))
         {
             connectivityEncoder.ComputeNumberOfEncodedPoints();
         }
+    }
+
+    private static (byte EncoderType, byte EncoderMethod) GetEncoderTypeAndMethod(Config config, PointCloud.PointCloud connectivityData)
+    {
+        var encoderType = connectivityData is Mesh.Mesh ? Constants.EncodingType.TriangularMesh : Constants.EncodingType.PointCloud;
+        int encoderMethod = config.GetOption(ConfigOptionName.EncodingMethod, -1);
+
+        if (encoderType == Constants.EncodingType.TriangularMesh)
+        {
+            if (encoderMethod == -1)
+            {
+                encoderMethod = config.Speed == 10 ? Constants.EncodingMethod.SequentialEncoding : Constants.EncodingMethod.EdgeBreakerEncoding;
+            }
+        }
+
+        return (encoderType, (byte)encoderMethod);
     }
 
     private static void EncodeHeader(EncoderBuffer encoderBuffer, DracoHeader header)
@@ -46,27 +66,28 @@ public class DracoEncoder
         encoderBuffer.WriteUInt16(header.Flags);
     }
 
-    private static ConnectivityEncoder GetConnectivityEncoder(EncoderBuffer encoderBuffer, Config config, PointCloud.PointCloud pointCloud)
+    private static ConnectivityEncoder GetConnectivityEncoder(EncoderBuffer encoderBuffer, Config config, DracoHeader header, PointCloud.PointCloud connectedData)
     {
-        var isStandardEdgeBreakerAvailable = config.IsOptionSet(ConfigOptionName.Feature.EdgeBreaker);
-        var isPredictiveEdgeBreakerAvailable = config.IsOptionSet(ConfigOptionName.Feature.PredictiveEdgeBreaker);
-        var encodingMethod = config.GetOption(ConfigOptionName.EncodingMethod, -1);
-
-        if (pointCloud is Mesh.Mesh mesh)
+        if (header!.EncoderType == Constants.EncodingType.PointCloud)
         {
-            if (encodingMethod == -1)
-            {
-                encodingMethod = config.Speed == 10 ? Constants.EncodingMethod.SequentialEncoding : Constants.EncodingMethod.EdgeBreakerEncoding;
-            }
+            throw new NotImplementedException("Point cloud decoding is not implemented.");
+        }
+        else if (header.EncoderType == Constants.EncodingType.TriangularMesh)
+        {
+            var mesh = (Mesh.Mesh)connectedData!;
 
-            if (encodingMethod == Constants.EncodingMethod.EdgeBreakerEncoding)
+            if (header.EncoderMethod == Constants.EncodingMethod.SequentialEncoding)
+            {
+                return new MeshSequentialEncoder(config);
+            }
+            else if (header.EncoderMethod == Constants.EncodingMethod.EdgeBreakerEncoding)
             {
                 var isTinyMesh = mesh.FacesCount < 1000;
                 int selectedEdgeBreakerMethod = config.GetOption(ConfigOptionName.EdgeBreakerMethod, -1);
 
                 if (selectedEdgeBreakerMethod == -1)
                 {
-                    if (isStandardEdgeBreakerAvailable && (config.Speed >= 5 || !isPredictiveEdgeBreakerAvailable || isTinyMesh))
+                    if (config.Speed >= 5 || isTinyMesh)
                     {
                         selectedEdgeBreakerMethod = Constants.EdgeBreakerTraversalDecoderType.StandardEdgeBreaker;
                     }
@@ -76,28 +97,24 @@ public class DracoEncoder
                     }
                 }
 
+                var meshEdgeBreakerEncoder = selectedEdgeBreakerMethod switch
+                {
+                    Constants.EdgeBreakerTraversalDecoderType.StandardEdgeBreaker => new MeshEdgeBreakerTraversalEncoder(config),
+                    Constants.EdgeBreakerTraversalDecoderType.ValenceEdgeBreaker => new MeshEdgeBreakerTraversalValenceEncoder(config),
+                    Constants.EdgeBreakerTraversalDecoderType.PredictiveEdgeBreaker => new MeshEdgeBreakerTraversalPredictiveEncoder(config),
+                    _ => throw new InvalidDataException($"Unsupported edge breaker traversal encoder type {selectedEdgeBreakerMethod}"),
+                };
                 encoderBuffer.WriteByte((byte)selectedEdgeBreakerMethod);
-                if (selectedEdgeBreakerMethod == Constants.EdgeBreakerTraversalDecoderType.StandardEdgeBreaker)
-                {
-                    if (isStandardEdgeBreakerAvailable)
-                    {
-                        return new MeshEdgeBreakerTraversalEncoder(config);
-                    }
-                }
-                else if (selectedEdgeBreakerMethod == Constants.EdgeBreakerTraversalDecoderType.ValenceEdgeBreaker)
-                {
-                    return new MeshEdgeBreakerTraversalValenceEncoder(config);
-                }
-                else if (selectedEdgeBreakerMethod == Constants.EdgeBreakerTraversalDecoderType.PredictiveEdgeBreaker)
-                {
-                    return new MeshEdgeBreakerTraversalPredictiveEncoder(config);
-                }
+                return meshEdgeBreakerEncoder;
             }
             else
             {
-                return new MeshSequentialEncoder(config);
+                throw new InvalidDataException($"Unsupported encoder method {header.EncoderMethod}.");
             }
         }
-        throw new NotImplementedException("The given method is not supported.");
+        else
+        {
+            throw new InvalidDataException($"Unsupported encoder type {header.EncoderType}.");
+        }
     }
 }
